@@ -4,19 +4,19 @@
 import random
 
 class Event:
+    me = 0
     clock = 0
-    def __init__(this,clock = 0):
+    def __init__(this, brm = 0, clock = 0):
         this.clock = clock
+        this.me = brm
     def __repr__(this):
         return "event at %.1f"%this.clock
     def __str__(this):
         return "event at %.1f"%this.clock
 
-
     def process(this):
         print 'process me at %.1f'%this.clock
-        pass
-#   }
+#}
 
 class Eventlist:
     clock = 0
@@ -30,13 +30,12 @@ class Eventlist:
                 tmp.append(event)
                 tmp += this._list[i:]
                 this._list = tmp
-                print this._list
+                #print this._list
                 return True
         this._list.append(event)
     #}
 
     def procone(this):
-        sync()
         e = this._list.pop(0)
         e.process()
         this.clock = e.clock
@@ -51,7 +50,41 @@ class Eventlist:
 #} class eventlist
 
 def main():
-    return 
+    el = Eventlist()
+    b = brm()
+
+    class Stevent(Event):
+        def process(this):
+            this.me.takestdmg()
+            this.clock += 0.5
+            print this.me.st
+            el.add(this)
+    
+    class Meleeevent(Event):
+        def process(this, iv = 1.5):
+            this.me.takemelee()
+            this.clock += iv
+            el.add(this)
+
+    class Puryevent(Event):
+        def process(this, iv = 15):
+            this.me.pury()
+            this.clock += iv
+            el.add(this)
+            
+
+    e = Stevent(b)
+    el.add(e)
+
+    e = Meleeevent(b)
+    el.add(e)
+
+    e = Puryevent(b)
+    el.add(e)
+
+    el.run(20)
+    b.showavoid()
+
 
 
 class brm:
@@ -59,6 +92,8 @@ class brm:
     #ht : high tolerance
     #bc : blackout combo
 
+    def ah(this):
+        print 'ah'
     fout = 0
     clock = 0
 
@@ -86,15 +121,11 @@ class brm:
     st = 0  # stagger pool
     sttick = 0 # stagger tick
 
-
     total = 0 # total dmg taken
     avoid = 0 # avoidance
     facetotal = 0
     sttaken = 0
     stin = 0
-
-    
-
 
     class Cd():
         clock = 0
@@ -116,7 +147,99 @@ class brm:
             if this.stack == this.stackmax :
                 this.clock = 0
 
+        def remain(this):
+            return cd - clock
 
+
+
+
+    def takestdmg(this):
+        if this.st <= 0 :
+            return
+
+        this.sttaken += this.sttick
+        this.st -= this.sttick
+
+    def pury(this):
+        this.avoid += (this.phrate + this.prate) * this.st 
+        this.st -= this.prate * this.st
+        this.sttick -= this.sttick * this.prate
+
+    def takemelee(this):
+
+        rate = 0.9
+
+        if this.mastery == 0:
+            this.total += 100.0
+            this.stin += rate * 100
+            this.st += rate * 100
+            this.sttick = this.st * this.stdmgrate
+        else :
+            r = random.random()
+            dodge = this.dodgebase + this.mastery* this.masterystack
+            if r < dodge:
+                this.masterystack = 0
+                if this.wrist == 1:
+                    this.puryclock+=1
+                return
+            else:
+                this.total += 100.0
+                this.st += rate * 100
+                this.sttick = this.st * this.stdmgrate
+                this.masterystack += 1
+#   }
+
+    def showavoid(this):
+        if this.prate == 0.65:
+            print 'ed',  
+        elif this.srate == 0.5:
+            print 'ht',
+        else :
+            print 'bc',
+        if this.ring == 1 :
+            print 'ring',
+        if this.waist ==1:
+            print 'waist',
+        print this.avoid/this.total
+        return this.avoid/this.total
+
+
+    def getavoid(this):
+        return this.avoid/this.total
+
+
+    def getehp(this):
+        return 1/(1-this.avoid/this.total)
+
+
+    def clean(this):
+        this.st = 0
+        this.avoid = 0
+        this.total = 0
+
+
+    def tick(this,offset):
+        for i in this.clock :
+            i += offset
+
+        if this.puryclock > this.puryiv :
+            this.puryclock -= this.puryiv
+            this.purystack += 1
+            if this.purystack > 3 + this.light :
+                this.purystack = 3 + this.light
+
+        this.takemelee()
+        ret = this.takephy()
+        this.takemag()
+        
+        this.puryac(ret)
+
+        this.stclock += this.clockoffset
+        if this.stclock > this.stiv :
+            this.stclock -= this.stiv
+            this.sttaken += this.sttick
+            this.st -= this.sttick
+    #}tick
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
             iron = 8, palm = 1.3, haste = 1.3, meleeiv = 1.5,dodgebase = 0.08, mastery = 0, magic = 0):
@@ -127,10 +250,10 @@ class brm:
         this.dodgebase = dodgebase
         this.haste = haste
 
-        blackcd = Cd(90)
-        kegcd = Cd(8.0/haste)
-        palmcd = Cd(5.0/haste)
-        brewcd = Cd(21,3)
+        blackcd = brm.Cd(90)
+        kegcd = brm.Cd(8.0/haste)
+        palmcd = brm.Cd(5.0/haste)
+        brewcd = brm.Cd(21,3)
 
         for t in talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
@@ -172,36 +295,7 @@ class brm:
 #   } init
 
 
-
-
-
-
-
-    def tick(this,offset):
-        for i in this.clock :
-            i += offset
-
-        if this.puryclock > this.puryiv :
-            this.puryclock -= this.puryiv
-            this.purystack += 1
-            if this.purystack > 3 + this.light :
-                this.purystack = 3 + this.light
-
-        this.takemelee()
-        ret = this.takephy()
-        this.takemag()
-        
-        this.puryac(ret)
-
-        this.stclock += this.clockoffset
-        if this.stclock > this.stiv :
-            this.stclock -= this.stiv
-            this.sttaken += this.sttick
-            this.st -= this.sttick
-    #}
-
-
-#}
+#} class brm
 
 if __name__ == '__main__' :
     main()
