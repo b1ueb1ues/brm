@@ -4,11 +4,11 @@
 import random
 
 class Event:
-    me = 0
+    tar = 0
     clock = 0
     def __init__(this, brm = 0, clock = 0):
         this.clock = clock
-        this.me = brm
+        this.tar = brm
     def __repr__(this):
         return "event at %.1f"%this.clock
     def __str__(this):
@@ -37,8 +37,8 @@ class Eventlist:
 
     def procone(this):
         e = this._list.pop(0)
-        e.process()
         this.clock = e.clock
+        e.process()
         return #this.clock
     
     def run(this, time = 10000):
@@ -50,27 +50,63 @@ class Eventlist:
 #} class eventlist
 
 def main():
-    el = Eventlist()
     b = brm()
+    el = b.el
 
     class Stevent(Event):
         def process(this):
-            this.me.takestdmg()
+            this.tar.takestdmg()
             this.clock += 0.5
-            print this.me.st
-            el.add(this)
+          #  print this.tar.st
+            this.tar.el.add(this)
     
     class Meleeevent(Event):
         def process(this, iv = 1.5):
-            this.me.takemelee()
+            this.tar.takemelee()
             this.clock += iv
-            el.add(this)
+            this.tar.el.add(this)
 
     class Puryevent(Event):
-        def process(this, iv = 15):
-            this.me.pury()
+        def process(this, iv = 3):
+            this.tar.pury()
             this.clock += iv
-            el.add(this)
+            this.tar.el.add(this)
+
+    class Kegevent(Event):
+        def process(this):
+            if this.tar.brewcdevent != 0:
+                this.tar.brewcdr(korp = 'k')
+            this.clock += 8.0/this.tar.haste
+            this.tar.el.add(this)
+
+    class Palmevent(Event):
+        def process(this):
+            if this.tar.brewcdevent != 0:
+                this.tar.brewcdr(korp = 'p')
+            this.clock += 5.0/this.tar.haste
+            this.tar.el.add(this)
+            
+    class Ironevent(Event):
+        def process(this):
+            print 'iron at',this.clock
+            if this.tar.brewcd.stack <= 0 :
+                print 'no ironbrew'
+            else:
+                this.tar.brew()
+            this.clock += this.tar.iduration
+            this.tar.el.add(this)
+
+
+    class Considerpuryevent(Event):
+        def process(this, iv = 1):
+            if this.tar.brewcd.stack >=2 \
+                    and this.clock - this.tar.brewcd.timing > this.tar.brewcd.cd/2 :
+                this.tar.pury()
+            elif this.tar.brewcd.stack == 3:
+                this.tar.pury()
+            this.clock += iv
+            this.tar.el.add(this)
+
             
 
     e = Stevent(b)
@@ -79,10 +115,19 @@ def main():
     e = Meleeevent(b)
     el.add(e)
 
-    e = Puryevent(b)
+    e = Kegevent(b)
     el.add(e)
 
-    el.run(20)
+    e = Ironevent(b)
+    el.add(e)
+
+    #e = Palmevent(b)
+    #el.add(e)
+
+    e = Considerpuryevent(b)
+    el.add(e)
+
+    el.run(40)
     b.showavoid()
 
 
@@ -92,8 +137,8 @@ class brm:
     #ht : high tolerance
     #bc : blackout combo
 
-    def ah(this):
-        print 'ah'
+    el = Eventlist()
+
     fout = 0
     clock = 0
 
@@ -110,7 +155,8 @@ class brm:
     haste = 1.3
 
     iduration = 7.5
-    palm = 1.3
+    kegcdr = 4
+    palmcdr = 1.3
 
     prate = 0.5 # purify rate
     phrate = 0  # purify healrate
@@ -127,8 +173,32 @@ class brm:
     sttaken = 0
     stin = 0
 
+
+    class Brewcdevent(Event):
+        disable = 0
+        def process(this):
+            if this.disable == 1 :
+                print 'baned'
+            if this.disable == 0 :
+                this.tar.brewcd.down(now = this.clock)
+                if this.tar.brewcd.stack < this.tar.brewcd.stackmax :
+                    print "brewstack %d"%this.tar.brewcd.stack
+                    this.clock =  this.tar.el.clock + this.tar.brewcd.cd
+                    this.tar.el.add(this)
+                else:
+                    print "brewmax"
+                    this.brewcdevent = 0
+
+
+    class Spell():
+        timing = 0
+        cd = 0
+        stack = 0
+        stackmax = 0
+
     class Cd():
         clock = 0
+        timing = 0
         cd = 0
         stack = 1
         stackmax = 1
@@ -138,7 +208,9 @@ class brm:
             this.stackmax = stack
             this.stack = stack
 
-        def cool(this,offset):
+        def cool(this,offset = 0, now = 0):
+            if now != 0:
+                offset = now - timing
             this.clock += offset
             if this.clock > this.cd :
                 this.stack += 1
@@ -147,10 +219,46 @@ class brm:
             if this.stack == this.stackmax :
                 this.clock = 0
 
+        def down(this, now):
+            this.stack += 1
+            if this.stack > this.stackmax :
+                this.stack = this.stackmax
+            clock = 0
+            timing = now
+
+
         def remain(this):
             return cd - clock
 
+        def cast(this, timing):
+            this.timing = timing
+            this.stack -= 1
 
+
+    brewcdevent = 0 # maybe a instance
+    brewcd = Cd(21,3) #should be a instance
+
+    def brewcdr(this, korp = 'k'):
+        cdr = 0
+        if korp == 'k' :
+            cdr = this.kegcdr
+        else :
+            cdr = this.palmcdr
+            
+        timing = this.brewcdevent.clock - cdr
+        #if timing < this.el.clock :
+        #    timing = this.el.clock
+        newevent = brm.Brewcdevent(this, timing)
+        this.brewcdevent.disable = 1
+        this.brewcdevent = newevent
+        this.el.add(newevent)
+
+
+    def brew(this):
+        this.brewcd.cast(this.el.clock)
+        if this.brewcdevent == 0:
+            this.brewcdevent = brm.Brewcdevent(this, clock = this.el.clock + this.brewcd.cd)
+            this.el.add(this.brewcdevent)
 
 
     def takestdmg(this):
@@ -161,9 +269,14 @@ class brm:
         this.st -= this.sttick
 
     def pury(this):
+        print 'pury %d'%this.brewcd.stack
+        if this.brewcd.stack <= 0:
+            print 'no brew'
+            return
         this.avoid += (this.phrate + this.prate) * this.st 
         this.st -= this.prate * this.st
         this.sttick -= this.sttick * this.prate
+        this.brew()
 
     def takemelee(this):
 
@@ -242,13 +355,14 @@ class brm:
     #}tick
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iron = 8, palm = 1.3, haste = 1.3, meleeiv = 1.5,dodgebase = 0.08, mastery = 0, magic = 0):
+            iron = 8, palmcdr = 1.3, haste = 1.3, meleeiv = 1.5,dodgebase = 0.08, mastery = 0, magic = 0):
         random.seed()
 
         this.meleeiv = meleeiv  # 
         this.mastery = mastery
         this.dodgebase = dodgebase
         this.haste = haste
+        this.palmcdr = palmcdr
 
         blackcd = brm.Cd(90)
         kegcd = brm.Cd(8.0/haste)
@@ -269,12 +383,13 @@ class brm:
                 this.prate = 0.65
             elif t == 'bc':
                 this.t7 = 'bc'
+                this.kegcdr = 6
             elif t == 'black':
                 this.t3 = 'black'
             elif t == 'light':
                 this.t3 = 'light'
                 this.light = 1
-                brewcd = Cd(18,4)
+                this.brewcd = Cd(18,4)
 
         for e in equip:
             if e == '2t' :
@@ -283,7 +398,7 @@ class brm:
             if e == '4t' :
                 this.prate += 0.05
                 this.srate += 0.05
-                palm += 1
+                this.palmcdr += 1
             if e == 'ring':
                 this.ring =1
                 this.stdmgrate = 1.0/26
