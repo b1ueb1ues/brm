@@ -25,31 +25,37 @@ def testinterval(brm,interval):
 	a = 0
 	i = interval
 	brm.clean()
-	for j in range(int(200000/i)):
+	for j in range(int(10000/i)):
 		brm.iron(i)
 		brm.pury()
 	a = brm.getavoid()
-	print i,'\t',a,
 	return a
 
 def testtalent(ironduration = 9):
 	brm = brmlite(t7='ht',waist=1,ring=1)
-	brm2 = brmlite(t7='ed',waist=1,ring=1)
+	brm2 = brmlite(t7='ht',waist=1,ring=1)
 	offset = 0.05
 	i = 1 - offset
+        olda = 0
+        oldb = 0
 	while(1):
 		if i > 2:
 			break
 		i+=offset
-		bps = brm_bps.bps(haste=i,t7='ht15',p=2.3)
+		bps = brm_bps.bps(haste=i,t7='ht',p=1.3)
 		pps = bps - 1.0/ ironduration
-		bps2 = brm_bps.bps(haste=i,t7 = 'ed',p=2.3)
+		bps2 = brm_bps.bps(haste=i,t7 = 'ht',p=2.3)
 		pps2 = bps2 - 1.0/ ironduration
 
 		print i,'\t',
 		a = testinterval(brm,1/pps)
+
+		print a, 1-(1-a)/(1-olda),
+                olda = a
 		b = testinterval(brm2,1/pps2)
-		print '\n'
+		print b, 1-(1-b)/(1-oldb)
+                oldb = b
+
 
 	return 0;
 

@@ -1,0 +1,317 @@
+#!/usr/bin/python2.7
+# -*- encoding:utf8 -*-
+
+import random
+
+debug = 1
+
+class Event:
+    time = 0
+    dest = 0
+    src = 0
+
+    def __init__(this, brm = 0, time = 0):
+        this.time = time
+        this.tar = brm
+    def __str__(this):
+        return this.__class__.__name__+" at %.3f"%this.time
+
+    def process(this):
+        print this.time,'process'
+#}
+
+class Eventlist:
+    time = 0
+    _list = []
+    brm = 0
+    def __str__(this):
+        return str(this._list)
+
+    #def __init__(this, brm):
+    #   this.brm = brm
+
+
+    def add(this,event):
+        if debug == 1:
+            print "%.3f"%this.time,'add',event
+        timing = event.time
+        for i in range(len(this._list)) :
+            if timing <= this._list[i].time  :
+                tmp = this._list[:i]
+                tmp.append(event)
+                tmp += this._list[i:]
+                this._list = tmp
+                return True
+        this._list.append(event)
+    #}
+
+
+    def procone(this):
+        e = this._list.pop(0)
+        this.time = e.time
+        e.process()
+        return #this.time
+    
+
+    def run(this, time = 10000):
+        while(1):
+            if this.time > time :
+                return
+            this.procone()
+
+#} class eventlist
+
+
+def main():
+    b = brmbase(equip=[''])
+    el = Eventlist()
+    e = Event()
+    el.add(e)
+    el.run()
+
+    exit()
+    class Stevent(Event):
+        def process(this):
+            this.tar.takestdmg()
+            this.time += 0.5
+          #  print this.tar.st
+            this.tar.el.add(this)
+    
+    class Meleeevent(Event):
+        def process(this, iv = 1.5):
+            this.tar.takemelee()
+            this.time += iv
+            this.tar.el.add(this)
+
+    class Puryevent(Event):
+        def process(this, iv = 3):
+            this.tar.pury()
+            this.clock += iv
+            this.tar.el.add(this)
+
+    class Kegevent(Event):
+        def process(this):
+            if this.tar.debug2 == 1:
+                return
+            if this.tar.brewcdevent != 0:
+                this.tar.brewcdr(korp = 'k')
+            this.clock += 8.0/this.tar.haste
+            this.tar.el.add(this)
+
+    class Palmevent(Event):
+        def process(this):
+            if this.tar.debug == 1:
+                return
+            if this.tar.brewcdevent != 0:
+                this.tar.brewcdr(korp = 'p')
+            this.clock += 5.0/this.tar.haste
+            this.tar.el.add(this)
+            
+
+
+    class Considerpuryevent(Event):
+        def process(this, iv = 1):
+            if this.tar.brewcd.stack >=2 \
+                    and this.clock - this.tar.brewcd.timing > this.tar.brewcd.cd/2 :
+                this.tar.pury()
+            elif this.tar.brewcd.stack == 3:
+                this.tar.pury()
+            this.clock += iv
+            this.tar.el.add(this)
+
+            
+
+    e = Stevent(b)
+    el.add(e)
+
+    e = Meleeevent(b)
+    el.add(e)
+
+    e = Kegevent(b)
+    el.add(e)
+
+    #e = Ironevent(b)
+    #el.add(e)
+
+    e = Palmevent(b)
+    el.add(e)
+
+    e = Considerpuryevent(b)
+    el.add(e)
+
+    el.run(10000)
+    b.showavoid()
+
+
+
+
+class brmbase:
+    #ed : elusive dance
+    #ht : high tolerance
+    #bc : blackout combo
+
+    el = Eventlist()
+
+    fout = 0
+
+    t3 = ''
+    t7 = ''
+
+    ring = 0
+    waist = 0
+    wrist = 0
+
+    #stat
+    dodgebase = 0.08
+    mastery = 0.3
+    haste = 1.3
+    crit = 0.1
+    vers = 0
+
+    iduration = 8
+    kegcdr = 4
+    palmcdr = 1.3
+
+    #stagger
+    prate = 0.5 # purify rate
+    phrate = 0  # purify healrate
+    srate = 0.4 # stagger rate
+    irate = 0.8 # stagger rate (ironskin)
+    stdmgrate = 1.0/20 # stagger dmg rate
+    st = 0  # stagger pool
+    sttick = 0 # stagger tick
+
+    #statis
+    totaldmgtaken = 0 # total dmg taken
+    stout = 0 # st avoidance
+    totaltank = 0
+    sttaken = 0
+    stin = 0
+    puryheal = 0
+
+    def takephydmg(this,dmg=100,rate=0.9):
+        this.totaldmgtaken += dmg
+        this.stin += rate * dmg
+        this.st += rate * dmg
+        this.sttick = this.st * this.stdmgrate
+
+    def takemelee(this,dmg=100,rate=0.9):
+        if this.mastery == 0:
+            this.totaldmgtaken += 100.0
+            this.stin += rate * 100
+            this.takephydmg(dmg)
+        else :
+            r = random.random()
+            dodge = this.dodgebase + this.mastery* this.masterystack
+            if r < dodge:
+                this.masterystack = 0
+            else:
+                this.takephydmg(dmg)
+                this.masterystack += 1
+   #}takemelee
+
+    def takestdmg(this):
+        this.sttaken += this.sttick
+        this.st -= this.sttick
+
+    def pury(this):
+        this.stout += this.prate * this.st 
+        this.puryheal += this.phrate * this.st
+
+        this.st -= this.prate * this.st
+        this.sttick -= this.sttick * this.prate
+
+    def showavoid(this):
+        if this.prate == 0.65:
+            print 'ed',  
+        elif this.srate == 0.5:
+            print 'ht',
+        else :
+            print 'bc',
+        if this.ring == 1 :
+            print 'ring',
+        if this.waist ==1:
+            print 'waist',
+        if this.wrist ==1:
+            print 'wrist'
+
+        avoidance = (this.stout + this.puryheal) / this.totaldmgtaken
+        print avoidance
+        return avoidance
+
+    def getavoid(this):
+        return (this.stout + this.puryheal) / this.totaldmgtaken
+
+    def getehrp(this):
+        return 1/(1-this.avoid/this.total)
+
+    def iron(this,time = 1):
+        for i in range(time):
+            this.takephydmg(this.irate)
+            this.takestdmg()
+            this.takestdmg()
+
+
+    def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
+            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
+        random.seed()
+
+        this.el.brm = this
+
+        this.mastery = mastery
+        this.dodgebase = dodgebase
+        this.haste = haste
+        this.crit = crit
+        this.vers = vers
+        this.kegcdr = 4
+        this.palmcdr = palmcdr
+
+
+
+        for t in talent:
+            if t == 'ht' or t == 'ht1' or t == 'ht10':
+                this.t7 = 'ht'
+                this.srate = 0.5
+                this.irate = 0.9
+                this.haste *= 1.1
+            elif t == 'ht15':
+                this.t7 = 'ht15'
+                this.srate = 0.5
+                this.irate = 0.9
+                this.haste *= 1.15
+            elif t == 'ed':
+                this.t7 = 'ed'
+                this.prate = 0.65
+            elif t == 'bc':
+                this.t7 = 'bc'
+                this.kegcdr = 6
+            elif t == 'black':
+                this.t3 = 'black'
+            elif t == 'light':
+                this.t3 = 'light'
+
+        for e in equip:
+            if e == '2t' :
+                this.prate += 0.05
+                this.srate += 0.05
+            if e == '4t' :
+                this.prate += 0.05
+                this.srate += 0.05
+                this.palmcdr += 1
+            if e == 'ring':
+                this.ring =1
+                this.stdmgrate = 1.0/26
+            if e == 'waist':
+                this.waist =1
+                this.phrate = this.prate * 0.25
+            if e == 'wrist':
+                this.wrist =1
+
+
+
+    #}init
+#}class brmbase
+
+
+if __name__ == '__main__' :
+    main()
