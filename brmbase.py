@@ -3,22 +3,52 @@
 
 import random
 
-debug = 1
+debug = 0
 
 class Event:
     time = 0
-    dest = 0
+    dst = 0
     src = 0
+    el = 0
 
-    def __init__(this, brm = 0, time = 0):
+    def __init__(this, src = 0, time=0, dst = 0):
         this.time = time
-        this.tar = brm
+        this.src = src
+        this.dst = dst
+    def __repr__(this):
+        return this.__class__.__name__+" at %.3f"%this.time
     def __str__(this):
         return this.__class__.__name__+" at %.3f"%this.time
+
+    def move(this, offset = 0, newtiming = 0):
+        this.el.move(this, offset, newtiming)
+
+
 
     def process(this):
         print this.time,'process'
 #}
+
+class RepeatEvent(Event):
+    repeat = 0
+
+    def __init__(this, src, repeat = 1,time=0, dst=0):
+        Event.__init__(this, src, time, dst)
+        if this.repeat == 0 :
+            this.repeat = repeat
+
+    def repeatproc(this):
+        print this.time,'repeatproc'
+
+    def process(this):
+        this.repeatproc()
+        this.time += this.repeat
+        this.el.add(this)
+
+
+#}class repeatevent
+
+
 
 class Eventlist:
     time = 0
@@ -32,6 +62,7 @@ class Eventlist:
 
 
     def add(this,event):
+        event.el = this
         if debug == 1:
             print "%.3f"%this.time,'add',event
         timing = event.time
@@ -44,6 +75,34 @@ class Eventlist:
                 return True
         this._list.append(event)
     #}
+    
+    def rm(this,event):
+        for i in range(len(this._list)) :
+            if this._list[i] == event :
+                ret = this._list.pop(i)
+                event.el = 0
+                return ret
+        print 'rm 404'
+        return 0
+
+
+    def move(this, event, offset = -1, newtiming = 0):
+        if newtiming == 0:
+            e = this.rm(event)
+            if e == 0 :
+                print 'move 404'
+                return 
+            e.time += offset
+            this.add(e)
+        else :
+            if newtiming < this.time :
+                newtiming = this.time
+            e = this.rm(event)
+            if e == 0 :
+                print 'move 404'
+                return 
+            e.time = newtiming
+            this.add(e)
 
 
     def procone(this):
@@ -65,9 +124,14 @@ class Eventlist:
 def main():
     b = brmbase(equip=[''])
     el = Eventlist()
-    e = Event()
+    e = Event(time = 3)
     el.add(e)
-    el.run()
+    print el
+    e = Event(time = 4)
+    el.add(e)
+    print el
+    el.move(e,newtiming = -1)
+    print el
 
     exit()
     class Stevent(Event):
@@ -154,8 +218,8 @@ class brmbase:
 
     fout = 0
 
-    t3 = ''
-    t7 = ''
+    talent = []
+    equip = []
 
     ring = 0
     waist = 0
@@ -171,6 +235,10 @@ class brmbase:
     iduration = 8
     kegcdr = 4
     palmcdr = 1.3
+    brewcd = 21
+    brewstack = 3
+    brewstackmax = 3
+
 
     #stagger
     prate = 0.5 # purify rate
@@ -211,6 +279,9 @@ class brmbase:
    #}takemelee
 
     def takestdmg(this):
+        if this.st <= 0 :
+            return
+
         this.sttaken += this.sttick
         this.st -= this.sttick
 
@@ -269,28 +340,27 @@ class brmbase:
 
 
         for t in talent:
+            this.talent = talent
             if t == 'ht' or t == 'ht1' or t == 'ht10':
-                this.t7 = 'ht'
                 this.srate = 0.5
                 this.irate = 0.9
                 this.haste *= 1.1
             elif t == 'ht15':
-                this.t7 = 'ht15'
                 this.srate = 0.5
                 this.irate = 0.9
                 this.haste *= 1.15
             elif t == 'ed':
-                this.t7 = 'ed'
                 this.prate = 0.65
             elif t == 'bc':
-                this.t7 = 'bc'
                 this.kegcdr = 6
-            elif t == 'black':
-                this.t3 = 'black'
             elif t == 'light':
-                this.t3 = 'light'
+                this.brewcd = 18
+                this.brewstack = 4
+                this.brewstackmax = 4
+            
 
         for e in equip:
+            this.equip = equip
             if e == '2t' :
                 this.prate += 0.05
                 this.srate += 0.05
@@ -307,6 +377,7 @@ class brmbase:
             if e == 'wrist':
                 this.wrist =1
 
+        this.brewcd /= this.haste
 
 
     #}init
