@@ -55,8 +55,8 @@ class Eventlist:
     def __str__(this):
         return str(this._list)
 
-    #def __init__(this, brm):
-    #   this.brm = brm
+    def __init__(this):
+        this._list = []
 
 
     def add(this,event):
@@ -91,12 +91,12 @@ class Eventlist:
                 print this.time,': move 404', event
                 return 
             e.time += offset
-            if e.time < this.time :
-                e.time = this.time
+           # if e.time < this.time :
+           #     e.time = this.time
             this.add(e)
         else :
-            if newtiming < this.time :
-                newtiming = this.time
+           # if newtiming < this.time :
+           #     newtiming = this.time
             e = this.rm(event)
             if e == 0 :
                 print this.time,': move 404', event
@@ -107,7 +107,8 @@ class Eventlist:
 
     def procone(this):
         e = this._list.pop(0)
-        this.time = e.time
+        if this.time < e.time:
+            this.time = e.time
         if debug == 1:
             print '%.2f: '%this.time,e,this
         e.process()
@@ -216,9 +217,10 @@ class brmbase:
     #ht : high tolerance
     #bc : blackout combo
 
-    el = Eventlist()
 
     fout = 0
+
+    el = 0
 
     talent = []
     equip = []
@@ -230,6 +232,9 @@ class brmbase:
     #stat
     dodgebase = 0.08
     mastery = 0.3
+    masterystack = 0
+    meleecount = 0
+    misscount = 0
     haste = 1.3
     crit = 0.1
     vers = 0
@@ -266,6 +271,7 @@ class brmbase:
         this.sttick = this.st * this.stdmgrate
 
     def takemelee(this,dmg=100,rate=0.9):
+        this.totaltank += 0
         if this.mastery == 0:
             this.totaldmgtaken += 100.0
             this.stin += rate * 100
@@ -310,11 +316,15 @@ class brmbase:
 
         avoidance = (this.stout + this.puryheal) / this.totaldmgtaken
         print avoidance
+        print 'totalmeleetank', this.totaltank
         print 'totaldmgtaken',this.totaldmgtaken
-        print 'stin', this.stin
-        print 'sttaken', this.sttaken
-        print 'pury ',this.stout
-        print 'waist heal',this.puryheal
+        print 'stagger input', this.stin
+        print 'sttagger taken', this.sttaken
+        print 'purify',this.stout
+        if this.phrate != 0 :
+            print 'waist heal',this.puryheal
+        if this.mastery != 0 :
+            print "miss count %d(%.2f%%)"%(this.misscount, float(this.misscount)*100/this.meleecount)
         return avoidance
 
     def getavoid(this):
@@ -334,6 +344,7 @@ class brmbase:
             iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
         random.seed()
 
+        this.el = Eventlist()
         this.el.brm = this
 
         this.mastery = mastery
