@@ -23,6 +23,9 @@ class Event:
     def move(this, offset = 0, newtiming = 0):
         this.el.move(this, offset, newtiming)
 
+    def rm(this):
+        this.el.rm(this)
+
     def process(this):
         print this.time,'process'
 #}
@@ -324,7 +327,7 @@ class brmbase:
         if this.phrate != 0 :
             print 'waist heal',this.puryheal
         if this.mastery != 0 :
-            print "miss count %d(%.2f%%)"%(this.misscount, float(this.misscount)*100/this.meleecount)
+            print "dodge count %d(%.2f%%)"%(this.misscount, float(this.misscount)*100/this.meleecount)
         return avoidance
 
     def getavoid(this):
@@ -344,6 +347,7 @@ class brmbase:
             iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
         random.seed()
 
+
         this.el = Eventlist()
         this.el.brm = this
 
@@ -356,9 +360,11 @@ class brmbase:
         this.palmcdr = palmcdr
 
 
+        this.talent = talent
+        this.equip = equip
+
 
         for t in talent:
-            this.talent = talent
             if t == 'ht' or t == 'ht1' or t == 'ht10':
                 this.srate = 0.5
                 this.irate = 0.9
@@ -367,7 +373,7 @@ class brmbase:
                 this.srate = 0.5
                 this.irate = 0.9
                 this.haste *= 1.15
-            elif t == 'ed':
+            elif t == 'ed' or t == 'ed13' or t == 'ed20':
                 this.prate = 0.65
             elif t == 'bc':
                 this.kegcdr = 6

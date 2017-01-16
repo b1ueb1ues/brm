@@ -30,6 +30,12 @@ class brm(brmbase):
     misscount = 0
 
     noiron = 0
+    ed20 = 0
+    ed13 = 0
+    edev = 0
+    fishev = 0
+    edrate = 0
+    fishnow = 0
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -73,6 +79,7 @@ class brm(brmbase):
 
     class IronEv(RepeatEvent):
         def repeatproc(this):
+            this.src.fish()
             if this.src.brewstack == this.src.brewstackmax :
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack == 0:
@@ -83,6 +90,7 @@ class brm(brmbase):
 
     class BlackEv(RepeatEvent):
         def repeatproc(this):
+            this.src.fish()
             this.src.blackgot += 1
             n = this.src.brewstack + 1
             this.src.ironev.move(offset = n * this.src.iduration)
@@ -97,15 +105,38 @@ class brm(brmbase):
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack >= 3 :
                 this.src.pury()
+                this.src.fish()
+                
                 this.src.purytimes +=1
                 this.src.brewstack -= 1
             elif this.src.brewstack == 2 :
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
                 if this.src.brewcdev.time - this.time < 2 : 
                     this.src.pury()
+                    this.src.fish()
+                    if this.src.ed13 == 1:
+                        this.src.edm()
+                    elif this.src.ed20 == 1:
+                        this.src.edh()
                     this.src.purytimes +=1
                     this.src.brewstack -= 1
 
+    class FishEv(Event):
+        def process(this):
+            this.src.dodgebase -= 0.1
+            this.src.fishev = 0
+
+    class EdmediumEv(Event):
+        def process(this):
+            this.src.dodgebase -= 0.133
+            this.src.edev = 0
+            this.src.edrate = 0
+
+    class EdhighEv(Event):
+        def process(this):
+            this.src.dodgebase -= 0.20
+            this.src.edev = 0
+            this.src.edrate = 0
 
     class TakePhyEv(RepeatEvent):
         repeat = 1
@@ -117,15 +148,55 @@ class brm(brmbase):
         def repeatproc(this):
             this.src.takemelee()
 
+    def edm(this):
+        if this.edev != 0 :
+            this.edev.rm()
+            this.dodgebase -= this.edrate
+
+        ed = brm.EdmediumEv(this)
+        this.edev = ed
+        ed.time = this.el.time + 6
+        this.el.add(ed)
+        this.dodgebase += 0.133
+        this.edrate = 0.133
+
+    def edh(this):
+        if this.edev != 0 :
+            this.edev.rm()
+            this.dodgebase -= this.edrate
+
+        ed = brm.EdhighEv(this)
+        this.edev = ed
+        ed.time = this.el.time + 6
+        this.el.add(ed)
+        this.dodgebase += 0.2
+        this.edrate = 0.2
+
+    def fish(this):
+        if this.fishev != 0 :
+            fishev.move(newtiming = this.el.time + 3)
+        else :
+            fish = brm.FishEv(this)
+            fish.time = this.el.time + 3
+            this.el.add(fish)
+            this.dodgebase += 0.1
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
             iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
+
         brmbase.__init__(this, talent, equip, iron, palmcdr, haste, dodgebase, mastery, crit, vers)
 
-
-        if 'wrist' in this.equip :
+        if 'wrist' in equip :
             this.wrist = 1
 
+        if 'ed' in talent :
+            this.ed13 = 1
+
+        if 'ed13' in talent :
+            this.ed13 = 1
+
+        if 'ed20' in talent :
+            this.ed20 = 1
 
         this.staggerev = brm.StaggerEv(this)
         this.el.add(this.staggerev)
@@ -189,39 +260,56 @@ class brm(brmbase):
 
 
 def main():
+   # a = brm(haste=1.05,talent=['black','bc'])
+   # print a.talent
+   # exit()
     offset = 0.05
     i = 1.0 - offset
-    print 'haste\telusive dance\tblackout combo\thigh tol(10%)\thigh tol(15%)'
+    print 'haste\telus d(13.3%)\telus d(20%)\tblackout combo\thigh tol(10%)\thigh tol(15%)'
     while(1):
         if i > 1.5 :
             break
         i += offset
-        a = brm(haste=i,talent=['black','ed'])
-        b = brm(haste=i,talent=['black','bc'])
-        c = brm(haste=i,talent=['black','ht'])
-        d = brm(haste=i,talent=['black','ht15'])
+        a = brm(haste=i,talent=['black','ed13'],mastery = 0.3)
+        b = brm(haste=i,talent=['black','ed20'],mastery = 0.3)
+        c = brm(haste=i,talent=['black','bc'],mastery = 0.3)
+        d = brm(haste=i,talent=['black','ht'],mastery = 0.3)
+        e = brm(haste=i,talent=['black','ht15'],mastery = 0.3)
         a.run(1000000)
         b.run(1000000)
         c.run(1000000)
         d.run(1000000)
+        e.run(1000000)
         print i,'\t',
+
         if a.getavoid() == 0:
             print 'n/a\t\t',
         else : 
             print '%.5f\t\t'%(a.getavoid()),
+
         if b.getavoid() == 0:
             print 'n/a\t\t',
         else : 
             print '%.5f\t\t'%(b.getavoid()),
+
         if c.getavoid() == 0:
             print 'n/a\t\t',
         else : 
             print '%.5f\t\t'%(c.getavoid()),
-        if d.getavoid() == 0:
-            print 'n/a\t\t'
-        else : 
-            print '%.5f\t\t'%(d.getavoid())
 
+        if d.getavoid() == 0:
+            print 'n/a\t\t',
+        else : 
+            print '%.5f\t\t'%(d.getavoid()),
+
+        if e.getavoid() == 0:
+            print 'n/a\t\t',
+        else : 
+            print '%.5f\t\t'%(e.getavoid()),
+
+        print ' '
+
+    return
 
     #b = brm(equip=[''])
     #b.run(100000)
