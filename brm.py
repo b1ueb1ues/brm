@@ -144,7 +144,7 @@ class brm(brmbase):
             this.src.takephydmg()
 
     class TakeMeleeEv(RepeatEvent):
-        repeat = 1.5
+        repeat = 0.15
         def repeatproc(this):
             this.src.takemelee()
 
@@ -242,7 +242,7 @@ class brm(brmbase):
                     #print this.brewcdev,
                     this.brewcdev.move(-1)
                     this.blackev.move(-1)
-                    this.misscount += 1
+                this.misscount += 1
                 this.masterystack = 0
             else:
                 this.takephydmg(dmg)
@@ -257,9 +257,26 @@ class brm(brmbase):
             return 0
         return brmbase.getavoid(this)
 
+    def getmavoid(this):
+        return (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken ) / this.totaltank
+
 
 
 def main():
+    a = brm(equip=['wrist'], mastery = 0.3)
+    a.run(100000)
+    atake = 1-a.showavoid()
+
+    print '------'
+
+    b = brm(equip=[''], mastery = 0.3)
+    b.run(100000)
+    btake = 1-b.showavoid()
+
+    print '------'
+    avoid = 1-atake/btake
+    print avoid
+    return
    # a = brm(haste=1.05,talent=['black','bc'])
    # print a.talent
    # exit()
