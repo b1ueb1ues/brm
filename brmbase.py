@@ -23,8 +23,6 @@ class Event:
     def move(this, offset = 0, newtiming = 0):
         this.el.move(this, offset, newtiming)
 
-
-
     def process(this):
         print this.time,'process'
 #}
@@ -82,7 +80,7 @@ class Eventlist:
                 ret = this._list.pop(i)
                 event.el = 0
                 return ret
-        print 'rm 404'
+        print this.time, ': rm 404', event
         return 0
 
 
@@ -90,16 +88,18 @@ class Eventlist:
         if newtiming == 0:
             e = this.rm(event)
             if e == 0 :
-                print 'move 404'
+                print this.time,': move 404', event
                 return 
             e.time += offset
+            if e.time < this.time :
+                e.time = this.time
             this.add(e)
         else :
             if newtiming < this.time :
                 newtiming = this.time
             e = this.rm(event)
             if e == 0 :
-                print 'move 404'
+                print this.time,': move 404', event
                 return 
             e.time = newtiming
             this.add(e)
@@ -108,6 +108,8 @@ class Eventlist:
     def procone(this):
         e = this._list.pop(0)
         this.time = e.time
+        if debug == 1:
+            print '%.2f: '%this.time,e,this
         e.process()
         return #this.time
     
@@ -308,13 +310,18 @@ class brmbase:
 
         avoidance = (this.stout + this.puryheal) / this.totaldmgtaken
         print avoidance
+        print 'totaldmgtaken',this.totaldmgtaken
+        print 'stin', this.stin
+        print 'sttaken', this.sttaken
+        print 'pury ',this.stout
+        print 'waist heal',this.puryheal
         return avoidance
 
     def getavoid(this):
         return (this.stout + this.puryheal) / this.totaldmgtaken
 
     def getehrp(this):
-        return 1/(1-this.avoid/this.total)
+        return 1/(1-this.stout - this.puryheal/this.totaldmgtaken)
 
     def iron(this,time = 1):
         for i in range(time):
