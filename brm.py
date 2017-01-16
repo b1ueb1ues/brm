@@ -29,6 +29,8 @@ class brm(brmbase):
     wrist = 0
     misscount = 0
 
+    noiron = 0
+
     class StaggerEv(RepeatEvent):
         repeat = 0.5
         def repeatproc(this):
@@ -74,7 +76,8 @@ class brm(brmbase):
             if this.src.brewstack == this.src.brewstackmax :
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack == 0:
-                print 'no iron'
+                #print 'no iron'
+                this.src.noiron = 1
             this.src.brewstack -= 1
             this.src.irontimes += 1
 
@@ -97,7 +100,8 @@ class brm(brmbase):
                 this.src.purytimes +=1
                 this.src.brewstack -= 1
             elif this.src.brewstack == 2 :
-                if this.src.brewcdev.time - this.time < this.src.iduration :
+                #if this.src.brewcdev.time - this.time < this.src.iduration :
+                if this.src.brewcdev.time - this.time < 2 : 
                     this.src.pury()
                     this.src.purytimes +=1
                     this.src.brewstack -= 1
@@ -150,7 +154,7 @@ class brm(brmbase):
         this.takemeleeev = brm.TakeMeleeEv(this)
         this.el.add(this.takemeleeev)
 
-        print this.el
+        #print this.el
 
     def takemelee(this,dmg=100,rate=0.9):
         this.totaltank += dmg
@@ -177,10 +181,47 @@ class brm(brmbase):
     def run(this, time):
         this.el.run(time)
 
+    def getavoid(this):
+        if this.noiron == 1:
+            return 0
+        return brmbase.getavoid(this)
 
 
 
 def main():
+    offset = 0.05
+    i = 1.0 - offset
+    print 'haste\telusive dance\tblackout combo\thigh tol(10%)\thigh tol(15%)'
+    while(1):
+        if i > 1.5 :
+            break
+        i += offset
+        a = brm(haste=i,talent=['black','ed'])
+        b = brm(haste=i,talent=['black','bc'])
+        c = brm(haste=i,talent=['black','ht'])
+        d = brm(haste=i,talent=['black','ht15'])
+        a.run(1000000)
+        b.run(1000000)
+        c.run(1000000)
+        d.run(1000000)
+        print i,'\t',
+        if a.getavoid() == 0:
+            print 'n/a\t\t',
+        else : 
+            print '%.5f\t\t'%(a.getavoid()),
+        if b.getavoid() == 0:
+            print 'n/a\t\t',
+        else : 
+            print '%.5f\t\t'%(b.getavoid()),
+        if c.getavoid() == 0:
+            print 'n/a\t\t',
+        else : 
+            print '%.5f\t\t'%(c.getavoid()),
+        if d.getavoid() == 0:
+            print 'n/a\t\t'
+        else : 
+            print '%.5f\t\t'%(d.getavoid())
+
 
     #b = brm(equip=[''])
     #b.run(100000)
