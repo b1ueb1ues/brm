@@ -5,6 +5,21 @@ import random
 
 debug = 0
 
+def main():
+    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], \
+            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
+
+    print brmbase.__dict__
+
+    class test(brmbase):
+        def run(this):
+            print 'hello'
+            print this.__dict__
+
+    t = test()
+    t.run()
+
+
 class Event:
     time = 0
     dst = 0
@@ -127,92 +142,6 @@ class Eventlist:
 #} class eventlist
 
 
-def main():
-    b = brmbase(equip=[''])
-    el = Eventlist()
-    e = Event(time = 3)
-    el.add(e)
-    print el
-    e = Event(time = 4)
-    el.add(e)
-    print el
-    el.move(e,newtiming = -1)
-    print el
-
-    exit()
-    class Stevent(Event):
-        def process(this):
-            this.tar.takestdmg()
-            this.time += 0.5
-          #  print this.tar.st
-            this.tar.el.add(this)
-    
-    class Meleeevent(Event):
-        def process(this, iv = 1.5):
-            this.tar.takemelee()
-            this.time += iv
-            this.tar.el.add(this)
-
-    class Puryevent(Event):
-        def process(this, iv = 3):
-            this.tar.pury()
-            this.clock += iv
-            this.tar.el.add(this)
-
-    class Kegevent(Event):
-        def process(this):
-            if this.tar.debug2 == 1:
-                return
-            if this.tar.brewcdevent != 0:
-                this.tar.brewcdr(korp = 'k')
-            this.clock += 8.0/this.tar.haste
-            this.tar.el.add(this)
-
-    class Palmevent(Event):
-        def process(this):
-            if this.tar.debug == 1:
-                return
-            if this.tar.brewcdevent != 0:
-                this.tar.brewcdr(korp = 'p')
-            this.clock += 5.0/this.tar.haste
-            this.tar.el.add(this)
-            
-
-
-    class Considerpuryevent(Event):
-        def process(this, iv = 1):
-            if this.tar.brewcd.stack >=2 \
-                    and this.clock - this.tar.brewcd.timing > this.tar.brewcd.cd/2 :
-                this.tar.pury()
-            elif this.tar.brewcd.stack == 3:
-                this.tar.pury()
-            this.clock += iv
-            this.tar.el.add(this)
-
-            
-
-    e = Stevent(b)
-    el.add(e)
-
-    e = Meleeevent(b)
-    el.add(e)
-
-    e = Kegevent(b)
-    el.add(e)
-
-    #e = Ironevent(b)
-    #el.add(e)
-
-    e = Palmevent(b)
-    el.add(e)
-
-    e = Considerpuryevent(b)
-    el.add(e)
-
-    el.run(10000)
-    b.showavoid()
-
-
 
 
 class brmbase:
@@ -237,7 +166,7 @@ class brmbase:
     mastery = 0.3
     masterystack = 0
     meleecount = 0
-    misscount = 0
+    dodgecount = 0
     haste = 1.3
     crit = 0.1
     vers = 0
@@ -251,6 +180,7 @@ class brmbase:
 
 
     #stagger
+    ironskin = 1
     prate = 0.5 # purify rate
     phrate = 0  # purify healrate
     srate = 0.4 # stagger rate
@@ -268,6 +198,10 @@ class brmbase:
     puryheal = 0
 
     def takephydmg(this,dmg=100,rate=0.9):
+        if this.ironskin == 1 :
+            rate = this.irate
+        else :
+            rate = this.srate
         this.totaldmgtaken += dmg
         this.stin += rate * dmg
         this.st += rate * dmg
@@ -276,8 +210,6 @@ class brmbase:
     def takemelee(this,dmg=100,rate=0.9):
         this.totaltank += 0
         if this.mastery == 0:
-            this.totaldmgtaken += 100.0
-            this.stin += rate * 100
             this.takephydmg(dmg)
         else :
             r = random.random()
@@ -327,7 +259,7 @@ class brmbase:
         if this.phrate != 0 :
             print 'waist heal',this.puryheal
         if this.mastery != 0 :
-            print "dodge count %d(%.2f%%)"%(this.misscount, float(this.misscount)*100/this.meleecount)
+            print "dodge count %d(%.2f%%)"%(this.dodgecount, float(this.dodgecount)*100/this.meleecount)
         return avoidance
 
     def getavoid(this):
@@ -345,7 +277,7 @@ class brmbase:
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
             iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
-        random.seed()
+        random.seed(1)
 
 
         this.el = Eventlist()
@@ -406,6 +338,7 @@ class brmbase:
 
     #}init
 #}class brmbase
+
 
 
 if __name__ == '__main__' :

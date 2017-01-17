@@ -1,0 +1,10 @@
+import brm
+#b = brm.brm(equip=['waist'],mastery=0.3,meleeiv=0.75)
+#b1 = brm.brm(equip=['wrist','waist'],mastery=0.3,meleeiv=0.75)
+b = brm.brm(equip=[''],meleeiv=0.5)
+b1 = brm.brm(equip=['wrist',''],meleeiv=0.5)
+b.iron(100000)
+b1.iron(100000)
+b = b.showavoid()
+b1 = b1.showavoid()
+print 1-(1-b1)/(1-b)

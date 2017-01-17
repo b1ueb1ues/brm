@@ -27,7 +27,8 @@ class brm(brmbase):
     palmtimes = 0
 
     wrist = 0
-    misscount = 0
+    dodgecount = 0
+    meleetakeiv = 1.5
 
     noiron = 0
     ed20 = 0
@@ -36,6 +37,8 @@ class brm(brmbase):
     fishev = 0
     edrate = 0
     fishnow = 0
+
+    ironskin = 0
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -84,12 +87,23 @@ class brm(brmbase):
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack == 0:
                 #print 'no iron'
-                this.src.noiron = 1
+                this.repeat = this.src.brewcdev.time - this.time
+                blacktime = this.src.blackev.time - this.time
+                if blacktime < this.repeat :
+                    this.src.noiron += blacktime
+                else:
+                    this.src.noiron += this.repeat
+                this.src.ironskin = 0
+            
+            if this.src.ironskin == 0 :
+                this.repeat = this.src.iduration
+                this.src.ironskin = 1
             this.src.brewstack -= 1
             this.src.irontimes += 1
 
     class BlackEv(RepeatEvent):
         def repeatproc(this):
+            this.ironskin=1
             this.src.fish()
             this.src.blackgot += 1
             n = this.src.brewstack + 1
@@ -111,7 +125,7 @@ class brm(brmbase):
                 this.src.brewstack -= 1
             elif this.src.brewstack == 2 :
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
-                if this.src.brewcdev.time - this.time < 2 : 
+                if this.src.brewcdev.time - this.time <= 1 : 
                     this.src.pury()
                     this.src.fish()
                     if this.src.ed13 == 1:
@@ -144,7 +158,6 @@ class brm(brmbase):
             this.src.takephydmg()
 
     class TakeMeleeEv(RepeatEvent):
-        repeat = 0.15
         def repeatproc(this):
             this.src.takemelee()
 
@@ -182,9 +195,11 @@ class brm(brmbase):
             this.dodgebase += 0.1
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
+            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ):
 
         brmbase.__init__(this, talent, equip, iron, palmcdr, haste, dodgebase, mastery, crit, vers)
+
+        this.meleetakeiv = meleetakeiv
 
         if 'wrist' in equip :
             this.wrist = 1
@@ -197,6 +212,7 @@ class brm(brmbase):
 
         if 'ed20' in talent :
             this.ed20 = 1
+        
 
         this.staggerev = brm.StaggerEv(this)
         this.el.add(this.staggerev)
@@ -222,7 +238,7 @@ class brm(brmbase):
        # this.takephyev = brm.TakePhyEv(this)
        # this.el.add(this.takephyev)
 
-        this.takemeleeev = brm.TakeMeleeEv(this)
+        this.takemeleeev = brm.TakeMeleeEv(this, repeat = meleetakeiv)
         this.el.add(this.takemeleeev)
 
         #print this.el
@@ -238,11 +254,9 @@ class brm(brmbase):
             if r < dodge:
                 #doged!
                 if this.wrist == 1 :
-                    #print '%.2f: '%this.el.time,
-                    #print this.brewcdev,
                     this.brewcdev.move(-1)
                     this.blackev.move(-1)
-                this.misscount += 1
+                this.dodgecount += 1
                 this.masterystack = 0
             else:
                 this.takephydmg(dmg)
@@ -253,130 +267,39 @@ class brm(brmbase):
         this.el.run(time)
 
     def getavoid(this):
-        if this.noiron == 1:
-            return 0
-        return brmbase.getavoid(this)
+        if this.noiron != 0:
+            return "%.4f|%d"%(brmbase.getavoid(this),this.noiron)
+        return "%.5f\t"%(brmbase.getavoid(this))
 
     def getmavoid(this):
-        return (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken ) / this.totaltank
+        avoid = (this.stout + this.puryheal + this.dodgecount*100 ) / this.totaltank
+        if this.noiron != 0:
+            return "%.4f|%d"%(avoid,this.noiron)
+        return "%.5f\t"%(avoid)
 
 
 
 def main():
-    a = brm(equip=['wrist'], mastery = 0.3)
+    
+
+    a = brm(equip=[''], mastery = 0.3, meleetakeiv = 0.5)
     a.run(100000)
     atake = 1-a.showavoid()
+    print 'brew %d + 3*%d'%(a.brewgot, a.blackgot)
 
     print '------'
 
-    b = brm(equip=[''], mastery = 0.3)
+    b = brm(equip=['wrist','waist'], mastery = 0.3, meleetakeiv = 0.5)
     b.run(100000)
     btake = 1-b.showavoid()
+    print 'brew %d + 3*%d'%(b.brewgot, b.blackgot)
+
 
     print '------'
-    avoid = 1-atake/btake
-    print avoid
-    return
-   # a = brm(haste=1.05,talent=['black','bc'])
-   # print a.talent
-   # exit()
-    offset = 0.05
-    i = 1.0 - offset
-    print 'haste\telus d(13.3%)\telus d(20%)\tblackout combo\thigh tol(10%)\thigh tol(15%)'
-    while(1):
-        if i > 1.5 :
-            break
-        i += offset
-        a = brm(haste=i,talent=['black','ed13'],mastery = 0.3)
-        b = brm(haste=i,talent=['black','ed20'],mastery = 0.3)
-        c = brm(haste=i,talent=['black','bc'],mastery = 0.3)
-        d = brm(haste=i,talent=['black','ht'],mastery = 0.3)
-        e = brm(haste=i,talent=['black','ht15'],mastery = 0.3)
-        a.run(1000000)
-        b.run(1000000)
-        c.run(1000000)
-        d.run(1000000)
-        e.run(1000000)
-        print i,'\t',
-
-        if a.getavoid() == 0:
-            print 'n/a\t\t',
-        else : 
-            print '%.5f\t\t'%(a.getavoid()),
-
-        if b.getavoid() == 0:
-            print 'n/a\t\t',
-        else : 
-            print '%.5f\t\t'%(b.getavoid()),
-
-        if c.getavoid() == 0:
-            print 'n/a\t\t',
-        else : 
-            print '%.5f\t\t'%(c.getavoid()),
-
-        if d.getavoid() == 0:
-            print 'n/a\t\t',
-        else : 
-            print '%.5f\t\t'%(d.getavoid()),
-
-        if e.getavoid() == 0:
-            print 'n/a\t\t',
-        else : 
-            print '%.5f\t\t'%(e.getavoid()),
-
-        print ' '
-
-    return
-
-    #b = brm(equip=[''])
-    #b.run(100000)
-    #b.showavoid()
-
-   # a = brm(equip=['wrist'], mastery = 0.3, palmcdr= 1)
-   # a.run(100)
-   # atake = 1-a.showavoid()
-   # print a.wristtimes
-
-   # a = brm(equip=['wrist'],mastery= 0.3)
-   # a.run(100000)
-   # a.showavoid()
-   # print 'a wrist', a.wristtimes
-   # print 'a purytimes',a.purytimes
-   # print 'a irontimes',a.irontimes
-   # print 'a palm',a.palmtimes
-   # print 'a keg',a.kegtimes
-   # print 'a brewgot',a.brewgot
-   # print 'a blackgot',a.blackgot
-
-   # exit()
-
-    a = brm(equip=['wrist'], mastery = 0.3)
-    a.run(100000)
-    atake = 1-a.showavoid()
-
-    print '------'
-
-    b = brm(equip=['wrist'], mastery = 0.4)
-    b.run(100000)
-    btake = 1-b.showavoid()
-
-    print '------'
-    c = brm(equip=['wrist'], mastery = 0.3, haste = 1.4)
-    c.run(100000)
-    ctake = 1-c.showavoid()
-
     avoid = 1-btake/atake
-    print avoid
+    print 'wrist+waist = ',avoid
 
-    avoid = 1-ctake/atake
-    print avoid
 
-    print 'a misscount', a.misscount
-
-    print 'a purytimes',a.purytimes
-    print 'b purytimes',b.purytimes
-    print 'a brewgot',a.brewgot
-    print 'b brewgot',b.brewgot
 
 
 #} main
