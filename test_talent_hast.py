@@ -1,3 +1,4 @@
+from brm import *
 offset = 0.01
 i = 1.0 - offset
 print 'haste\telus d(13.3%)\telus d(20.0%)\tblackout combo\thigh tol(10%)\thigh tol(15%)'
