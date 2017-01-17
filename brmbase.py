@@ -249,8 +249,8 @@ class brmbase:
         if this.wrist ==1:
             print 'wrist'
 
-        avoidance = (this.stout + this.puryheal) / this.totaldmgtaken
-        print avoidance
+        avoidance = (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken) / this.totaltank
+        print 'avoid > %.4f%% < dmg'%(avoidance*100)
         print 'totalmeleetank', this.totaltank
         print 'totaldmgtaken',this.totaldmgtaken
         print 'stagger input', this.stin
