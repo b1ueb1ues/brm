@@ -6,11 +6,11 @@ while(1):
     if i > 1.5 :
         break
     i += offset
-    a = brm(haste=i,equip=[''],talent=['black','ed13'],mastery = 0.2)
-    b = brm(haste=i,equip=[''],talent=['black','ed20'],mastery = 0.2)
-    c = brm(haste=i,equip=[''],talent=['black','bc'],mastery = 0.2)
-    d = brm(haste=i,equip=[''],talent=['black','ht'],mastery = 0.2)
-    e = brm(haste=i,equip=[''],talent=['black','ht15'],mastery = 0.2)
+    a = brm(haste=i,equip=['4t'],talent=['black','ed13'],mastery = 0.3, iduration = 8)
+    b = brm(haste=i,equip=['4t'],talent=['black','ed20'],mastery = 0.3, iduration = 8)
+    c = brm(haste=i,equip=['4t'],talent=['black','bc'],mastery = 0.3, iduration = 8)
+    d = brm(haste=i,equip=['4t'],talent=['black','ht'],mastery = 0.3, iduration = 8)
+    e = brm(haste=i,equip=['4t'],talent=['black','ht15'],mastery = 0.3, iduration = 8)
     a.run(100000)
     b.run(100000)
     c.run(100000)

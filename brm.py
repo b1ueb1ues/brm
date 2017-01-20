@@ -15,16 +15,16 @@ class brm(brmbase):
     brewstackmax = 3
     brewstack = 3
     brewcd = 21.0
-    brewgot = 0
-    blackgot = 1
+    brewgain = 0
+    blackgain = 1
 
     palmcdr = 1.3
     kegcdr = 4
 
-    purytimes = 0
-    irontimes = 0
-    kegtimes = 0
-    palmtimes = 0
+    purycount = 0
+    ironcount = 0
+    kegcount = 0
+    palmcount = 0
 
     wrist = 0
     dodgecount = 0
@@ -49,15 +49,23 @@ class brm(brmbase):
 
     class BrewcdEv(RepeatEvent):
         def repeatproc(this):
-            this.src.brewgot += 1
+            this.src.brewgain += 1
             this.src.brewstack += 1
             if this.src.brewstack >= this.src.brewstackmax :
                 this.src.brewstack = this.src.brewstackmax
 
 
     class KegEv(RepeatEvent):
+        realrepeat = 0
         def repeatproc(this):
-            this.src.kegtimes += 1
+            if this.repeat != this.realrepeat :
+                this.repeat = this.realrepeat 
+
+            if this.src.blackev.time - this.time < 2:
+                this.repeat = this.src.blackev.time - this.time + 0.01
+                return
+
+            this.src.kegcount += 1
             if this.src.brewstack < this.src.brewstackmax :
                 this.src.brewcdev.move(offset = 0 - this.src.kegcdr)
 
@@ -70,7 +78,7 @@ class brm(brmbase):
 
     class PalmEv(RepeatEvent):
         def repeatproc(this):
-            this.src.palmtimes += 1
+            this.src.palmcount += 1
             if this.src.brewstack < this.src.brewstackmax :
                 this.src.brewcdev.move(offset = 0 - this.src.palmcdr)
 
@@ -99,18 +107,27 @@ class brm(brmbase):
                 this.repeat = this.src.iduration
                 this.src.ironskin = 1
             this.src.brewstack -= 1
-            this.src.irontimes += 1
+            this.src.ironcount += 1
 
     class BlackEv(RepeatEvent):
         def repeatproc(this):
             this.ironskin=1
             this.src.fish()
-            this.src.blackgot += 1
+            this.src.blackgain += 1
             n = this.src.brewstack + 1
             this.src.ironev.move(offset = n * this.src.iduration)
             this.src.brewcdev.move(newtiming = this.el.time + this.src.brewcd)
             this.src.brewstack = this.src.brewstackmax - 1
-            this.src.irontimes += n
+            this.src.ironcount += n
+            this.src.brewgain += 3
+
+            tmpev = brm.PalmEv(this.src,repeat=0)
+            tmpev.time = this.time + 0.01
+            tmpev.addto(this.el)
+
+            tmpev = brm.PalmEv(this.src,repeat=0)
+            tmpev.time = this.time + 0.02
+            tmpev.addto(this.el)
 
     class ConsiderPuryEv(RepeatEvent):
         repeat = 1
@@ -121,7 +138,7 @@ class brm(brmbase):
                 this.src.pury()
                 this.src.fish()
                 
-                this.src.purytimes +=1
+                this.src.purycount +=1
                 this.src.brewstack -= 1
             elif this.src.brewstack == 2 :
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
@@ -132,7 +149,7 @@ class brm(brmbase):
                         this.src.edm()
                     elif this.src.ed20 == 1:
                         this.src.edh()
-                    this.src.purytimes +=1
+                    this.src.purycount +=1
                     this.src.brewstack -= 1
 
     class FishEv(Event):
@@ -187,17 +204,17 @@ class brm(brmbase):
 
     def fish(this):
         if this.fishev != 0 :
-            fishev.move(newtiming = this.el.time + 3)
+            fishev.move(newtiming = this.el.time + 4.5)
         else :
             fish = brm.FishEv(this)
-            fish.time = this.el.time + 3
+            fish.time = this.el.time + 4.5
             this.el.add(fish)
             this.dodgebase += 0.1
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ):
 
-        brmbase.__init__(this, talent, equip, iron, palmcdr, haste, dodgebase, mastery, crit, vers)
+        brmbase.__init__(this, talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
         this.meleetakeiv = meleetakeiv
 
@@ -218,6 +235,7 @@ class brm(brmbase):
         this.el.add(this.staggerev)
 
         this.kegev = brm.KegEv(this, repeat = 8.0 / this.haste)
+        this.kegev.realrepeat = 8.0/this.haste
         this.el.add(this.kegev)
 
         this.palmev = brm.PalmEv(this, repeat = 5.0 / this.haste)
@@ -277,6 +295,12 @@ class brm(brmbase):
             return "%.4f|%d"%(avoid,this.noiron)
         return "%.5f\t"%(avoid)
 
+    def showavoid(this):
+        brmbase.showavoid(this)
+        print 'ironskin *',this.ironcount
+        print 'purify *',this.purycount
+        print 'blackox *',this.blackgain
+
 
 
 def main():
@@ -285,14 +309,14 @@ def main():
     a = brm(equip=[''], mastery = 0.3, meleetakeiv = 0.5)
     a.run(100000)
     atake = 1-a.showavoid()
-    print 'brew %d + 3*%d'%(a.brewgot, a.blackgot)
+    print 'brew %d + 3*%d'%(a.brewgain, a.blackgain)
 
     print '------'
 
     b = brm(equip=['wrist','waist'], mastery = 0.3, meleetakeiv = 0.5)
     b.run(100000)
     btake = 1-b.showavoid()
-    print 'brew %d + 3*%d'%(b.brewgot, b.blackgot)
+    print 'brew %d + 3*%d'%(b.brewgain, b.blackgain)
 
 
     print '------'

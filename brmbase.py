@@ -26,6 +26,9 @@ class Event:
     src = 0
     el = 0
 
+    def addto(this, el):
+        el.add(this)
+
     def __init__(this, src = 0, time=0, dst = 0):
         this.time = time
         this.src = src
@@ -58,6 +61,8 @@ class RepeatEvent(Event):
 
     def process(this):
         this.repeatproc()
+        if this.repeat == 0 :
+            return
         this.time += this.repeat
         this.el.add(this)
 
@@ -254,8 +259,8 @@ class brmbase:
         print 'totalmeleetank', this.totaltank
         print 'totaldmgtaken',this.totaldmgtaken
         print 'stagger input', this.stin
-        print 'sttagger taken', this.sttaken
-        print 'purify',this.stout
+        print 'stagger taken', this.sttaken
+        print 'stagger purified',this.stout
         if this.phrate != 0 :
             print 'waist heal',this.puryheal
         if this.mastery != 0 :
@@ -276,13 +281,14 @@ class brmbase:
 
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
         random.seed(1)
 
 
         this.el = Eventlist()
         this.el.brm = this
 
+        this.iduration = iduration
         this.mastery = mastery
         this.dodgebase = dodgebase
         this.haste = haste
