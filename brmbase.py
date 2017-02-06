@@ -241,19 +241,21 @@ class brmbase:
         this.sttick -= this.sttick * this.prate
 
     def showavoid(this):
-        if this.prate == 0.65:
-            print 'ed',  
-        elif this.srate == 0.5:
-            print 'ht',
-        else :
-            print 'bc',
-        if this.ring == 1 :
-            print 'ring',
-        if this.waist ==1:
-            print 'waist',
-        if this.wrist ==1:
-            print 'wrist'
-
+        print this.talent
+        print this.equip
+#        if this.prate == 0.65:
+#            print 'ed',  
+#        elif this.srate == 0.5:
+#            print 'ht',
+#        else :
+#            print 'bc',
+#        if this.ring == 1 :
+#            print 'ring',
+#        if this.waist ==1:
+#            print 'waist',
+#        if this.wrist ==1:
+#            print 'wrist'
+#
         avoidance = (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken) / this.totaltank
         print 'avoid > %.4f%% < dmg'%(avoidance*100)
         print 'totalmeleetank', this.totaltank
@@ -324,10 +326,10 @@ class brmbase:
         for e in equip:
             this.equip = equip
             if e == '2t' :
-                this.prate += 0.05
+                this.irate += 0.05
                 this.srate += 0.05
             if e == '4t' :
-                this.prate += 0.05
+                this.irate += 0.05
                 this.srate += 0.05
                 this.palmcdr += 1
             if e == 'ring':

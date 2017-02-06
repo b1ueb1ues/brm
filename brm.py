@@ -16,7 +16,7 @@ class brm(brmbase):
     brewstack = 3
     brewcd = 21.0
     brewgain = 0
-    blackgain = 1
+    blackgain = 0
 
     palmcdr = 1.3
     kegcdr = 4
@@ -111,6 +111,8 @@ class brm(brmbase):
 
     class BlackEv(RepeatEvent):
         def repeatproc(this):
+            if 'black' not in this.src.talent :
+                return 
             this.ironskin=1
             this.src.fish()
             this.src.blackgain += 1
@@ -137,6 +139,10 @@ class brm(brmbase):
             if this.src.brewstack >= 3 :
                 this.src.pury()
                 this.src.fish()
+                if this.src.ed13 == 1:
+                    this.src.edm()
+                elif this.src.ed20 == 1:
+                    this.src.edh()
                 
                 this.src.purycount +=1
                 this.src.brewstack -= 1

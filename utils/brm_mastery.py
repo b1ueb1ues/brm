@@ -34,7 +34,11 @@ def main(mastery):
 
 if __name__ == '__main__':
 	i = 0
+        dodgebase = 0.40
+        main(0.3)
         dodgebase = 0.20
+        main(0.3)
+        exit()
 	while(1):
 		i+=0.01
 		print "-----\n mastery = ",i
