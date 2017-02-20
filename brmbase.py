@@ -257,7 +257,7 @@ class brmbase:
 #            print 'wrist'
 #
         avoidance = (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken) / this.totaltank
-        print 'avoid > %.4f%% < dmg'%(avoidance*100)
+        print 'avoid >>!! %.4f%% !!<< dmg'%(avoidance*100)
         print 'totalmeleetank', this.totaltank
         print 'totaldmgtaken',this.totaldmgtaken
         print 'stagger input', this.stin
@@ -265,7 +265,7 @@ class brmbase:
         print 'stagger purified',this.stout
         if this.phrate != 0 :
             print 'waist heal',this.puryheal
-        if this.mastery != 0 :
+        if this.mastery != 0 and this.dodgecount!= 0:
             print "dodge count %d(%.2f%%)"%(this.dodgecount, float(this.dodgecount)*100/this.meleecount)
         return avoidance
 

@@ -200,9 +200,9 @@ class brm(brmbase):
             this.dodgebase += 0.1
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ):
 
-        brmbase.__init__(this, talent, equip, iron, palmcdr, haste, dodgebase, mastery, crit, vers)
+        brmbase.__init__(this, talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
         this.meleetakeiv = meleetakeiv
 

@@ -39,6 +39,8 @@ class brm(brmbase):
     fishnow = 0
 
     ironskin = 0
+    
+    magic = 0
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -113,6 +115,15 @@ class brm(brmbase):
         def repeatproc(this):
             if 'black' not in this.src.talent :
                 return 
+            brewtime = this.src.brewcdev.time - this.time
+            '''
+            if brewtime < this.src.brewcd / 3 :
+                newev = brm.BlackEv(this.src, repeat = 90, time = this.time + brewtime + 0.1)
+                this.src.blackev = newev
+                this.el.add(this.src.blackev)
+                this.repeat = 0
+                return
+                '''
             this.ironskin=1
             this.src.fish()
             this.src.blackgain += 1
@@ -184,6 +195,12 @@ class brm(brmbase):
         def repeatproc(this):
             this.src.takemelee()
 
+    class TakeMagEv(RepeatEvent):
+        repeat = 1
+        def repeatproc(this):
+            this.src.takemagicdmg()
+
+
     def edm(this):
         if this.edev != 0 :
             this.edev.rm()
@@ -218,11 +235,12 @@ class brm(brmbase):
             this.dodgebase += 0.1
 
     def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ,magic = 0):
 
         brmbase.__init__(this, talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
         this.meleetakeiv = meleetakeiv
+        this.magic = magic
 
         if 'wrist' in equip :
             this.wrist = 1
@@ -262,8 +280,14 @@ class brm(brmbase):
        # this.takephyev = brm.TakePhyEv(this)
        # this.el.add(this.takephyev)
 
-        this.takemeleeev = brm.TakeMeleeEv(this, repeat = meleetakeiv)
-        this.el.add(this.takemeleeev)
+        if this.magic == 0:
+            this.takemeleeev = brm.TakeMeleeEv(this, repeat = meleetakeiv)
+            this.el.add(this.takemeleeev)
+
+        if this.magic != 0 :
+            this.takemagev = brm.TakeMagEv(this)
+            this.el.add(this.takemagev)
+
 
         #print this.el
 
@@ -286,6 +310,20 @@ class brm(brmbase):
                 this.takephydmg(dmg)
                 this.masterystack += 1
    #}takemelee
+
+    def takemagicdmg(this):
+        dmg = 100
+        if this.ironskin == 1 :
+            rate = this.irate * 0.7
+        else :
+            rate = this.srate * 0.7
+        this.totaltank += dmg
+        this.totaldmgtaken += dmg
+        this.stin += rate * dmg
+        this.st += rate * dmg
+        this.sttick = this.st * this.stdmgrate
+
+
 
     def run(this, time):
         this.el.run(time)
