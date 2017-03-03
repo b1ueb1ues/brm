@@ -16,15 +16,15 @@ exit()
 '''
 
 def test2():
-    offset = 0.01
-    i = 1.0 - offset
-    print 'haste\td      \t4t       \tno 4t    \t'
+    offset = 0.02
+    i = 1.1 - offset
+    print 'haste\td      \twr       \tno wr    \t'
     while(1):
         if i > 1.4 :
             break
         i += offset
-        a = brm(haste=i,palmcdr=1.4,iduration=8.5,equip=['4t','waist','ring'],talent=['black','ht'],mastery = 0.27)
-        b = brm(haste=i,palmcdr=1.4,iduration=8.5,equip=['4t','waist','ring'],talent=['light','ht'],mastery = 0.27)
+        a = brm(haste=i,palmcdr=1.4,iduration=8.5,equip=['4t','ring','waist'],talent=['black','ht15'],mastery = 0.27, crit = 0.25)
+        b = brm(haste=i,palmcdr=1.4,iduration=8.5,equip=['4t'],talent=['black','ht15'],mastery = 0.27, crit = 0.25)
         a.run(100000)
         b.run(100000)
 

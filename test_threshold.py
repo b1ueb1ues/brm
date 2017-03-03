@@ -1,12 +1,20 @@
 from brm import *
 
-b = brm(equip=['4t'], haste = 1.25, talent=['ed','black'])
-b.run(10000)
-print b.blackgain,b.kegcount,b.palmcount,b.brewgain
+b = brm(equip=['4t'], haste = 1.06, talent=['ht15','black'])
+b.run(100000)
+print b.blackgain,b.brewgain,b.brewcdwaste,b.blackcdwaste
 
-b = brm(equip=[''], haste = 1.25, talent=['ed','black'])
-b.run(10000)
-print b.blackgain,b.kegcount,b.palmcount,b.brewgain
+b = brm(equip=['4t'], haste = 1.07, talent=['ht15','black'])
+b.run(100000)
+print b.blackgain,b.brewgain,b.brewcdwaste,b.blackcdwaste
+
+b = brm(equip=['4t'], haste = 1.08, talent=['ht15','black'])
+b.run(100000)
+print b.blackgain,b.brewgain,b.brewcdwaste,b.blackcdwaste
+
+b = brm(equip=['4t'], haste = 1.20, talent=['ht15','black'])
+b.run(100000)
+print b.blackgain,b.brewgain,b.brewcdwaste,b.blackcdwaste
 exit()
 
 for i in range(10):

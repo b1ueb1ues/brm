@@ -235,7 +235,10 @@ class brmbase:
 
     def pury(this):
         this.stout += this.prate * this.st 
-        this.puryheal += this.phrate * this.st
+        if this.crit != 0 :
+            this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
+        else :
+            this.puryheal += this.phrate * this.st
 
         this.st -= this.prate * this.st
         this.sttick -= this.sttick * this.prate

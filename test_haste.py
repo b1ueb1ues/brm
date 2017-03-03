@@ -3,7 +3,7 @@ from brm import *
 f = open("/opt/brm/figure_haste.csv",'w')
 
 
-def main(typ = 'ave'):
+def main(typ = 'ave', time = 100000):
     average = 1
     global f
 
@@ -20,7 +20,7 @@ def main(typ = 'ave'):
             break
 
         d = brm(haste=i,equip=['4t'],talent=['black','ht15'],mastery = 0.3, iduration = 8)
-        d.run(100000)
+        d.run(time)
 
         if init == 0 :
             a = d.getmavoid()
@@ -61,5 +61,8 @@ def main(typ = 'ave'):
 
 
 if __name__ == '__main__' :
-    main('ave')
     main('point')
+    exit()
+    main('ave')
+    for i in range(10):
+        main('point',time = i * 10000 + 10000)

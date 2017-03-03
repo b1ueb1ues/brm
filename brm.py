@@ -41,6 +41,8 @@ class brm(brmbase):
     ironskin = 0
     
     magic = 0
+    brewcdwaste = 0
+    blackcdwaste = 0
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -57,15 +59,20 @@ class brm(brmbase):
                 this.src.brewstack = this.src.brewstackmax
 
 
+    kegintl = 0
     class KegEv(RepeatEvent):
         realrepeat = 0
         def repeatproc(this):
             if this.repeat != this.realrepeat :
                 this.repeat = this.realrepeat 
 
-            if this.src.blackev.time - this.time < 2:
-                this.repeat = this.src.blackev.time - this.time + 0.01
-                return
+            blackremain = this.src.blackev.time - this.time 
+            if this.src.kegintl == 1:
+                if blackremain < 1:
+                    this.repeat = this.src.blackev.time - this.time + 0.01
+                    return
+            if blackremain < this.src.kegcdr :
+                this.src.blackcdwaste += blackremain
 
             this.src.kegcount += 1
             if this.src.brewstack < this.src.brewstackmax :
@@ -111,19 +118,32 @@ class brm(brmbase):
             this.src.brewstack -= 1
             this.src.ironcount += 1
 
+    blackintl = 1
     class BlackEv(RepeatEvent):
         def repeatproc(this):
             if 'black' not in this.src.talent :
                 return 
-            brewtime = this.src.brewcdev.time - this.time
-            '''
-            if brewtime < this.src.brewcd / 3 :
-                newev = brm.BlackEv(this.src, repeat = 90, time = this.time + brewtime + 0.1)
-                this.src.blackev = newev
-                this.el.add(this.src.blackev)
-                this.repeat = 0
-                return
-                '''
+
+            brewremain = this.src.brewcdev.time - this.time
+
+            if this.repeat != 90 :
+                this.repeat = 90
+            elif this.src.blackintl == 1:
+#                brewremain = this.src.brewcdev.time - this.time
+#                this.repeat = brewremain + 0.1
+#                return
+                if brewremain < this.src.brewcd / 2 :
+                    this.repeat = brewremain + 0.01
+                    return
+                   # newev = brm.BlackEv(this.src, repeat = 90, time = this.src.brewcdev.time + 0.1)
+                   # this.src.blackev = newev
+                   # this.el.add(this.src.blackev)
+                   # this.repeat = 0
+                   # return
+
+            this.src.brewcdwaste += this.src.brewcd - brewremain
+
+
             this.ironskin=1
             this.src.fish()
             this.src.blackgain += 1

@@ -3,7 +3,7 @@ offset = 0.05
 i = 1.0 - offset
 print 'haste\telus d(13.3%)\telus d(20.0%)\tblackout combo\thigh tol(10%)\thigh tol(15%)'
 while(1):
-    if i > 1.5 :
+    if i > 1.4 :
         break
     i += offset
     a = brm(haste=i,equip=['waist','wrist'],talent=['black','ed13'],mastery = 0.3)
