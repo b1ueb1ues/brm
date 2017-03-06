@@ -16,11 +16,13 @@ class brm(brmbase):
     brewstack = 3
     blackstack = 1
     blackstackmax = 1
+    blackenablestart = 0
     blackcd = 90.0
     brewcd = 21.0
     brewgain = 0
     blackcd = 90.0
     blackgain = 0
+
 
     palmcdr = 1.3
     kegcdr = 4
@@ -80,10 +82,11 @@ class brm(brmbase):
                 if blackremain < 1:
                     this.repeat = this.src.blackev.time - this.time + 0.01
                     return
+
             if this.src.blackstack == 1:
                 this.src.blackcdwaste += this.src.kegcdr
             elif blackremain < this.src.kegcdr :
-                this.src.blackcdwaste += blackremain
+                this.src.blackcdwaste += this.src.kegcdr - blackremain
 
             this.src.kegcount += 1
             if this.src.brewstack < this.src.brewstackmax :
@@ -112,7 +115,7 @@ class brm(brmbase):
             if this.src.blackstack == 1:
                 this.src.blackcdwaste += this.src.palmcdr
             elif blackremain < this.src.palmcdr :
-                this.src.blackcdwaste += blackremain
+                this.src.blackcdwaste += this.src.palmcdr - blackremain
 
     class IronEv(RepeatEvent):
         def repeatproc(this):
@@ -141,18 +144,19 @@ class brm(brmbase):
             if 'black' not in this.src.talent :
                 return 
 
-            brewremain = this.src.brewcdev.time - this.time
-            blackstack = 0
+            brewcdremain = this.src.brewcdev.time - this.time
+            this.src.blackstack = 0
 
             if this.repeat != 90 :
                 this.repeat = 90
             elif this.src.blackintl == 1:
-#                brewremain = this.src.brewcdev.time - this.time
-#                this.repeat = brewremain + 0.1
+#                brewcdremain = this.src.brewcdev.time - this.time
+#                this.repeat = brewcdremain + 0.1
 #                return
-                if brewremain < this.src.brewcd / 2 :
-                    this.repeat = brewremain + 0.01
-                    blackstack = 1
+                if brewcdremain < this.src.brewcd / 2 :
+                    this.repeat = brewcdremain + 0.01
+                    this.blackstack = 1
+                    this.src.blackcdwaste += brewcdremain + 0.01
                     return
                    # newev = brm.BlackEv(this.src, repeat = 90, time = this.src.brewcdev.time + 0.1)
                    # this.src.blackev = newev
@@ -160,7 +164,7 @@ class brm(brmbase):
                    # this.repeat = 0
                    # return
 
-            this.src.brewcdwaste += this.src.brewcd - brewremain
+            this.src.brewcdwaste += this.src.brewcd - brewcdremain
 
 
             this.ironskin=1
@@ -385,15 +389,19 @@ class brm(brmbase):
 
     def showavoid(this):
         brmbase.showavoid(this)
+        print 'simc time',this.timeran
+        print 'brewgain',this.brewgain
         print 'ironskin *',this.ironcount
         print 'purify *',this.purycount
         print 'blackox *',this.blackgain
         print 'brew-stache %d%%'%int(this.fishtime/this.timeran*100)
+        print 'blackcdwaste %d (%d stackbrew)'%(this.blackcdwaste, 3*this.blackcdwaste/90)
+        print 'brewcdwaste from BOB %d (%d stackbrew)'%(this.brewcdwaste, this.brewcdwaste/this.brewcd)
+        print 'totalwaste %d stackbrew'%(3*this.blackcdwaste/90+this.brewcdwaste/this.brewcd)
 
 
 
 def main():
-    
 
     a = brm(equip=[''], mastery = 0.3, meleetakeiv = 0.5)
     a.run(100000)
