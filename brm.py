@@ -395,7 +395,7 @@ class brm(brmbase):
         return "%.5f\t"%(avoid)
 
     def showavoid(this):
-        brmbase.showavoid(this)
+        ret = brmbase.showavoid(this)
         print 'simc time',this.timeran
         print 'brewgain',this.brewgain
         print 'ironskin *',this.ironcount
@@ -407,6 +407,8 @@ class brm(brmbase):
         print 'blackcdwaste %d (%d stackbrew)'%(this.blackcdwaste, 3*this.blackcdwaste/90)
         print 'brewcdwaste from BOB %d (%d stackbrew)'%(this.brewcdwaste, this.brewcdwaste/this.brewcd)
         print 'totalwaste %d stackbrew'%(3*this.blackcdwaste/90+this.brewcdwaste/this.brewcd)
+        return ret
+
 
 
 
