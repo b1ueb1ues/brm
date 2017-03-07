@@ -34,6 +34,7 @@ class brm(brmbase):
     brewcdwaste = 0
     blackcdwaste = 0
     fishtime = 0
+    edtime = 0
     timeran = 0
 
     wrist = 0
@@ -249,6 +250,9 @@ class brm(brmbase):
         if this.edev != 0 :
             this.edev.rm()
             this.dodgebase -= this.edrate
+            this.edtime -= 6 - (this.el.time - this.edev.time)
+
+        this.edtime += 6
 
         ed = brm.EdmediumEv(this)
         this.edev = ed
@@ -261,6 +265,9 @@ class brm(brmbase):
         if this.edev != 0 :
             this.edev.rm()
             this.dodgebase -= this.edrate
+            this.edtime -= 6 - (this.el.time - this.edev.time)
+
+        this.edtime += 6
 
         ed = brm.EdhighEv(this)
         this.edev = ed
@@ -395,6 +402,8 @@ class brm(brmbase):
         print 'purify *',this.purycount
         print 'blackox *',this.blackgain
         print 'brew-stache %d%%'%int(this.fishtime/this.timeran*100)
+        if this.edtime != 0 :
+            print 'elusive dance %d%%'%int(this.edtime/this.timeran*100)
         print 'blackcdwaste %d (%d stackbrew)'%(this.blackcdwaste, 3*this.blackcdwaste/90)
         print 'brewcdwaste from BOB %d (%d stackbrew)'%(this.brewcdwaste, this.brewcdwaste/this.brewcd)
         print 'totalwaste %d stackbrew'%(3*this.blackcdwaste/90+this.brewcdwaste/this.brewcd)
