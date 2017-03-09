@@ -411,7 +411,6 @@ class brm(brmbase):
 
 
 
-
 def main():
 
     a = brm(equip=[''], mastery = 0.3, meleetakeiv = 0.5)

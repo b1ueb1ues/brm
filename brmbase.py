@@ -189,8 +189,6 @@ class config():
     talent=[]
 
 
-
-
 class brmbase:
     #ed : elusive dance
     #ht : high tolerance
