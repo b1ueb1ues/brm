@@ -146,6 +146,48 @@ class Eventlist:
 
 #} class eventlist
 
+class config():
+    def show(this):
+        print this.stat,this.equip,this.talent,this.iduration,this.palmcdr
+
+    def __init__(this,stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0):
+        if len(stat)!= 4:
+            print 'stat err'
+            exit()
+        this.stat = stat
+        this.crit = float(stat[0])/100
+        this.haste = float(stat[0])/100+1
+        this.vers = float(stat[0])/100
+        this.mastery = float(stat[0])/100
+        this.equip = equip
+        this.talent = talent
+        this.iduration = iduration
+        this.palmcdr = palmcdr
+
+        if crit != 0 :
+            this.crit = crit
+            this.stat[0] = crit
+        if haste != 0 :
+            this.haste = haste
+            this.stat[1] = haste
+        if vers != 0 :
+            this.vers = vers
+            this.stat[2] = vers
+        if mastery != 0 :
+            this.mastery = mastery
+            this.stat[3] = mastery
+    haste = 0
+    crit = 0
+    mastery = 0
+    vers = 0
+    stat = []
+
+    palmcdr = 0
+    iduration = 0
+
+    equip=[]
+    talent=[]
+
 
 
 
@@ -161,6 +203,8 @@ class brmbase:
 
     talent = []
     equip = []
+    stat = []
+    conf = 0
 
     ring = 0
     waist = 0
@@ -244,8 +288,9 @@ class brmbase:
         this.sttick -= this.sttick * this.prate
 
     def showavoid(this):
-        print this.talent
-        print this.equip
+        print 'stat\t',this.stat
+        print 'talent\t',this.talent
+        print 'equip\t',this.equip
 #        if this.prate == 0.65:
 #            print 'ed',  
 #        elif this.srate == 0.5:
@@ -260,7 +305,9 @@ class brmbase:
 #            print 'wrist'
 #
         avoidance = (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken) / this.totaltank
-        print 'avoid >>!! %.4f%% !!<< dmg'%(avoidance*100)
+        print '----------------------------'
+        print ' avoid ->| %.4f%% |<- dmg'%(avoidance*100)
+        print '----------------------------'
         print 'totalmeleetank', this.totaltank
         print 'totaldmgtaken',this.totaldmgtaken
         print 'stagger input', this.stin
@@ -285,29 +332,34 @@ class brmbase:
             this.takestdmg()
 
 
-    def __init__(this,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
+    def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.10, mastery = 0, crit = 0, vers = 0 ):
         random.seed(1)
 
 
         this.el = Eventlist()
         this.el.brm = this
 
-        this.iduration = iduration
-        this.mastery = mastery
+        if conf == 0 :
+            conf = config(stat=[crit,haste,vers,mastery], equip = equip, talent = talent, palmcdr = palmcdr, iduration = iduration)
+
+        this.conf = conf
+
         this.dodgebase = dodgebase
-        this.haste = haste
-        this.crit = crit
-        this.vers = vers
         this.kegcdr = 4
-        this.palmcdr = palmcdr
+
+        this.iduration = conf.iduration
+        this.mastery = conf.mastery
+        this.haste = conf.haste
+        this.crit = conf.crit
+        this.vers = conf.vers
+        this.palmcdr = conf.palmcdr
+        this.talent = conf.talent
+        this.equip = conf.equip
+        this.stat = conf.stat
 
 
-        this.talent = talent
-        this.equip = equip
-
-
-        for t in talent:
+        for t in this.talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
                 this.srate = 0.5
                 this.irate = 0.9
@@ -325,9 +377,7 @@ class brmbase:
                 this.brewstack = 4
                 this.brewstackmax = 4
             
-
-        for e in equip:
-            this.equip = equip
+        for e in this.equip:
             if e == '2t' :
                 this.irate += 0.05
                 this.srate += 0.05
