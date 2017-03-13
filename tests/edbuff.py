@@ -1,4 +1,5 @@
-from brm import *
+from _brmtest import *
+
 
 def main():
 
@@ -8,11 +9,17 @@ def main():
 
     pool = []
 
-    pool.append( config(equip=['4t']) )
-    pool.append( config(equip=['4t','ring','waist']) )
+    pool.append(config( \
+        equip=['4t'],talent=['black']  \
+        ))
+    pool.append(config( \
+        equip=['4t'],talent=['black','ednobuff']  \
+        ))
+    pool.append(config(\
+        equip=['4t'],talent=['black','ed20']  \
+        ))
 
-    #testhaste(pool)
-    test2haste(pool)
+    testmastery(pool)
 
 def test2haste(pool, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
     if len(pool) != 2:
@@ -64,7 +71,7 @@ def test2(pool, time = 100000):
         d = 1-(1-br)/(1-ar)
     print 'diff:',d
 
-def testhaste(line, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
+def testmastery(line, time = 100000, start = 0.2, stop = 0.45, offset = 0.02):
 
     i = start - offset
     col = 1
@@ -73,7 +80,7 @@ def testhaste(line, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
         col += 1
         l.show()
 
-    print '\nhaste\t',
+    print '\nmastery\t',
     for j in range(len(line)):
         print '%d\t'%(j+1),
     print ''
@@ -83,13 +90,13 @@ def testhaste(line, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
             break
         av = []
         for c in line :
-            c.haste = i
+            c.mastery = i
             b = brm(conf=c)
             b.run(time)
             av.append(b.getmavoid())
             #print av
 
-        print "  %d%%"%(100*(i-1)),
+        print "%d%%"%(100*i),
         for a in av:
             print '\t%.4f'%float(a),
         print ''

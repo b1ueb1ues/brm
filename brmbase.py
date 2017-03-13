@@ -104,6 +104,8 @@ class Eventlist:
                 event.el = 0
                 return ret
         print this.time, ': rm 404', event
+        print this
+        exit()
         return 0
 
 
@@ -147,18 +149,21 @@ class Eventlist:
 #} class eventlist
 
 class config():
+    count = [0]
     def show(this):
         print this.stat,this.equip,this.talent,this.iduration,this.palmcdr
 
-    def __init__(this,stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0):
+    def __init__(this,stat=0,equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0):
+        if stat == 0 :
+            stat = [25,25,0,27]
         if len(stat)!= 4:
             print 'stat err'
             exit()
         this.stat = stat
         this.crit = float(stat[0])/100
-        this.haste = float(stat[0])/100+1
-        this.vers = float(stat[0])/100
-        this.mastery = float(stat[0])/100
+        this.haste = float(stat[1])/100+1
+        this.vers = float(stat[2])/100
+        this.mastery = float(stat[3])/100
         this.equip = equip
         this.talent = talent
         this.iduration = iduration
@@ -166,16 +171,17 @@ class config():
 
         if crit != 0 :
             this.crit = crit
-            this.stat[0] = crit
+            this.stat[0] = int(crit*100)
         if haste != 0 :
             this.haste = haste
-            this.stat[1] = haste
+            this.stat[1] = int(haste*100-100)
         if vers != 0 :
             this.vers = vers
-            this.stat[2] = vers
+            this.stat[2] = int(vers*100)
         if mastery != 0 :
             this.mastery = mastery
-            this.stat[3] = mastery
+            this.stat[3] = int(mastery*100)
+
     haste = 0
     crit = 0
     mastery = 0
@@ -237,20 +243,22 @@ class brmbase:
     sttick = 0 # stagger tick
 
     #statis
-    totaldmgtaken = 0 # total dmg taken
+    dtb4st = 0 # total dmg taken
     stout = 0 # st avoidance
     totaltank = 0
     sttaken = 0
     stin = 0
     puryheal = 0
+    facetaken = 0
 
     def takephydmg(this,dmg=100,rate=0.9):
         if this.ironskin == 1 :
             rate = this.irate
         else :
             rate = this.srate
-        this.totaldmgtaken += dmg
+        this.dtb4st += dmg
         this.stin += rate * dmg
+        this.facetaken += dmg * (1-rate)
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
@@ -302,15 +310,15 @@ class brmbase:
 #        if this.wrist ==1:
 #            print 'wrist'
 #
-        avoidance = (this.stout + this.puryheal + this.totaltank - this.totaldmgtaken) / this.totaltank
+        avoidance = this.getehrr()
         print '----------------------------'
-        print ' avoid ->| %.4f%% |<- dmg'%(avoidance*100)
+        print ' ehr ->| %.4f%% |<- reduced'%(avoidance*100)
         print '----------------------------'
         print 'totalmeleetank', this.totaltank
-        print 'totaldmgtaken',this.totaldmgtaken
+        print 'dmgtaken b4st',this.dtb4st
         print 'stagger input', this.stin
         print 'stagger taken', this.sttaken
-        print 'stagger purified',this.stout
+        print 'stagger purified %d(%.2f%%)'%(this.stout,this.stout/this.stin*100)
         if this.phrate != 0 :
             print 'waist heal',this.puryheal
         if this.mastery != 0 and this.dodgecount!= 0:
@@ -318,10 +326,13 @@ class brmbase:
         return avoidance
 
     def getavoid(this):
-        return (this.stout + this.puryheal) / this.totaldmgtaken
+        return (this.stout + this.puryheal) / this.dtb4st
 
-    def getehrp(this):
-        return 1/(1-this.stout - this.puryheal/this.totaldmgtaken)
+    def getehr(this):
+        return 1/(1-this.stout - this.puryheal/this.dtb4st)
+
+    def getehrr(this):
+        return 1-this.getehr()
 
     def iron(this,time = 1):
         for i in range(time):
@@ -339,7 +350,8 @@ class brmbase:
         this.el.brm = this
 
         if conf == 0 :
-            conf = config(stat=[crit,haste,vers,mastery], equip = equip, talent = talent, palmcdr = palmcdr, iduration = iduration)
+            tmpstat = [int(crit*100),int(haste*100-100),int(vers*100),int(mastery*100)]
+            conf = config(stat=tmpstat, equip = equip, talent = talent, palmcdr = palmcdr, iduration = iduration)
 
         this.conf = conf
 
@@ -367,6 +379,8 @@ class brmbase:
                 this.irate = 0.9
                 this.haste *= 1.15
             elif t == 'ed' or t == 'ed13' or t == 'ed20':
+                this.prate = 0.65
+            elif t == 'ednobuff' :
                 this.prate = 0.65
             elif t == 'bc':
                 this.kegcdr = 6

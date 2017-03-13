@@ -23,6 +23,8 @@ class brm(brmbase):
     blackcd = 90.0
     blackgain = 0
 
+    selfhrate = 0.05
+
 
     palmcdr = 1.3
     kegcdr = 4
@@ -125,13 +127,14 @@ class brm(brmbase):
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack == 0:
                 #print 'no iron'
-                this.repeat = this.src.brewcdev.time - this.time
+                this.repeat = this.src.brewcdev.time - this.time + 0.01
                 blacktime = this.src.blackev.time - this.time
                 if blacktime < this.repeat :
                     this.src.noiron += blacktime
                 else:
                     this.src.noiron += this.repeat
                 this.src.ironskin = 0
+                return
             
             if this.src.ironskin == 0 :
                 this.repeat = this.src.iduration
@@ -288,7 +291,7 @@ class brm(brmbase):
             this.fishstart = this.el.time #statis
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0, crit = 0, vers = 0, meleetakeiv = 1.5 ,magic = 0):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.5 ,magic = 0):
 
         brmbase.__init__(this,conf,talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
@@ -296,16 +299,18 @@ class brm(brmbase):
         this.magic = magic
     
 
-        if 'wrist' in equip :
+        #print this.crit,this.haste,this.vers,this.mastery
+        #print this.stat
+        if 'wrist' in this.equip :
             this.wrist = 1
 
-        if 'ed' in talent :
+        if 'ed' in this.talent :
             this.ed13 = 1
 
-        if 'ed13' in talent :
+        if 'ed13' in this.talent :
             this.ed13 = 1
 
-        if 'ed20' in talent :
+        if 'ed20' in this.talent :
             this.ed20 = 1
         
 
@@ -372,7 +377,7 @@ class brm(brmbase):
         else :
             rate = this.srate * 0.7
         this.totaltank += dmg
-        this.totaldmgtaken += dmg
+        this.dtb4st += dmg
         this.stin += rate * dmg
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
@@ -387,6 +392,23 @@ class brm(brmbase):
         if this.noiron != 0:
             return "%.4f|%d"%(brmbase.getavoid(this),this.noiron)
         return "%.5f\t"%(brmbase.getavoid(this))
+
+    def getehr(this):
+        vers = this.vers
+        crit = this.crit
+        mastery = this.mastery
+        selfh = this.dtb4st*this.selfhrate*(1.0-vers/2) \
+            *(1.0+crit)*(1.0+crit*0.65)*(1.0+vers)*(1.0+mastery)
+        realdt = (this.facetaken + this.sttaken) * (1.0-vers/2)
+        ehrb4 = realdt - selfh - this.puryheal
+        ehr = ehrb4 / (1.0+0.65*crit) 
+        ehrpdt = ehr / this.totaltank
+        #print selfh, realdt
+        return ehrpdt
+
+    def getehrr(this):
+        return 1-this.getehr()
+
 
     def getmavoid(this):
         avoid = (this.stout + this.puryheal + this.dodgecount*100 ) / this.totaltank

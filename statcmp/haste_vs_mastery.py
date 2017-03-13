@@ -1,5 +1,5 @@
 #!/usr/bin/python2.7
-from brm import *
+from statcmp import *
 
 m = 15000.0
 h = 0.0
