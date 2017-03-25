@@ -57,6 +57,14 @@ class brm(brmbase):
     
     magic = 0
 
+    quicksip = 0
+    qspurified = 0
+    staveoff = 0
+    newfuzan = 0
+
+    
+
+
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -81,7 +89,8 @@ class brm(brmbase):
                 this.repeat = this.realrepeat 
 
             blackremain = this.src.blackev.time - this.time 
-            if this.src.kegintl == 1:
+
+            if this.src.kegintl == 1 and this.repeat != 0:
                 if blackremain < 1:
                     this.repeat = this.src.blackev.time - this.time + 0.01
                     return
@@ -96,10 +105,18 @@ class brm(brmbase):
                 this.src.brewcdev.move(offset = 0 - this.src.kegcdr)
 
                 timing = this.src.blackev.time - this.src.kegcdr
+
                 if timing < this.el.time :
                     this.src.blackev.move(newtiming = this.el.time)
                 else:
                     this.src.blackev.move(newtiming = timing)
+
+            if this.src.staveoff != 0 and this.repeat != 0:
+                r = random.random()
+                if r <= 0.2 :
+                    this.src.sokegev = brm.KegEv(this.src,time=this.time+0.01,repeat = 0)
+                    this.src.sokegev.realrepeat = 0
+                    this.el.add(this.src.sokegev)
 
 
     class PalmEv(RepeatEvent):
@@ -181,6 +198,9 @@ class brm(brmbase):
             this.src.ironcount += n
             this.src.brewgain += 3
 
+            for i in range(n):
+                this.src.qspury()
+
             tmpev = brm.PalmEv(this.src,repeat=0)
             tmpev.time = this.time + 0.01
             tmpev.addto(this.el)
@@ -196,6 +216,7 @@ class brm(brmbase):
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack >= 3 :
                 this.src.pury()
+                this.src.qsiron()
                 this.src.fish()
                 if this.src.ed13 == 1:
                     this.src.edm()
@@ -208,6 +229,7 @@ class brm(brmbase):
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
                 if this.src.brewcdev.time - this.time <= 1 : 
                     this.src.pury()
+                    this.src.qsiron()
                     this.src.fish()
                     if this.src.ed13 == 1:
                         this.src.edm()
@@ -248,6 +270,16 @@ class brm(brmbase):
         def repeatproc(this):
             this.src.takemagicdmg()
 
+    def qspury(this):
+        if this.quicksip != 0 :
+            this.qspurified += this.st * 0.05
+            this.st -= this.st * 0.05
+            this.sttick -= this.sttick * 0.05
+
+    def qsiron(this):
+        if this.quicksip != 0 :
+            this.ironev.move(offset = 1)
+    
 
     def edm(this):
         if this.edev != 0 :
@@ -291,12 +323,16 @@ class brm(brmbase):
             this.fishstart = this.el.time #statis
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.5 ,magic = 0):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.5 ,magic = 0, newfuzan = 0):
 
         brmbase.__init__(this,conf,talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
         this.meleetakeiv = meleetakeiv
         this.magic = magic
+
+        this.quicksip = newfuzan
+        this.staveoff = newfuzan
+        this.newfuzan = newfuzan
     
 
         #print this.crit,this.haste,this.vers,this.mastery
@@ -429,6 +465,9 @@ class brm(brmbase):
         print 'blackcdwaste %d (%d stackbrew)'%(this.blackcdwaste, 3*this.blackcdwaste/90)
         print 'brewcdwaste from BOB %d (%d stackbrew)'%(this.brewcdwaste, this.brewcdwaste/this.brewcd)
         print 'totalwaste %d stackbrew'%(3*this.blackcdwaste/90+this.brewcdwaste/this.brewcd)
+        if this.newfuzan != 0 :
+            print 'qspurified %d(%.2f%%)'%(this.qspurified,this.qspurified/this.stin)
+        #print 'kegcount %d'%this.kegcount
         return ret
 
 
