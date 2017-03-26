@@ -26,7 +26,7 @@ class brm(brmbase):
     selfhrate = 0.05
 
 
-    palmcdr = 1.3
+    palmcdr = 1.4
     kegcdr = 4
 
     purycount = 0
@@ -53,7 +53,7 @@ class brm(brmbase):
     fishstart = 0
     edenable = 0
 
-    ironskin = 0
+    ironskin = 1
     
     magic = 0
 
@@ -212,6 +212,8 @@ class brm(brmbase):
     class ConsiderPuryEv(RepeatEvent):
         repeat = 1
         def repeatproc(this):
+          #  print this.src.ironskin
+          #  print this.src.el
             if this.src.brewstack == this.src.brewstackmax :
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack >= 3 :
@@ -227,7 +229,7 @@ class brm(brmbase):
                 this.src.brewstack -= 1
             elif this.src.brewstack == 2 :
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
-                if this.src.brewcdev.time - this.time <= 1 : 
+                if this.src.brewcdev.time - this.time <= 8 : 
                     this.src.pury()
                     this.src.qsiron()
                     this.src.fish()
@@ -271,6 +273,7 @@ class brm(brmbase):
             this.src.takemagicdmg()
 
     def qspury(this):
+        #print this.st, this.qspurified
         if this.quicksip != 0 :
             this.qspurified += this.st * 0.05
             this.st -= this.st * 0.05
@@ -323,7 +326,7 @@ class brm(brmbase):
             this.fishstart = this.el.time #statis
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.5 ,magic = 0, newfuzan = 0):
+            iduration = 8, palmcdr = 1.4, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.5 ,magic = 0, newfuzan = 0):
 
         brmbase.__init__(this,conf,talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
