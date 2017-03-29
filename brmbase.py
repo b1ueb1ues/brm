@@ -7,7 +7,7 @@ debug = 0
 
 def main():
     b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], \
-            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
+            iron = 8, palmcdr = 1.4, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
 
     print brmbase.__dict__
 
@@ -153,7 +153,7 @@ class config():
     def show(this):
         print this.stat,this.equip,this.talent,this.iduration,this.palmcdr
 
-    def __init__(this,stat=0,equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0):
+    def __init__(this,stat=0,equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.4, haste=0, crit=0, vers=0, mastery=0):
         if stat == 0 :
             stat = [25,25,0,27]
         if len(stat)!= 4:
@@ -226,7 +226,7 @@ class brmbase:
 
     iduration = 8
     kegcdr = 4
-    palmcdr = 1.3
+    palmcdr = 1.4
     brewcd = 21
     brewstack = 3
     brewstackmax = 3
@@ -342,7 +342,7 @@ class brmbase:
 
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.10, mastery = 0, crit = 0, vers = 0 ):
+            iduration = 8, palmcdr = 1.4, haste = 1.3, dodgebase = 0.10, mastery = 0, crit = 0, vers = 0 ):
         random.seed(1)
 
 

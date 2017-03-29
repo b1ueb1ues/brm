@@ -28,7 +28,7 @@ class brm(brmbase):
     t20heal = 0.0
 
 
-    palmcdr = 1.3
+    palmcdr = 1.4
     kegcdr = 4
 
     purycount = 0
@@ -55,11 +55,15 @@ class brm(brmbase):
     fishstart = 0
     edenable = 0
 
-    ironskin = 0
+    ironskin = 1
     
     magic = 0
     
     newfuzan = 0
+
+    quicksip = 0
+    qspurified = 0
+    staveoff = 0
 
     class t20Ev(RepeatEvent):
         def repeatproc(this):
@@ -68,6 +72,10 @@ class brm(brmbase):
             this.src.st -= 0.25 * this.src.st
             this.src.sttick -= this.src.sttick * 0.25
             #print this.src.st
+
+    
+
+
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -92,7 +100,8 @@ class brm(brmbase):
                 this.repeat = this.realrepeat 
 
             blackremain = this.src.blackev.time - this.time 
-            if this.src.kegintl == 1:
+
+            if this.src.kegintl == 1 and this.repeat != 0:
                 if blackremain < 1:
                     this.repeat = this.src.blackev.time - this.time + 0.01
                     return
@@ -107,10 +116,18 @@ class brm(brmbase):
                 this.src.brewcdev.move(offset = 0 - this.src.kegcdr)
 
                 timing = this.src.blackev.time - this.src.kegcdr
+
                 if timing < this.el.time :
                     this.src.blackev.move(newtiming = this.el.time)
                 else:
                     this.src.blackev.move(newtiming = timing)
+
+            if this.src.staveoff != 0 and this.repeat != 0:
+                r = random.random()
+                if r <= 0.2 :
+                    this.src.sokegev = brm.KegEv(this.src,time=this.time+0.01,repeat = 0)
+                    this.src.sokegev.realrepeat = 0
+                    this.el.add(this.src.sokegev)
 
 
     class PalmEv(RepeatEvent):
@@ -196,10 +213,8 @@ class brm(brmbase):
             this.src.ironcount += n
             this.src.brewgain += 3
 
-            if this.src.newfuzan != 0 :
-                for i in range(n):
-                    this.src.st -= this.src.st * 0.05
-                    this.src.sttick -= this.src.sttick * 0.05
+            for i in range(n):
+                this.src.qspury()
 
             tmpev = brm.PalmEv(this.src,repeat=0)
             tmpev.time = this.time + 0.01
@@ -213,12 +228,13 @@ class brm(brmbase):
         repeat = 1
         def repeatproc(this):
             #print '%.2f|%.2f '%(this.src.masterystack*this.src.mastery,  this.src.dodgebase)
+          #  print this.src.ironskin
+          #  print this.src.el
             if this.src.brewstack == this.src.brewstackmax :
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack >= 3 :
                 this.src.pury()
-                if this.src.newfuzan != 0 :
-                    this.src.ironev.move(offset = 1)
+                this.src.qsiron()
                 this.src.fish()
 
                 if this.src.ed13 == 1:
@@ -230,10 +246,9 @@ class brm(brmbase):
                 this.src.brewstack -= 1
             elif this.src.brewstack == 2 :
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
-                if this.src.brewcdev.time - this.time <= 1 : 
+                if this.src.brewcdev.time - this.time <= 8 : 
                     this.src.pury()
-                    if this.src.newfuzan != 0 :
-                        this.src.ironev.move(offset = 1)
+                    this.src.qsiron()
                     this.src.fish()
 
                     if this.src.ed13 == 1:
@@ -275,6 +290,17 @@ class brm(brmbase):
         def repeatproc(this):
             this.src.takemagicdmg()
 
+    def qspury(this):
+        #print this.st, this.qspurified
+        if this.quicksip != 0 :
+            this.qspurified += this.st * 0.05
+            this.st -= this.st * 0.05
+            this.sttick -= this.sttick * 0.05
+
+    def qsiron(this):
+        if this.quicksip != 0 :
+            this.ironev.move(offset = 1)
+    
 
     def edm(this):
         if this.edev != 0 :
@@ -325,6 +351,10 @@ class brm(brmbase):
         this.meleetakeiv = meleetakeiv
         this.magic = magic
         this.melee = melee
+
+        this.quicksip = newfuzan
+        this.staveoff = newfuzan
+        this.newfuzan = newfuzan
     
         this.newfuzan = newfuzan
 
@@ -463,8 +493,13 @@ class brm(brmbase):
         print 'blackcdwaste %d (%d stackbrew)'%(this.blackcdwaste, 3*this.blackcdwaste/90)
         print 'brewcdwaste from BOB %d (%d stackbrew)'%(this.brewcdwaste, this.brewcdwaste/this.brewcd)
         print 'totalwaste %d stackbrew'%(3*this.blackcdwaste/90+this.brewcdwaste/this.brewcd)
+
         if this.t20heal != 0:
             print 't20heal %d'%this.t20heal
+
+        if this.newfuzan != 0 :
+            print 'qspurified %d(%.2f%%)'%(this.qspurified,this.qspurified/this.stin)
+        #print 'kegcount %d'%this.kegcount
         return ret
 
 
