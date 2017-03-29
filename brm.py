@@ -24,6 +24,8 @@ class brm(brmbase):
     blackgain = 0
 
     selfhrate = 0.05
+    t20hrate = 0.8
+    t20heal = 0.0
 
 
     palmcdr = 1.3
@@ -56,7 +58,16 @@ class brm(brmbase):
     ironskin = 0
     
     magic = 0
+    
+    newfuzan = 0
 
+    class t20Ev(RepeatEvent):
+        def repeatproc(this):
+            this.src.t20heal += 100 * this.src.t20hrate
+            this.src.stout += 0.25 * this.src.st
+            this.src.st -= 0.25 * this.src.st
+            this.src.sttick -= this.src.sttick * 0.25
+            #print this.src.st
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -142,6 +153,11 @@ class brm(brmbase):
             this.src.brewstack -= 1
             this.src.ironcount += 1
 
+            if this.src.newfuzan != 0 :
+                this.src.st -= this.src.st * 0.05
+                this.src.sttick -= this.src.sttick * 0.05
+
+
     blackintl = 1
     class BlackEv(RepeatEvent):
         def repeatproc(this):
@@ -170,7 +186,6 @@ class brm(brmbase):
 
             this.src.brewcdwaste += this.src.brewcd - brewcdremain
 
-
             this.ironskin=1
             this.src.fish()
             this.src.blackgain += 1
@@ -180,6 +195,11 @@ class brm(brmbase):
             this.src.brewstack = this.src.brewstackmax - 1
             this.src.ironcount += n
             this.src.brewgain += 3
+
+            if this.src.newfuzan != 0 :
+                for i in range(n):
+                    this.src.st -= this.src.st * 0.05
+                    this.src.sttick -= this.src.sttick * 0.05
 
             tmpev = brm.PalmEv(this.src,repeat=0)
             tmpev.time = this.time + 0.01
@@ -192,11 +212,15 @@ class brm(brmbase):
     class ConsiderPuryEv(RepeatEvent):
         repeat = 1
         def repeatproc(this):
+            #print '%.2f|%.2f '%(this.src.masterystack*this.src.mastery,  this.src.dodgebase)
             if this.src.brewstack == this.src.brewstackmax :
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
             if this.src.brewstack >= 3 :
                 this.src.pury()
+                if this.src.newfuzan != 0 :
+                    this.src.ironev.move(offset = 1)
                 this.src.fish()
+
                 if this.src.ed13 == 1:
                     this.src.edm()
                 elif this.src.ed20 == 1:
@@ -208,7 +232,10 @@ class brm(brmbase):
                 #if this.src.brewcdev.time - this.time < this.src.iduration :
                 if this.src.brewcdev.time - this.time <= 1 : 
                     this.src.pury()
+                    if this.src.newfuzan != 0 :
+                        this.src.ironev.move(offset = 1)
                     this.src.fish()
+
                     if this.src.ed13 == 1:
                         this.src.edm()
                     elif this.src.ed20 == 1:
@@ -291,18 +318,24 @@ class brm(brmbase):
             this.fishstart = this.el.time #statis
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.5 ,magic = 0):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.50 ,melee = 1, magic = 0, newfuzan = 0):
 
         brmbase.__init__(this,conf,talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
         this.meleetakeiv = meleetakeiv
         this.magic = magic
+        this.melee = melee
     
+        this.newfuzan = newfuzan
 
         #print this.crit,this.haste,this.vers,this.mastery
         #print this.stat
         if 'wrist' in this.equip :
             this.wrist = 1
+
+        if 't20' in this.equip:
+            this.t20ev = brm.t20Ev(this, repeat = 60.0/3.2)
+            this.el.add(this.t20ev)
 
         if 'ed' in this.talent :
             this.ed13 = 1
@@ -339,13 +372,14 @@ class brm(brmbase):
        # this.takephyev = brm.TakePhyEv(this)
        # this.el.add(this.takephyev)
 
-        if this.magic == 0:
+        if this.melee != 0:
             this.takemeleeev = brm.TakeMeleeEv(this, repeat = meleetakeiv)
             this.el.add(this.takemeleeev)
 
         if this.magic != 0 :
             this.takemagev = brm.TakeMagEv(this)
             this.el.add(this.takemagev)
+
 
 
         #print this.el
@@ -400,7 +434,7 @@ class brm(brmbase):
         selfh = this.dtb4st*this.selfhrate*(1.0-vers/2) \
             *(1.0+crit)*(1.0+crit*0.65)*(1.0+vers)*(1.0+mastery)
         realdt = (this.facetaken + this.sttaken) * (1.0-vers/2)
-        ehrb4 = realdt - selfh - this.puryheal
+        ehrb4 = realdt - selfh - this.puryheal - this.t20heal
         ehr = ehrb4 / (1.0+0.65*crit) 
         ehrpdt = ehr / this.totaltank
         #print selfh, realdt
@@ -429,6 +463,8 @@ class brm(brmbase):
         print 'blackcdwaste %d (%d stackbrew)'%(this.blackcdwaste, 3*this.blackcdwaste/90)
         print 'brewcdwaste from BOB %d (%d stackbrew)'%(this.brewcdwaste, this.brewcdwaste/this.brewcd)
         print 'totalwaste %d stackbrew'%(3*this.blackcdwaste/90+this.brewcdwaste/this.brewcd)
+        if this.t20heal != 0:
+            print 't20heal %d'%this.t20heal
         return ret
 
 

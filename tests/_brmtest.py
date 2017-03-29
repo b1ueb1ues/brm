@@ -50,7 +50,9 @@ def test2haste(pool, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
         ar = float(a.getehrr())
         br = float(b.getehrr())
         d = 1.0-(1.0-ar)/(1.0-br)
+        flag = 1
         if d < 0 :
+            flag = 2
             d = 1.0-(1.0-br)/(1.0-ar)
 
         hasteprint = (100*i-100)
@@ -70,9 +72,11 @@ def test2(pool, time = 100000):
     print '>'
     br = b.showavoid()
     d = 1-(1-ar)/(1-br)
+    flag = 1
     if d < 0 :
+        flag = 2
         d = 1-(1-br)/(1-ar)
-    print '\n>\ndiff:',d
+    print '\n>\ndiff:',d,'%d good'%flag
 
 def testn(line, time = 100000):
 
