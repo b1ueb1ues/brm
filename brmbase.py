@@ -248,6 +248,7 @@ class brmbase:
     totaltank = 0
     sttaken = 0
     stin = 0
+    pbpury = 0
     puryheal = 0
     facetaken = 0
 
@@ -285,6 +286,7 @@ class brmbase:
 
     def pury(this):
         this.stout += this.prate * this.st 
+        this.pbpury += this.prate * this.st 
         if this.crit != 0 :
             this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
         else :
@@ -319,6 +321,7 @@ class brmbase:
         print 'stagger input', this.stin
         print 'stagger taken', this.sttaken
         print 'stagger purified %d(%.2f%%)'%(this.stout,this.stout/this.stin*100)
+        print 'purifybrew purified %d(%.2f%%)'%(this.pbpury,this.pbpury/this.stin*100)
         if this.phrate != 0 :
             print 'waist heal',this.puryheal
         if this.mastery != 0 and this.dodgecount!= 0:
