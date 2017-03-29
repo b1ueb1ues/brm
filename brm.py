@@ -64,11 +64,14 @@ class brm(brmbase):
     quicksip = 0
     qspurified = 0
     staveoff = 0
+    
+    t20pury = 0
 
     class t20Ev(RepeatEvent):
         def repeatproc(this):
-            this.src.t20heal += 100 * this.src.t20hrate
+            #this.src.t20heal += 100 * this.src.t20hrate
             this.src.stout += 0.25 * this.src.st
+            this.src.t20pury += 0.25 * this.src.st
             this.src.st -= 0.25 * this.src.st
             this.src.sttick -= this.src.sttick * 0.25
             #print this.src.st
@@ -344,7 +347,7 @@ class brm(brmbase):
             this.fishstart = this.el.time #statis
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.50 ,melee = 1, magic = 0, newfuzan = 0):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.50 ,melee = 1, magic = 0, newfuzan = 0, t20rppm = 5):
 
         brmbase.__init__(this,conf,talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
 
@@ -358,13 +361,15 @@ class brm(brmbase):
     
         this.newfuzan = newfuzan
 
+
         #print this.crit,this.haste,this.vers,this.mastery
         #print this.stat
         if 'wrist' in this.equip :
             this.wrist = 1
 
         if 't20' in this.equip:
-            this.t20ev = brm.t20Ev(this, repeat = 60.0/3.2)
+            this.t20rppm = t20rppm
+            this.t20ev = brm.t20Ev(this, repeat = 60.0/t20rppm)
             this.el.add(this.t20ev)
 
         if 'ed' in this.talent :
@@ -496,9 +501,11 @@ class brm(brmbase):
 
         if this.t20heal != 0:
             print 't20heal %d'%this.t20heal
+        if this.t20pury != 0 :
+            print '4t20pury %d(%.2f%%)'%(this.t20pury, this.t20pury/this.stin*100)
 
         if this.newfuzan != 0 :
-            print 'qspurified %d(%.2f%%)'%(this.qspurified,this.qspurified/this.stin)
+            print 'qspurified %d(%.2f%%)'%(this.qspurified,this.qspurified/this.stin*100)
         #print 'kegcount %d'%this.kegcount
         return ret
 
