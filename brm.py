@@ -446,6 +446,7 @@ class brm(brmbase):
         else :
             rate = this.srate * 0.7
         this.totaltank += dmg
+        this.magictank += dmg
         this.dtb4st += dmg
         this.stin += rate * dmg
         this.st += rate * dmg

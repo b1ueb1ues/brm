@@ -14,10 +14,10 @@ def main():
     pool = []
 
     pool.append(config( \
-        equip=['t20','ring'],talent=['black','ht15']   \
+        equip=['4t','ring','waist'],talent=['black','ht15']   \
         ))
     pool.append(config(\
-        equip=['t20','waist'],talent=['black','ht15']   \
+        equip=['2t','t20','ring','waist'],talent=['black','ht15']   \
         ))
 
     test2(pool)
@@ -59,8 +59,8 @@ def test2(pool, time = 100000):
     if len(pool) != 2:
         print ' pool != 2 '
         exit()
-    a = brm(conf = pool[0], t20rppm = 10, newfuzan = 1)
-    b = brm(conf = pool[1], t20rppm = 10, newfuzan = 1)
+    a = brm(conf = pool[0],newfuzan = 1, magic = 1)
+    b = brm(conf = pool[1], t20rppm = 3, newfuzan = 1, magic =1)
     a.run(time)
     b.run(time)
     ar = a.showavoid()
