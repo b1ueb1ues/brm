@@ -44,6 +44,9 @@ class Event:
     def rm(this):
         this.el.rm(this)
 
+    def elprocess(this):
+        this.process()
+
     def process(this):
         print this.time,'process'
 #}
@@ -57,14 +60,17 @@ class RepeatEvent(Event):
             this.repeat = repeat
 
     def repeatproc(this):
-        print this.time,'repeatproc'
+        print this.time,this,'repeatproc (deprecated)'
 
-    def process(this):
-        this.repeatproc()
+    def elprocess(this):
+        this.process()
         if this.repeat == 0 :
             return
         this.time += this.repeat
         this.el.add(this)
+
+    def process(this):
+        print this.time,'repeatev proc'
 
 
 #}class repeatevent
@@ -132,11 +138,13 @@ class Eventlist:
 
     def procone(this):
         e = this._list.pop(0)
+        if debug == 1:
+            print e,this._list
         if this.time < e.time:
             this.time = e.time
         if debug == 1:
             print '%.2f: '%this.time,e,this
-        e.process()
+        e.elprocess()
         return #this.time
     
 

@@ -64,11 +64,13 @@ class brm(brmbase):
     quicksip = 0
     qspurified = 0
     staveoff = 0
+    fbmastery = 1
+    bsmastery = 1
     
     t20pury = 0
 
     class t20Ev(RepeatEvent):
-        def repeatproc(this):
+        def process(this):
             #this.src.t20heal += 100 * this.src.t20hrate
             this.src.stout += 0.25 * this.src.st
             this.src.t20pury += 0.25 * this.src.st
@@ -82,13 +84,13 @@ class brm(brmbase):
 
     class StaggerEv(RepeatEvent):
         repeat = 0.5
-        def repeatproc(this):
+        def process(this):
             this.src.takestdmg()
             #print this.src.st
 
 
     class BrewcdEv(RepeatEvent):
-        def repeatproc(this):
+        def process(this):
             this.src.brewgain += 1
             this.src.brewstack += 1
             if this.src.brewstack >= this.src.brewstackmax :
@@ -98,7 +100,7 @@ class brm(brmbase):
     kegintl = 0
     class KegEv(RepeatEvent):
         realrepeat = 0
-        def repeatproc(this):
+        def process(this):
             if this.repeat != this.realrepeat :
                 this.repeat = this.realrepeat 
 
@@ -134,7 +136,7 @@ class brm(brmbase):
 
 
     class PalmEv(RepeatEvent):
-        def repeatproc(this):
+        def process(this):
             this.src.palmcount += 1
             if this.src.brewstack < this.src.brewstackmax :
                 this.src.brewcdev.move(offset = 0 - this.src.palmcdr)
@@ -151,8 +153,18 @@ class brm(brmbase):
             elif blackremain < this.src.palmcdr :
                 this.src.blackcdwaste += this.src.palmcdr - blackremain
 
+            # return 
+            this.src.bsev.move(offset=-5)
+            if this.src.bsev.time <= this.time :
+                this.src.bsev.time = this.time + 0.01
+            
+            r = random.random
+            if r <= 0.3 :
+                this.src.fbev.move(time=this.time+0.01)
+
+
     class IronEv(RepeatEvent):
-        def repeatproc(this):
+        def process(this):
             this.src.fish()
             if this.src.brewstack == this.src.brewstackmax :
                 this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
@@ -178,9 +190,11 @@ class brm(brmbase):
                 this.src.sttick -= this.src.sttick * 0.05
 
 
+
+
     blackintl = 1
     class BlackEv(RepeatEvent):
-        def repeatproc(this):
+        def process(this):
             if 'black' not in this.src.talent :
                 return 
 
@@ -229,7 +243,7 @@ class brm(brmbase):
 
     class ConsiderPuryEv(RepeatEvent):
         repeat = 1
-        def repeatproc(this):
+        def process(this):
             #print '%.2f|%.2f '%(this.src.masterystack*this.src.mastery,  this.src.dodgebase)
           #  print this.src.ironskin
           #  print this.src.el
@@ -273,6 +287,18 @@ class brm(brmbase):
             this.src.edev = 0
             this.src.edrate = 0
 
+    class FBEv(RepeatEvent):
+        repeat = 20
+        def process(this):
+            this.src.masterystack+=this.src.fbmastery
+
+    class BSEv(RepeatEvent):
+        repeat = 15
+        def process(this):
+            this.src.masterystack+=this.src.bsmastery
+
+
+
     class EdhighEv(Event):
         def process(this):
             this.src.dodgebase -= 0.20
@@ -281,16 +307,16 @@ class brm(brmbase):
 
     class TakePhyEv(RepeatEvent):
         repeat = 1
-        def repeatproc(this):
+        def process(this):
             this.src.takephydmg()
 
     class TakeMeleeEv(RepeatEvent):
-        def repeatproc(this):
+        def process(this):
             this.src.takemelee()
 
     class TakeMagEv(RepeatEvent):
         repeat = 1
-        def repeatproc(this):
+        def process(this):
             this.src.takemagicdmg()
 
     def qspury(this):
@@ -381,6 +407,11 @@ class brm(brmbase):
         if 'ed20' in this.talent :
             this.ed20 = 1
         
+        this.fbev = brm.FBEv(this,repeat = 20)
+        this.el.add(this.fbev)
+
+        this.bsev = brm.BSEv(this,repeat = 15)
+        this.el.add(this.bsev)
 
         this.staggerev = brm.StaggerEv(this)
         this.el.add(this.staggerev)
