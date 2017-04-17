@@ -373,9 +373,9 @@ class brm(brmbase):
             this.fishstart = this.el.time #statis
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.50 ,melee = 1, magic = 0, newfuzan = 0, t20rppm = 5):
+            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.50 ,melee = 1, magic = 0, newfuzan = 1, t20rppm = 5, prate = 0.5):
 
-        brmbase.__init__(this,conf,talent, equip, iduration, palmcdr, haste, dodgebase, mastery, crit, vers)
+        brmbase.__init__(this,conf,talent, equip, iduration,prate, palmcdr, haste, dodgebase, mastery, crit, vers)
 
         this.meleetakeiv = meleetakeiv
         this.magic = magic
@@ -386,6 +386,7 @@ class brm(brmbase):
         this.newfuzan = newfuzan
     
         this.newfuzan = newfuzan
+
 
 
         #print this.crit,this.haste,this.vers,this.mastery

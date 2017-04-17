@@ -161,7 +161,7 @@ class config():
     def show(this):
         print this.stat,this.equip,this.talent,this.iduration,this.palmcdr
 
-    def __init__(this,stat=0,equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.4, haste=0, crit=0, vers=0, mastery=0):
+    def __init__(this,stat=0,equip=['4t'],talent=['black','ht15'],iduration=8.5, prate = 0.5,palmcdr=1.4, haste=0, crit=0, vers=0, mastery=0):
         if stat == 0 :
             stat = [25,25,0,27]
         if len(stat)!= 4:
@@ -176,6 +176,7 @@ class config():
         this.talent = talent
         this.iduration = iduration
         this.palmcdr = palmcdr
+        this.prate = prate
 
         if crit != 0 :
             this.crit = crit
@@ -198,6 +199,7 @@ class config():
 
     palmcdr = 0
     iduration = 0
+    prate = 0
 
     equip=[]
     talent=[]
@@ -353,7 +355,7 @@ class brmbase:
 
 
     def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.4, haste = 1.3, dodgebase = 0.10, mastery = 0, crit = 0, vers = 0 ):
+            iduration = 8, prate=0.5, palmcdr = 1.4, haste = 1.3, dodgebase = 0.10, mastery = 0, crit = 0, vers = 0 ):
         random.seed(1)
 
 
@@ -362,7 +364,7 @@ class brmbase:
 
         if conf == 0 :
             tmpstat = [int(crit*100),int(haste*100-100),int(vers*100),int(mastery*100)]
-            conf = config(stat=tmpstat, equip = equip, talent = talent, palmcdr = palmcdr, iduration = iduration)
+            conf = config(stat=tmpstat, equip = equip, talent = talent, palmcdr = palmcdr, iduration = iduration, prate = prate)
 
         this.conf = conf
 
@@ -370,6 +372,7 @@ class brmbase:
         this.kegcdr = 4
 
         this.iduration = conf.iduration
+        this.prate = conf.prate
         this.mastery = conf.mastery
         this.haste = conf.haste
         this.crit = conf.crit
@@ -390,9 +393,9 @@ class brmbase:
                 this.irate = 0.9
                 this.haste *= 1.15
             elif t == 'ed' or t == 'ed13' or t == 'ed20':
-                this.prate = 0.65
+                this.prate += 0.15
             elif t == 'ednobuff' :
-                this.prate = 0.65
+                this.prate += 0.15
             elif t == 'bc':
                 this.kegcdr = 6
             elif t == 'light':
