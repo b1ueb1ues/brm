@@ -154,6 +154,8 @@ class brm(brmbase):
                 this.src.blackcdwaste += this.src.palmcdr - blackremain
 
             # return 
+            '''
+            # this is old ptr version
             this.src.bsev.move(offset=-5)
             if this.src.bsev.time <= this.time :
                 this.src.bsev.time = this.time + 0.01
@@ -161,6 +163,7 @@ class brm(brmbase):
             r = random.random
             if r <= 0.3 :
                 this.src.fbev.move(time=this.time+0.01)
+                '''
 
 
     class IronEv(RepeatEvent):
@@ -288,12 +291,12 @@ class brm(brmbase):
             this.src.edrate = 0
 
     class FBEv(RepeatEvent):
-        repeat = 20
+        repeat = 15
         def process(this):
             this.src.masterystack+=this.src.fbmastery
 
     class BSEv(RepeatEvent):
-        repeat = 15
+        repeat = 3
         def process(this):
             this.src.masterystack+=this.src.bsmastery
 
@@ -408,10 +411,13 @@ class brm(brmbase):
         if 'ed20' in this.talent :
             this.ed20 = 1
         
-        this.fbev = brm.FBEv(this,repeat = 20)
+        if 'chest' in this.equip:
+            this.fbev = brm.FBEv(this,repeat = 6.0/this.haste)
+        else :
+            this.fbev = brm.FBEv(this,repeat = 15)
         this.el.add(this.fbev)
 
-        this.bsev = brm.BSEv(this,repeat = 15)
+        this.bsev = brm.BSEv(this,repeat = 3)
         this.el.add(this.bsev)
 
         this.staggerev = brm.StaggerEv(this)
