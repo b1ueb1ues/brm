@@ -56,8 +56,8 @@ class RepeatEvent(Event):
 
     def __init__(this, src, repeat = 1,time=0, dst=0):
         Event.__init__(this, src, time, dst)
-        if this.repeat == 0 :
-            this.repeat = repeat
+        #if this.repeat != 0 :
+        this.repeat = repeat
 
     def repeatproc(this):
         print this.time,this,'repeatproc (deprecated)'
