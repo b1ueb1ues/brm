@@ -247,7 +247,7 @@ class brmbase:
     prate = 0.5 # purify rate
     phrate = 0  # purify healrate
     srate = 0.4 # stagger rate
-    irate = 0.8 # stagger rate (ironskin)
+    irate = 0.75 # stagger rate (ironskin)
     stdmgrate = 1.0/20 # stagger dmg rate
     st = 0  # stagger pool
     sttick = 0 # stagger tick

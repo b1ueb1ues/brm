@@ -416,8 +416,7 @@ class brm(brmbase):
         else :
             this.fbev = brm.FBEv(this,repeat = 15)
         this.el.add(this.fbev)
-
-        this.bsev = brm.BSEv(this,repeat = 3)
+        this.bsev = brm.BSEv(this,repeat = 3.0/this.haste)
         this.el.add(this.bsev)
 
         this.staggerev = brm.StaggerEv(this)
