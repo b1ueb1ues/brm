@@ -54,17 +54,17 @@ class Event:
 class RepeatEvent(Event):
     repeat = 0
 
-    def __init__(this, src, repeat = 1,time=0, dst=0):
+    def __init__(this, src, repeat = 0,time=0.0, dst=0):
         Event.__init__(this, src, time, dst)
-        #if this.repeat != 0 :
-        this.repeat = repeat
+        if repeat != 0  :
+            this.repeat = repeat
 
     def repeatproc(this):
         print this.time,this,'repeatproc (deprecated)'
 
     def elprocess(this):
         this.process()
-        if this.repeat == 0 :
+        if this.repeat <= 0 :
             return
         this.time += this.repeat
         this.el.add(this)
@@ -297,10 +297,8 @@ class brmbase:
     def pury(this):
         this.stout += this.prate * this.st 
         this.pbpury += this.prate * this.st 
-        if this.crit != 0 :
-            this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
-        else :
-            this.puryheal += this.phrate * this.st
+        #print this.el.time,this.st,this.st * this.prate
+        this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
 
         this.st -= this.prate * this.st
         this.sttick -= this.sttick * this.prate
@@ -385,12 +383,12 @@ class brmbase:
 
         for t in this.talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
-                this.srate = 0.5
-                this.irate = 0.9
+                this.srate += 0.10
+                this.irate += 0.10
                 this.haste *= 1.1
             elif t == 'ht15':
-                this.srate = 0.5
-                this.irate = 0.9
+                this.srate += 0.10
+                this.irate += 0.10
                 this.haste *= 1.15
             elif t == 'ed' or t == 'ed13' or t == 'ed20':
                 this.prate += 0.15

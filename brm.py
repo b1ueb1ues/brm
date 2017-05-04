@@ -411,13 +411,15 @@ class brm(brmbase):
         if 'ed20' in this.talent :
             this.ed20 = 1
         
-        if 'chest' in this.equip:
-            this.fbev = brm.FBEv(this,repeat = 6.0/this.haste)
-        else :
-            this.fbev = brm.FBEv(this,repeat = 15)
-        this.el.add(this.fbev)
-        this.bsev = brm.BSEv(this,repeat = 3.0/this.haste)
-        this.el.add(this.bsev)
+        this.bsfbmastery = 0
+        if this.bsfbmastery != 0 :
+            if 'chest' in this.equip:
+                this.fbev = brm.FBEv(this,repeat = 6.0/this.haste)
+            else :
+                this.fbev = brm.FBEv(this,repeat = 15)
+            this.el.add(this.fbev)
+            this.bsev = brm.BSEv(this,repeat = 3.0/this.haste)
+            this.el.add(this.bsev)
 
         this.staggerev = brm.StaggerEv(this)
         this.el.add(this.staggerev)

@@ -14,10 +14,10 @@ def main():
     pool = []
 
     pool.append(config(\
-        stat=[20,25,0,35],equip=['4t','ring','waist'],talent=['black','ht15']   \
+        stat=[35,25,0,15],equip=['4t','ring','waist'],talent=['black','ht15'],iduration=9.5   \
         ))
     pool.append(config( \
-        stat=[20,25,0,40],equip=['4t','wrist','waist'],talent=['black','ht15']   \
+        stat=[15,25,0,35],equip=['4t','wrist','waist'],talent=['black','ht15']   \
         ))
 
     #test2haste(pool)
