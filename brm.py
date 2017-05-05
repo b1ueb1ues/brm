@@ -43,7 +43,6 @@ class brm(brmbase):
 
     wrist = 0
     dodgecount = 0
-    meleetakeiv = 1.5
 
     noiron = 0
     ed20 = 0
@@ -57,7 +56,11 @@ class brm(brmbase):
 
     ironskin = 1
     
+#dmgtype
+    melee = 1
+    meleetakeiv = 1.5
     magic = 0
+#}
     
     newfuzan = 0
 
@@ -66,7 +69,8 @@ class brm(brmbase):
     staveoff = 0
     fbmastery = 1
     bsmastery = 1
-    
+    newfuzan = 1
+
     t20pury = 0
 
     class t20Ev(RepeatEvent):
@@ -375,22 +379,11 @@ class brm(brmbase):
             this.dodgebase += 0.1
             this.fishstart = this.el.time #statis
 
-    def __init__(this,conf=0,talent=['black','ht'],equip=['ring','waist'], \
-            iduration = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.1, mastery = 0.27, crit = 0.25, vers = 0.1, meleetakeiv = 1.50 ,melee = 1, magic = 0, newfuzan = 1, t20rppm = 5, prate = 0.53):
-
-        brmbase.__init__(this,conf,talent, equip, iduration,prate, palmcdr, haste, dodgebase, mastery, crit, vers)
-
-        this.meleetakeiv = meleetakeiv
-        this.magic = magic
-        this.melee = melee
-
-        this.quicksip = newfuzan
-        this.staveoff = newfuzan
-        this.newfuzan = newfuzan
-    
-        this.newfuzan = newfuzan
-
-
+    def __init__(this,conf=0,transfer=0,**argv):
+        if transfer != 0 :
+            transfer.update(argv)
+            argv = transfer
+        super(brm,this).__init__(transfer=argv)
 
         #print this.crit,this.haste,this.vers,this.mastery
         #print this.stat
@@ -437,10 +430,11 @@ class brm(brmbase):
        # this.el.add(this.takephyev)
 
         if this.melee != 0:
-            this.takemeleeev = brm.TakeMeleeEv(this.el, repeat = meleetakeiv)
+            this.takemeleeev = brm.TakeMeleeEv(this.el, repeat = this.meleetakeiv)
 
         if this.magic != 0 :
             this.takemagev = brm.TakeMagEv(this.el)
+        this.init = 1
 
        # print this.el
        # exit()
@@ -479,10 +473,6 @@ class brm(brmbase):
         this.sttick = this.st * this.stdmgrate
 
 
-
-    def run(this, time):
-        this.timeran = time
-        this.el.run(time)
 
     def getavoid(this):
         if this.noiron != 0:
@@ -540,14 +530,14 @@ class brm(brmbase):
 
 def main():
 
-    a = brm(equip=[''], mastery = 0.3, meleetakeiv = 0.5)
+    a = brm(equip=['4t'],talent=['black','ht10'], mastery = 30, meleetakeiv = 1.5)
     a.run(100000)
     atake = 1-a.showavoid()
     print 'brew %d + 3*%d'%(a.brewgain, a.blackgain)
 
     print '------'
 
-    b = brm(equip=['wrist','waist'], mastery = 0.3, meleetakeiv = 0.5)
+    b = brm(equip=['4t','wrist','waist'],talent=['black','ht10'], mastery = 30, meleetakeiv = 1.5)
     b.run(100000)
     btake = 1-b.showavoid()
     print 'brew %d + 3*%d'%(b.brewgain, b.blackgain)

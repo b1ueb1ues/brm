@@ -2,17 +2,15 @@
 # -*- encoding:utf8 -*-
 
 import random
+import copy
 from event import *
 from config import *
 debug = 0
 
 def main():
-    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], stat=[25,25,0,20],\
-            iduration = 8, palmcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
+#    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], stat=[25,25,0,20],\
+#            iduration = 8, palmcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
 
-    print 'test'
-    b.palmcdr = 1.5
-    print 'end test'
 
     class test(brmbase):
         def run(this):
@@ -34,6 +32,7 @@ class brmbase(object):
     el = 0
     conf = 0
     init = 0
+    initargv = {}
 
     talent = []
     equip = []
@@ -93,7 +92,7 @@ class brmbase(object):
         this.sttick = this.st * this.stdmgrate
 
     def takemelee(this,dmg=100,rate=0.9):
-        this.totaltank += 0
+        this.totaltank += dmg
         if this.mastery == 0:
             this.takephydmg(dmg)
         else :
@@ -126,18 +125,6 @@ class brmbase(object):
         print 'stat\t',this.stat
         print 'talent\t',this.talent
         print 'equip\t',this.equip
-#        if this.prate == 0.65:
-#            print 'ed',  
-#        elif this.srate == 0.5:
-#            print 'ht',
-#        else :
-#            print 'bc',
-#        if this.ring == 1 :
-#            print 'ring',
-#        if this.waist ==1:
-#            print 'waist',
-#        if this.wrist ==1:
-#            print 'wrist'
 #
         avoidance = this.getehrr()
         print '----------------------------'
@@ -171,25 +158,43 @@ class brmbase(object):
             this.takestdmg()
 
 
+    '''
     def __setattr__(this,name,value):
-        if this.init :
-            tmpconf = this.conf
+        if this.init != 0:
+            if name == 'conf' :
+                tmpconf = conf
+            else :
+                tmpconf = this.conf
             tmpconf.__setattr__(name,value)
-            tmp = this.__class__(tmpconf)
-            print tmp
-            this = tmp
-            exit()
+            this.refresh(tmpconf)
             return
 
         super.__setattr__(this,name,value)
+        '''
 
-    def __init__(this,**argv):
-        this.conf = config(dic = argv)
+    def refresh(this):
+        initargv = this.initargv
+        tmpdic = copy.copy(this.__dict__)
+        for i in tmpdic :
+            this.__delattr__(i)
+        this.__init__(transfer=initargv)
+        return
+
+    def run(this, time):
+        this.refresh()
+        this.timeran = time
+        this.el.run(time)
+
+        
+    def __init__(this,transfer=0,**argv):
+        if transfer != 0 :
+            transfer.update(argv)
+            argv = transfer
+        this.initargv = argv
+        this.conf = config(transfer=argv)
         this.conf.setup(this)
 
         random.seed(1)
-
-
 
         this.el = Eventlist()
         this.el.src = this
@@ -232,7 +237,8 @@ class brmbase(object):
                 this.wrist =1
 
         this.brewcd /= this.haste
-        this.init = 1
+        if transfer == 0:
+            this.init = 1
 
 
     #}init
