@@ -118,19 +118,19 @@ class brm(brmbase):
 
             this.src.kegcount += 1
             if this.src.brewstack < this.src.brewstackmax :
-                this.src.brewcdev.move(offset = 0 - this.src.kegcdr)
+                this.src.brewcdev.mv(offset = 0 - this.src.kegcdr)
 
                 timing = this.src.blackev.time - this.src.kegcdr
 
                 if timing < this.el.time :
-                    this.src.blackev.move(newtiming = this.el.time)
+                    this.src.blackev.mv(time = this.el.time)
                 else:
-                    this.src.blackev.move(newtiming = timing)
+                    this.src.blackev.mv(time = timing)
 
             if this.src.staveoff != 0 and this.repeat != 0:
                 r = random.random()
                 if r <= 0.2 :
-                    this.src.sokegev = brm.KegEv(this.src,time=this.time+0.01,repeat = 0)
+                    this.src.sokegev = brm.KegEv(time=this.time+0.01,repeat = 0)
                     this.src.sokegev.realrepeat = 0
                     this.el.add(this.src.sokegev)
 
@@ -139,13 +139,13 @@ class brm(brmbase):
         def process(this):
             this.src.palmcount += 1
             if this.src.brewstack < this.src.brewstackmax :
-                this.src.brewcdev.move(offset = 0 - this.src.palmcdr)
+                this.src.brewcdev.mv(offset = 0 - this.src.palmcdr)
 
                 timing = this.src.blackev.time - this.src.palmcdr
                 if timing < this.el.time :
-                    this.src.blackev.move(newtiming = this.el.time)
+                    this.src.blackev.mv(time = this.el.time)
                 else:
-                    this.src.blackev.move(newtiming = timing)
+                    this.src.blackev.mv(time = timing)
 
             blackremain = this.src.blackev.time - this.time 
             if this.src.blackstack == 1:
@@ -156,13 +156,13 @@ class brm(brmbase):
             # return 
             '''
             # this is old ptr version
-            this.src.bsev.move(offset=-5)
+            this.src.bsev.mv(offset=-5)
             if this.src.bsev.time <= this.time :
                 this.src.bsev.time = this.time + 0.01
             
             r = random.random
             if r <= 0.3 :
-                this.src.fbev.move(time=this.time+0.01)
+                this.src.fbev.mv(time=this.time+0.01)
                 '''
 
 
@@ -170,7 +170,7 @@ class brm(brmbase):
         def process(this):
             this.src.fish()
             if this.src.brewstack == this.src.brewstackmax :
-                this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
+                this.src.brewcdev.mv(time = this.time + this.src.brewcd)
             if this.src.brewstack == 0:
                 #print 'no iron'
                 this.repeat = this.src.brewcdev.time - this.time + 0.01
@@ -227,8 +227,8 @@ class brm(brmbase):
             this.src.fish()
             this.src.blackgain += 1
             n = this.src.brewstack + 1
-            this.src.ironev.move(offset = n * this.src.iduration)
-            this.src.brewcdev.move(newtiming = this.el.time + this.src.brewcd)
+            this.src.ironev.mv(offset = n * this.src.iduration)
+            this.src.brewcdev.mv(time = this.el.time + this.src.brewcd)
             this.src.brewstack = this.src.brewstackmax - 1
             this.src.ironcount += n
             this.src.brewgain += 3
@@ -236,11 +236,11 @@ class brm(brmbase):
             for i in range(n):
                 this.src.qspury()
 
-            tmpev = brm.PalmEv(this.src,repeat=0)
+            tmpev = brm.PalmEv(repeat=0)
             tmpev.time = this.time + 0.01
             tmpev.addto(this.el)
 
-            tmpev = brm.PalmEv(this.src,repeat=0)
+            tmpev = brm.PalmEv(repeat=0)
             tmpev.time = this.time + 0.02
             tmpev.addto(this.el)
 
@@ -251,7 +251,7 @@ class brm(brmbase):
           #  print this.src.ironskin
           #  print this.src.el
             if this.src.brewstack == this.src.brewstackmax :
-                this.src.brewcdev.move(newtiming = this.time + this.src.brewcd)
+                this.src.brewcdev.mv(time = this.time + this.src.brewcd)
             if this.src.brewstack >= 3 :
                 this.src.pury()
                 this.src.qsiron()
@@ -331,7 +331,7 @@ class brm(brmbase):
 
     def qsiron(this):
         if this.quicksip != 0 :
-            this.ironev.move(offset = 1)
+            this.ironev.mv(offset = 1)
     
 
     def edm(this):
@@ -366,9 +366,9 @@ class brm(brmbase):
 
     def fish(this):
         if this.fishev != 0 :
-            this.fishev.move(newtiming = this.el.time + 4.5)
+            this.fishev.mv(time = this.el.time + 4.5)
         else :
-            fish = brm.FishEv(this)
+            fish = brm.FishEv()
             fish.time = this.el.time + 4.5
             this.el.add(fish)
             this.fishev = fish
@@ -399,8 +399,7 @@ class brm(brmbase):
 
         if 't20' in this.equip:
             this.t20rppm = t20rppm
-            this.t20ev = brm.t20Ev(this, repeat = 60.0/t20rppm)
-            this.el.add(this.t20ev)
+            this.t20ev = brm.t20Ev(this.el, repeat = 60.0/t20rppm)
 
         if 'ed' in this.talent :
             this.ed13 = 1
@@ -411,52 +410,40 @@ class brm(brmbase):
         if 'ed20' in this.talent :
             this.ed20 = 1
         
-        this.bsfbmastery = 0
+        this.bsfbmastery = 1
         if this.bsfbmastery != 0 :
             if 'chest' in this.equip:
-                this.fbev = brm.FBEv(this,repeat = 6.0/this.haste)
+                this.fbev = brm.FBEv(this.el ,repeat = 6.0/this.haste)
             else :
-                this.fbev = brm.FBEv(this,repeat = 15)
-            this.el.add(this.fbev)
-            this.bsev = brm.BSEv(this,repeat = 3.0/this.haste)
-            this.el.add(this.bsev)
+                this.fbev = brm.FBEv(this.el ,repeat = 15)
+            this.bsev = brm.BSEv(this.el, repeat = 3.0/this.haste)
 
-        this.staggerev = brm.StaggerEv(this)
-        this.el.add(this.staggerev)
+        this.staggerev = brm.StaggerEv(this.el)
 
-        this.kegev = brm.KegEv(this, repeat = 8.0 / this.haste)
+        this.kegev = brm.KegEv(this.el, repeat = 8.0 / this.haste)
         this.kegev.realrepeat = 8.0/this.haste
-        this.el.add(this.kegev)
 
-        this.palmev = brm.PalmEv(this, repeat = 5.0 / this.haste)
-        this.el.add(this.palmev)
+        this.palmev = brm.PalmEv(this.el, repeat = 5.0 / this.haste)
 
-        this.ironev = brm.IronEv(this, repeat = this.iduration)
-        this.el.add(this.ironev)
+        this.ironev = brm.IronEv(this.el, repeat = this.iduration)
 
-        this.blackev = brm.BlackEv(this, repeat = 90.0)
-        this.el.add(this.blackev)
+        this.blackev = brm.BlackEv(this.el, repeat = 90.0)
 
-        this.brewcdev = brm.BrewcdEv(this, repeat = this.brewcd)
-        this.el.add(this.brewcdev)
+        this.brewcdev = brm.BrewcdEv(this.el, repeat = this.brewcd)
         
-        this.considerpuryev = brm.ConsiderPuryEv(this)
-        this.el.add(this.considerpuryev)
+        this.considerpuryev = brm.ConsiderPuryEv(this.el)
 
        # this.takephyev = brm.TakePhyEv(this)
        # this.el.add(this.takephyev)
 
         if this.melee != 0:
-            this.takemeleeev = brm.TakeMeleeEv(this, repeat = meleetakeiv)
-            this.el.add(this.takemeleeev)
+            this.takemeleeev = brm.TakeMeleeEv(this.el, repeat = meleetakeiv)
 
         if this.magic != 0 :
-            this.takemagev = brm.TakeMagEv(this)
-            this.el.add(this.takemagev)
+            this.takemagev = brm.TakeMagEv(this.el)
 
-
-
-        #print this.el
+       # print this.el
+       # exit()
 
     def takemelee(this,dmg=100,rate=0.9):
         this.totaltank += dmg
@@ -469,8 +456,8 @@ class brm(brmbase):
             if r < dodge:
                 #doged!
                 if this.wrist == 1 :
-                    this.brewcdev.move(-1)
-                    this.blackev.move(-1)
+                    this.brewcdev.mv(-1)
+                    this.blackev.mv(-1)
                 this.dodgecount += 1
                 this.masterystack = 0
             else:

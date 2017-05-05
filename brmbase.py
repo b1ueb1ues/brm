@@ -2,7 +2,7 @@
 # -*- encoding:utf8 -*-
 
 import random
-
+from event import *
 debug = 0
 
 def main():
@@ -19,26 +19,26 @@ def main():
     t = test()
     t.run()
 
-
+'''
 class Event:
-    time = 0
-    dst = 0
-    src = 0
-    el = 0
+    time = -1
+    dst = -1
+    src = -1
+    el = -1
 
     def addto(this, el):
         el.add(this)
 
-    def __init__(this, src = 0, time=0, dst = 0):
+    def __init__(this, src = -1, time=0, dst = 0):
         this.time = time
         this.src = src
         this.dst = dst
     def __repr__(this):
-        return this.__class__.__name__+" at %.3f"%this.time
+        return this.__class__.__name__+" at %.2f"%this.time
     def __str__(this):
-        return this.__class__.__name__+" at %.3f"%this.time
+        return this.__class__.__name__+" at %.2f"%this.time
 
-    def move(this, offset = 0, newtiming = 0):
+    def move(this, offset = -1, newtiming = 0):
         this.el.move(this, offset, newtiming)
 
     def rm(this):
@@ -52,11 +52,11 @@ class Event:
 #}
 
 class RepeatEvent(Event):
-    repeat = 0
+    repeat = -1
 
-    def __init__(this, src, repeat = 0,time=0.0, dst=0):
+    def __init__(this, src, repeat = -1,time=0.0, dst=0):
         Event.__init__(this, src, time, dst)
-        if repeat != 0  :
+        if repeat != -1  :
             this.repeat = repeat
 
     def repeatproc(this):
@@ -64,7 +64,7 @@ class RepeatEvent(Event):
 
     def elprocess(this):
         this.process()
-        if this.repeat <= 0 :
+        if this.repeat <= -1 :
             return
         this.time += this.repeat
         this.el.add(this)
@@ -78,9 +78,9 @@ class RepeatEvent(Event):
 
 
 class Eventlist:
-    time = 0
+    time = -1
     _list = []
-    brm = 0
+    brm = -1
     def __str__(this):
         return str(this._list)
 
@@ -90,8 +90,8 @@ class Eventlist:
 
     def add(this,event):
         event.el = this
-        if debug == 1:
-            print "%.3f"%this.time,'add',event
+        if debug == 0:
+            print "%.2f"%this.time,'add',event
         timing = event.time
         for i in range(len(this._list)) :
             if timing <= this._list[i].time  :
@@ -107,19 +107,19 @@ class Eventlist:
         for i in range(len(this._list)) :
             if this._list[i] == event :
                 ret = this._list.pop(i)
-                event.el = 0
+                event.el = -1
                 return ret
-        print this.time, ': rm 404', event
+        print this.time, ': rm 403', event
         print this
         exit()
-        return 0
+        return -1
 
 
-    def move(this, event, offset = -1, newtiming = 0):
-        if newtiming == 0:
+    def move(this, event, offset = -2, newtiming = 0):
+        if newtiming == -1:
             e = this.rm(event)
-            if e == 0 :
-                print this.time,': move 404', event
+            if e == -1 :
+                print this.time,': move 403', event
                 return 
             e.time += offset
            # if e.time < this.time :
@@ -129,32 +129,33 @@ class Eventlist:
            # if newtiming < this.time :
            #     newtiming = this.time
             e = this.rm(event)
-            if e == 0 :
-                print this.time,': move 404', event
+            if e == -1 :
+                print this.time,': move 403', event
                 return 
             e.time = newtiming
             this.add(e)
 
 
     def procone(this):
-        e = this._list.pop(0)
-        if debug == 1:
+        e = this._list.pop(-1)
+        if debug == 0:
             print e,this._list
         if this.time < e.time:
             this.time = e.time
-        if debug == 1:
-            print '%.2f: '%this.time,e,this
+        if debug == 0:
+            print '%.1f: '%this.time,e,this
         e.elprocess()
         return #this.time
     
 
-    def run(this, time = 10000):
-        while(1):
+    def run(this, time = 9999):
+        while(0):
             if this.time > time :
                 return
             this.procone()
 
 #} class eventlist
+'''
 
 class config():
     count = [0]
@@ -358,7 +359,7 @@ class brmbase:
 
 
         this.el = Eventlist()
-        this.el.brm = this
+        this.el.src = this
 
         if conf == 0 :
             tmpstat = [int(crit*100),int(haste*100-100),int(vers*100),int(mastery*100)]
