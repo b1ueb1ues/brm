@@ -15,7 +15,9 @@ def main():
     class test(brmbase):
         def run(this):
             print 'hello'
-            print this.__dict__
+            this.ev = RepeatEvent(this.el,repeat=1)
+            print this.el
+            super(test,this).run(100)
 
     t = test(stat=[25,25,0,20])
     t.run()
@@ -31,12 +33,12 @@ class brmbase(object):
     fout = 0
     el = 0
     conf = 0
-    init = 0
+    initialized = 0
     initargv = {}
 
-    talent = []
-    equip = []
-    stat = []
+    talent = ['black']
+    equip = ['4t']
+    stat = [25,25,0,25]
 
     ring = 0
     waist = 0
@@ -174,30 +176,64 @@ class brmbase(object):
 
     def refresh(this):
         initargv = this.initargv
-        tmpdic = copy.copy(this.__dict__)
+        tmpdic = copy.deepcopy(this.__dict__)
+        tmpdic.pop('conf')
         for i in tmpdic :
             this.__delattr__(i)
-        this.__init__(transfer=initargv)
+        this.__init__(transfer=tmpdic)
         return
 
-    def run(this, time):
-        this.refresh()
+    def run(this, time=9999):
+        #this.refresh()
+        this.init()
         this.timeran = time
         this.el.run(time)
 
+    def statsync(this):
+        attr = this.__dict__
         
-    def __init__(this,transfer=0,**argv):
-        if transfer != 0 :
-            transfer.update(argv)
-            argv = transfer
-        this.initargv = argv
-        this.conf = config(transfer=argv)
+        if 'crit' in attr:
+            this.stat[0] = attr['crit']
+        if 'haste' in attr:
+            this.stat[1] = attr['haste']
+        if 'vers' in attr:
+            this.stat[2] = attr['vers']
+        if 'mastery' in attr:
+            this.stat[3] = attr['mastery']
+
+        this.crit = this.stat[0]
+        this.haste = this.stat[1]
+        this.vers = this.stat[2]
+        this.mastery = this.stat[3]
+
+        this.stat[2] = '%.2f/%.2f'%(this.vers,float(this.vers)/2)
+
+        this.crit = float (this.crit) / 100
+        this.haste = float (this.haste) / 100 + 1
+        this.vers = float (this.vers) / 100
+        this.mastery = float (this.mastery) / 100
+
+    def setup(this):
+        argv = this.initargv
+        for a in argv:
+            this.__setattr__(a,argv[a])
+
+
+    def init(this):
+        '''
+        #argv = this.initargv.update(this.__dict__)
+        argv = this.initargv
+        if 'conf' in this.argv:
+            this.conf = this.argv['conf']
+        else:
+            this.conf = config(transfer=argv,argv=this.__dict__)
         this.conf.setup(this)
-
-        random.seed(1)
-
-        this.el = Eventlist()
-        this.el.src = this
+        '''
+        if this.initialized != 0 :
+           print 'dirty brmbase'
+           exit()
+        this.statsync()
+        this.setup()
 
         for t in this.talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
@@ -237,9 +273,15 @@ class brmbase(object):
                 this.wrist =1
 
         this.brewcd /= this.haste
-        if transfer == 0:
-            this.init = 1
+        this.initialized = 1
+        
+    def __init__(this,**argv):
+        this.initargv = argv
 
+        random.seed(1)
+
+        this.el = Eventlist()
+        this.el.src = this
 
     #}init
 #}class brmbase

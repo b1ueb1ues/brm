@@ -346,7 +346,7 @@ class brm(brmbase):
 
         this.edtime += 6
 
-        ed = brm.EdmediumEv(this)
+        ed = brm.EdmediumEv()
         this.edev = ed
         ed.time = this.el.time + 6
         this.el.add(ed)
@@ -361,7 +361,7 @@ class brm(brmbase):
 
         this.edtime += 6
 
-        ed = brm.EdhighEv(this)
+        ed = brm.EdhighEv()
         this.edev = ed
         ed.time = this.el.time + 6
         this.el.add(ed)
@@ -379,14 +379,13 @@ class brm(brmbase):
             this.dodgebase += 0.1
             this.fishstart = this.el.time #statis
 
-    def __init__(this,conf=0,transfer=0,**argv):
-        if transfer != 0 :
-            transfer.update(argv)
-            argv = transfer
-        super(brm,this).__init__(transfer=argv)
-
+    def init(this):
+        super(brm,this).init()
         #print this.crit,this.haste,this.vers,this.mastery
         #print this.stat
+
+        this.init = 0
+
         if 'wrist' in this.equip :
             this.wrist = 1
 
@@ -438,6 +437,16 @@ class brm(brmbase):
 
        # print this.el
        # exit()
+        pass
+
+    def __init__(this,**argv):
+        print argv
+        exit()
+        #if argv != {} :
+            #transfer.update(argv)
+            #argv = transfer
+        super(brm,this).__init__(transfer=argv)
+
 
     def takemelee(this,dmg=100,rate=0.9):
         this.totaltank += dmg
