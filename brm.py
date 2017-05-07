@@ -62,11 +62,10 @@ class brm(brmbase):
     magic = 0
 #}
     
-    newfuzan = 0
 
-    quicksip = 0
-    qspurified = 0
-    staveoff = 0
+    quicksip = 1
+    qspurified = 1
+    staveoff = 1
     fbmastery = 1
     bsmastery = 1
     newfuzan = 1
@@ -440,12 +439,7 @@ class brm(brmbase):
         pass
 
     def __init__(this,**argv):
-        print argv
-        exit()
-        #if argv != {} :
-            #transfer.update(argv)
-            #argv = transfer
-        super(brm,this).__init__(transfer=argv)
+        super(brm,this).__init__(**argv)
 
 
     def takemelee(this,dmg=100,rate=0.9):

@@ -4,13 +4,16 @@
 import random
 import copy
 from event import *
-from config import *
 debug = 0
 
 def main():
 #    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], stat=[25,25,0,20],\
 #            iduration = 8, palmcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
 
+    b = brmbase(stat=[30,20,0,16],equip=['rint','waist','4t'],iduration=9)
+    b.haste=32
+    b.init()
+    print b.__dict__
 
     class test(brmbase):
         def run(this):
@@ -36,9 +39,9 @@ class brmbase(object):
     initialized = 0
     initargv = {}
 
-    talent = ['black']
-    equip = ['4t']
-    stat = [25,25,0,25]
+    talent = []
+    equip = []
+    stat = []
 
     ring = 0
     waist = 0
@@ -114,14 +117,18 @@ class brmbase(object):
         this.sttaken += this.sttick
         this.st -= this.sttick
 
-    def pury(this):
-        this.stout += this.prate * this.st 
-        this.pbpury += this.prate * this.st 
+    def pury(this,rate=-1):
+        if rate == -1 :
+            prate = this.prate
+        else :
+            prate = rate
+        this.stout +=  prate * this.st 
+        this.pbpury += prate * this.st 
         #print this.el.time,this.st,this.st * this.prate
-        this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
-
-        this.st -= this.prate * this.st
-        this.sttick -= this.sttick * this.prate
+        if rate == -1 :
+            this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
+        this.st -= this.st * prate
+        this.sttick -= this.sttick * prate
 
     def showavoid(this):
         print 'stat\t',this.stat
@@ -175,6 +182,7 @@ class brmbase(object):
         '''
 
     def refresh(this):
+        'unstable'
         initargv = this.initargv
         tmpdic = copy.deepcopy(this.__dict__)
         tmpdic.pop('conf')
@@ -220,20 +228,12 @@ class brmbase(object):
 
 
     def init(this):
-        '''
-        #argv = this.initargv.update(this.__dict__)
-        argv = this.initargv
-        if 'conf' in this.argv:
-            this.conf = this.argv['conf']
-        else:
-            this.conf = config(transfer=argv,argv=this.__dict__)
-        this.conf.setup(this)
-        '''
         if this.initialized != 0 :
            print 'dirty brmbase'
            exit()
-        this.statsync()
         this.setup()
+        this.statsync()
+
 
         for t in this.talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
@@ -282,6 +282,10 @@ class brmbase(object):
 
         this.el = Eventlist()
         this.el.src = this
+
+        this.talent = ['black']
+        this.equip = ['4t']
+        this.stat = [25,25,0,25]
 
     #}init
 #}class brmbase
