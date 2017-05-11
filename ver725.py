@@ -13,11 +13,11 @@ def main():
 
     pool = []
 
-    pool.append(config(\
-        stat=[30,25,0,20],equip=['2t'],talent=['black','ht15']   \
+    pool.append(brm(\
+        stat=[30,25,0,20],equip=['4t','wrist'],talent=['black','ht15']   \
         ))
-    pool.append(config( \
-        stat=[30,31,0,20],equip=[''],talent=['black','ht15']   \
+    pool.append(brm(\
+        stat=[30,25,0,20],equip=['2t','t20','wrist'],talent=['black','ht15']   \
         ))
 
     #test2haste(pool)
@@ -64,8 +64,8 @@ def test2(pool, time = 100000):
     if len(pool) != 2:
         print ' pool != 2 '
         exit()
-    a = brm(conf = pool[0])
-    b = brm(conf = pool[1])
+    a = pool[0]
+    b = pool[1]
     a.run(time)
     b.run(time)
     ar = a.showavoid()
@@ -84,7 +84,7 @@ def testn(line, time = 100000):
     for l in line:
         print '%d: '%col,
         col += 1
-        l.show()
+        #l.show()
 
     print '\n>'
     for j in range(len(line)):
@@ -93,7 +93,7 @@ def testn(line, time = 100000):
 
     av = []
     for c in line :
-        b = brm(conf=c)
+        b = c
         b.run(time)
         av.append(b.getehrr())
         #print av

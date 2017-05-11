@@ -44,9 +44,11 @@ def bps(haste=1,t7='ht',p=1.3,t3='black'):
 	return ret
 
 if __name__ == '__main__':
-    i = 1.3
-    a = bps(i,'ht10',p=1.1445,t3='black')
-    print 1/a 
+    i = 1.5
+    a = bps(i,p=2.3,t3='black')
+    b = bps(i,p=2.6,t3='black')
+    print a  * 60
+    print b * 60
     exit()
 
     i=1-0.01

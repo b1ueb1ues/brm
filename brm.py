@@ -70,8 +70,9 @@ class brm(brmbase):
     bsmastery = 1
     newfuzan = 1
 
-    t20pury = 0
-
+    t20 = 0
+    t20pury = 0.0
+    '''
     class t20Ev(RepeatEvent):
         def process(this):
             #this.src.t20heal += 100 * this.src.t20hrate
@@ -80,6 +81,7 @@ class brm(brmbase):
             this.src.st -= 0.25 * this.src.st
             this.src.sttick -= this.src.sttick * 0.25
             #print this.src.st
+            '''
 
     
 
@@ -234,10 +236,11 @@ class brm(brmbase):
             this.src.brewcdev.mv(time = this.el.time + this.src.brewcd)
             this.src.brewstack = this.src.brewstackmax - 1
             this.src.ironcount += n
-            this.src.brewgain += 3
+            this.src.brewgain += this.src.brewstackmax
 
             for i in range(n):
                 this.src.qspury()
+                this.src.t20purify()
 
             tmpev = brm.PalmEv(repeat=0)
             tmpev.time = this.time + 0.01
@@ -332,6 +335,13 @@ class brm(brmbase):
             this.st -= this.st * 0.05
             this.sttick -= this.sttick * 0.05
 
+    def t20purify(this):
+        #print this.st, this.qspurified
+        if this.t20 != 0 :
+            this.t20pury += this.st * 0.1
+            this.st -= this.st * 0.1
+            this.sttick -= this.sttick * 0.1
+
     def qsiron(this):
         if this.quicksip != 0 :
             this.ironev.mv(offset = 1)
@@ -368,6 +378,7 @@ class brm(brmbase):
         this.edrate = 0.2
 
     def fish(this):
+        this.t20purify()
         if this.fishev != 0 :
             this.fishev.mv(time = this.el.time + 4.5)
         else :
@@ -389,8 +400,9 @@ class brm(brmbase):
             this.wrist = 1
 
         if 't20' in this.equip:
-            this.t20rppm = t20rppm
-            this.t20ev = brm.t20Ev(this.el, repeat = 60.0/t20rppm)
+            this.t20 = 1
+            #this.t20rppm = t20rppm
+            #this.t20ev = brm.t20Ev(this.el, repeat = 60.0/t20rppm)
 
         if 'ed' in this.talent :
             this.ed13 = 1
