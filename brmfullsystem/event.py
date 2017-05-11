@@ -74,7 +74,8 @@ class Eventlist:
 
     def add(this,event):
         event.el = this
-        event.src = this.src
+        if event.src == 0 :
+            event.src = this.src
         if this.debug :
             print "%.2f"%this.time,'add',event
         timing = event.time

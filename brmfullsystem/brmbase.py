@@ -40,8 +40,7 @@ class brmbase(object):
     initargv = {}
     
     hp = 0
-    energy
-
+    energy = 100
 
     talent = []
     equip = []
