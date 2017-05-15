@@ -4,6 +4,7 @@
 import random
 import copy
 from event import *
+import statistic
 debug = 0
 
 def main():
@@ -40,7 +41,9 @@ class brmbase(object):
     initargv = {}
     
     hp = 0
+    hpmax = 600
     energy = 100
+    ap = 0
 
     talent = []
     equip = []
@@ -88,7 +91,7 @@ class brmbase(object):
     puryheal = 0
     facetaken = 0
 
-    def takephydmg(this,dmg=100,rate=0.9):
+    def takephydmg(this,dmg=400,rate=0.9):
         if this.ironskin == 1 :
             rate = this.irate
         else :
@@ -99,7 +102,20 @@ class brmbase(object):
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
-    def takemelee(this,dmg=100,rate=0.9):
+    def takemagicdmg(this):
+        dmg = 100
+        if this.ironskin == 1 :
+            rate = this.irate * 0.7
+        else :
+            rate = this.srate * 0.7
+        this.totaltank += dmg
+        this.magictank += dmg
+        this.dtb4st += dmg
+        this.stin += rate * dmg
+        this.st += rate * dmg
+        this.sttick = this.st * this.stdmgrate
+
+    def takemelee(this,dmg=400,rate=0.9):
         this.totaltank += dmg
         if this.mastery == 0:
             this.takephydmg(dmg)
@@ -223,6 +239,10 @@ class brmbase(object):
         this.haste = float (this.haste) / 100 + 1
         this.vers = float (this.vers) / 100
         this.mastery = float (this.mastery) / 100
+
+
+    def gethaste(this):
+        return this.haste
 
     def setup(this):
         argv = this.initargv

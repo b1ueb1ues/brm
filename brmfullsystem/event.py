@@ -1,17 +1,19 @@
 
-class Event:
+class Event(object):
     time = 0
     dst = 0
     src = 0
     el = 0
+    withhaste = 0
 
     def addto(this, el):
         el.add(this)
 
-    def __init__(this,el=0, src = 0, time=0, dst = 0):
+    def __init__(this,el=0, src = 0, time=0, dst = 0, withhaste = 0):
         this.time = time
         this.src = src
         this.dst = dst
+        this.withhaste = withhaste
         if el != 0:
             this.addto(el)
     def __repr__(this):
@@ -34,8 +36,8 @@ class Event:
 
 class RepeatEvent(Event):
     repeat = 1
-    def __init__(this,el=0, repeat = -2 ,time=0.0, dst=0):
-        Event.__init__(this,el, time, dst)
+    def __init__(this,el = 0, src = 0, repeat = -2 ,time = 0.0, dst = 0, withhaste = 0):
+        super(RepeatEvent,this).__init__(el, src, time, dst, withhaste)
         if repeat != -2 :
             this.repeat = repeat
 
@@ -56,9 +58,7 @@ class RepeatEvent(Event):
 
 #}class repeatevent
 
-
-
-class Eventlist:
+class Eventlist(object):
     time = 0
     _list = []
     src = 0
@@ -88,6 +88,7 @@ class Eventlist:
                 return True
         this._list.append(event)
     #}
+
     
     def rm(this,event):
         for i in range(len(this._list)) :
@@ -134,7 +135,7 @@ class Eventlist:
             print e,this._list
         if this.time < e.time:
             this.time = e.time
-        if this.debug :
+        if this.debug != 0 :
             print '%.1f: '%this.time,e,this
         e.elprocess()
 #        if this.count >=3:
@@ -150,3 +151,138 @@ class Eventlist:
 
 #} class eventlist
 
+class Eventlist_withhaste(Eventlist):
+    _hastelist = []
+    _oldhaste = 1
+    def add_withhaste(this,event):
+        event.el = this
+        if event.src == 0 :
+            event.src = this.src
+        if this.debug :
+            print "%.2f"%this.time,'addhaste',event
+        timing = (event.time - this.time) / this._oldhaste + this.time
+        event.time = timing
+        print 'timing',timing
+        for i in range(len(this._hastelist)) :
+            if timing <= this._hastelist[i].time  :
+                tmp = this._hastelist[:i]
+                tmp.append(event)
+                tmp += this._hastelist[i:]
+                this._hastelist = tmp
+                return True
+        this._hastelist.append(event)
+    #}
+
+    def add(this,event):
+        if event.withhaste != 0:
+            this.add_withhaste(event)
+            return
+        else:
+            super(Eventlist_withhaste,this).add(event)
+    #}
+    
+    def synchaste(this):
+        haste = this.src.gethaste()
+        if haste == this._oldhaste:
+            return
+        change = haste / this._oldhaste
+        for i in this._hastelist :
+            tmp = i.time - this.time
+            tmp = tmp/change + this.time
+        this._oldhaste = haste
+
+
+    def processone(this):
+        if this.debug != 0:
+            print 'thistime!!!!!!!',this.time
+            print 'in hasteprocessone'
+            print this._list,'\n',this._hastelist,'\n'
+        this.synchaste()
+        iv1 = None
+        iv2 = None
+        if this._list != []:
+            iv1 = this._list[0].time - this.time
+        if this._hastelist != []:
+            iv2 = this._hastelist[0].time - this.time
+
+        if iv1 == None :  #and iv2 != 0
+            if iv2 == None :
+                if this.debug != 0:
+                    print 'return',this._list,this._hastelist
+                return 
+            e = this._hastelist.pop(0)
+            e.time = this.time + iv2
+        elif iv2 == None : #and iv1 != 0
+            e = this._list.pop(0)
+        elif iv1 < iv2:
+            e = this._list.pop(0)
+        else :
+            e = this._hastelist.pop(0)
+
+
+#        this.count += 1
+#        print this._list
+
+        if this.debug :
+            print '>>>>>hasteprocone',e,'\n',this._list,'\n',this._hastelist,'\n'
+        if this.time < e.time:
+            this.time = e.time
+        e.elprocess()
+#        if this.count >=3:
+#            exit()
+        return #this.time
+
+    def rm(this,event):
+        for i in range(len(this._list)) :
+            if this._list[i] == event :
+                ret = this._list.pop(i)
+                event.el = 0
+                return ret
+        print this.time, ': rm 404', event
+        print this
+        exit()
+        return 0
+
+
+    def mv(this, event, offset = 0, time = 0):
+        if offset != 0:
+            e = this.rm(event)
+            if e == 0 :
+                print this.time,': move 404', event
+                return 
+            e.time += offset
+           # if e.time < this.time :
+           #     e.time = this.time
+            this.add(e)
+        else :
+           # if newtiming < this.time :
+           #     newtiming = this.time
+            e = this.rm(event)
+            if e == 0 :
+                print this.time,': move 404', event
+                return 
+            e.time = time
+            this.add(e)
+#}class repeatlist
+
+
+
+def main():
+    class test(object):
+        def gethaste(this):
+            return 2
+
+    a = test()
+
+    el = Eventlist_withhaste(src=a,debug = 1)
+    e1 = RepeatEvent(repeat = 3)
+    e2 = RepeatEvent(repeat = 4,withhaste=1)
+    e1.addto(el)
+    e2.addto(el)
+    el.run(20)
+
+
+
+
+if __name__ == '__main__' :
+    main()
