@@ -4,14 +4,14 @@
 import random
 import copy
 from event import *
-import statistic
+from statistic import *
 debug = 0
 
 def main():
 #    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], stat=[25,25,0,20],\
 #            iduration = 8, palmcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
 
-    b = brmbase(stat=[30,20,0,16],equip=['rint','waist','4t'],iduration=9)
+    b = brmbase(stat=[30,20,0,16],equip=['ring','waist','4t'],iduration=9)
     b.haste=32
     b.init()
     print b.__dict__
@@ -40,10 +40,12 @@ class brmbase(object):
     initialized = 0
     initargv = {}
     
-    hp = 0
-    hpmax = 600
+    hp = 6000000
+    hpmax = 6000000
     energy = 100
     ap = 0
+    armor = 4400
+    armorrate = 0
 
     talent = []
     equip = []
@@ -52,20 +54,20 @@ class brmbase(object):
     ring = 0
     waist = 0
     wrist = 0
+    chest = 0
 
     #stat
-    dodgebase = 0.08
+    dodgebase = 0.10
+    crit = 0.1
+    haste = 1.3
+    vers = 0
     mastery = 0.3
     masterystack = 0
-    meleecount = 0
-    dodgecount = 0
-    haste = 1.3
-    crit = 0.1
-    vers = 0
 
-    iduration = 8
-    kegcdr = 4
-    palmcdr = 1.4
+
+    isbduration = 8
+    kscdr = 4
+    tpcdr = 1.4
     brewcd = 21
     brewstack = 3
     brewstackmax = 3
@@ -82,41 +84,79 @@ class brmbase(object):
     sttick = 0 # stagger tick
 
     #statis
-    dtb4st = 0 # total dmg taken
-    stout = 0 # st avoidance
-    totaltank = 0
-    sttaken = 0
-    stin = 0
-    pbpury = 0
-    puryheal = 0
-    facetaken = 0
+    class meleecount(statistic):
+        pass
+    class dodgecount(statistic):
+        pass
+    class dodgecount(statistic):
+        pass
+    class dtb4st(statistic):
+        pass
+    class totaltank(statistic):
+        pass
+    class stin(statistic):
+        pass
+    class stout(statistic):
+        pass
+    class facetaken(statistic):
+        pass
 
-    def takephydmg(this,dmg=400,rate=0.9):
+    #totaltank = 0
+    #sttaken = 0
+    #stin = 0
+    #pbpury = 0
+    waistheal = 0
+
+
+
+    takephydmg_totaltank = totaltank(src='takephydmg')
+    takephydmg_dtb4st = dtb4st(src='takephydmg')
+    takephydmg_stin = stin(src='takephydmg')
+    takephydmg_facetaken = facetaken(src='takephydmg')
+
+    def takephydmg(this,dmg=4000000,rate=0.9):
+        this.takephydmg_totaltank += this.dmg
+        dmg -= dmg * this.armorrate
+        
         if this.ironskin == 1 :
             rate = this.irate
         else :
             rate = this.srate
-        this.dtb4st += dmg
-        this.stin += rate * dmg
-        this.facetaken += dmg * (1-rate)
+
+        this.takephydmg_dtb4st += dmg
+        this.takephydmg_stin += rate * dmg
+        this.takephydmg_facetaken += dmg * (1-rate)
+
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
-    def takemagicdmg(this):
-        dmg = 100
+
+    takemagicdmg_totaltank = totaltank(src='takemagicdmg')
+    takemagicdmg_dtb4st = dtb4st(src='takemagicdmg')
+    takemagicdmg_stin = stin(src='takemagicdmg')
+    takemagicdmg_facetaken = facetaken(src='takemagicdmg')
+
+    def takemagicdmg(this,dmg=400000):
         if this.ironskin == 1 :
             rate = this.irate * 0.7
         else :
             rate = this.srate * 0.7
-        this.totaltank += dmg
-        this.magictank += dmg
-        this.dtb4st += dmg
-        this.stin += rate * dmg
+        this.takemagicdmg_totaltank += dmg
+        this.takemagicdmg_dtb4st += dmg
+        this.takemagicdmg_stin += dmg * rate
+        this.takemagcidmg_facetaken += dmg * (1-rate)
+
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
-    def takemelee(this,dmg=400,rate=0.9):
-        this.totaltank += dmg
+
+    takemelee_totaltank = totaltank(src='takemelee')
+    takemelee_dtb4st = dtb4st(src='takemelee')
+    takemelee_stin = stin(src='takemelee')
+    takemelee_facetaken = facetaken(src='takemelee')
+
+    def takemelee(this,dmg=4000000,rate=0.9):
+        takemelee_totaltank += dmg
         if this.mastery == 0:
             this.takephydmg(dmg)
         else :
@@ -125,26 +165,40 @@ class brmbase(object):
             if r < dodge:
                 this.masterystack = 0
             else:
-                this.takephydmg(dmg)
+                dmg -= dmg * this.armorrate
+                if this.ironskin == 1 :
+                    rate = this.irate
+                else :
+                    rate = this.srate
+
+                this.takemelee_dtb4st += dmg
+                this.takemelee_stin += dmg * rate
+                this.takemelee_facetaken += dmg * (1-rate)
+
+                this.st += rate * dmg
+                this.sttick = this.st * this.stdmgrate
+
                 this.masterystack += 1
    #}takemelee
 
+    st_stout = stout(src='takestdmg')
     def takestdmg(this):
         if this.st <= 0 :
             return
-
-        this.sttaken += this.sttick
+        this.st_stout += this.sttick
         this.st -= this.sttick
 
-    def pury(this,rate=-1):
+    def pury(this,rate=-1,src='pb'):
         if rate == -1 :
             prate = this.prate
         else :
             prate = rate
-        this.stout +=  prate * this.st 
-        this.pbpury += prate * this.st 
+
+        pr_stout = brm.stout(src=src)
+        pr_stout += this.st * prate
+
         #print this.el.time,this.st,this.st * this.prate
-        if rate == -1 :
+        if rate == -1 and this.phrate != 0 :
             this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
         this.st -= this.st * prate
         this.sttick -= this.sttick * prate
@@ -244,6 +298,17 @@ class brmbase(object):
     def gethaste(this):
         return this.haste
 
+    def getarmorrate(this,level=113):
+        level = str(level)
+        armorC= {
+            '110':7390,
+            '111':7648,
+            '112':7906,
+            '113':8164
+        }
+        C = armorC[level]
+        return this.armor / (this.armor + C)
+
     def setup(this):
         argv = this.initargv
         for a in argv:
@@ -257,16 +322,19 @@ class brmbase(object):
         this.setup()
         this.statsync()
 
+        this.armorrate = this.getarmorrate()
 
         for t in this.talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
                 this.srate += 0.10
                 this.irate += 0.10
+                '''
                 this.haste *= 1.1
             elif t == 'ht15':
                 this.srate += 0.10
                 this.irate += 0.10
                 this.haste *= 1.15
+                '''
             elif t == 'ed' or t == 'ed13' or t == 'ed20':
                 this.prate += 0.15
             elif t == 'ednobuff' :
@@ -279,10 +347,10 @@ class brmbase(object):
                 this.brewstackmax = 4
             
         for e in this.equip:
-            if e == '2t' :
+            if e == '2t19' :
                 this.irate += 0.05
                 this.srate += 0.05
-            if e == '4t' :
+            if e == '4t19' :
                 this.irate += 0.05
                 this.srate += 0.05
                 this.palmcdr += 1
@@ -294,6 +362,8 @@ class brmbase(object):
                 this.phrate = this.prate * 0.25
             if e == 'wrist':
                 this.wrist =1
+            if e == 'chest':
+                this.chest =1
 
         this.brewcd /= this.haste
         this.initialized = 1

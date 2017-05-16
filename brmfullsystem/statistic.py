@@ -1,88 +1,67 @@
 
-class statistic(object):
-    s_value = [0]
-    src = 'null'
+class statisunit(object):
+    __value = 0
+    __name = 'null'
+    __parent = 0
 
-    addcount = 0
-    subcount = 0
-    addsum = 0
-    subsum = 0
-    s_addcount = [0]
-    s_subcount = [0]
-    s_addsum = [0]
-    s_subsum = [0]
+    def __init__(this,p,n = 'null'):
+        this.__parent = p
+        this.__name = n
+        if this.__name not in this.__parent.getv() :
+            this.__parent.getv()[this.__name] = this.__value
 
-    def __init__(this,src='null'):
-        this.src = src
-
-
-    def get(this):
-        return this.s_value[0]
-
-
-    def add(this,value):
-        this.s_value[0] += value
-        this.addcount += 1
-        this.s_addcount[0] += 1
-        this.addsum += value
-        this.s_addsum[0] += value
-
-    def sub(this,value):
-        this.s_value[0] -= value
-        this.subcount += 1
-        this.s_subcount[0] += 1
-        this.subsum += value
-        this.s_subsum[0] += value
-
-    def set(this,newvalue):
-        diff = newvalue - this.get()
-        if diff > 0 :
-            this.add(diff)
-        elif diff < 0 :
-            this.sub(0-diff)
-
-
-
-    def __add__(this,other):
-        return this.get() + other
-    def __radd__(this,other):
-        return this.get() + other
     def __iadd__(this,other):
-        this.add(other)
-        return this
-
-    def __sub__(this,other):
-        return this.get() - other
-    def __rsub__(this,other):
-        return this.get() - other
-    def __isub__(this,other):
-        this.sub(other)
+        this.__value += other
+        this.__parent.getv()[this.__name] += other
+        print this.__parent.getv()
         return this
 
     def __str__(this):
-        return str(this.get())
+        return str(this.__value)
+    def __impr__(this):
+        return str(this.__value)
+        
 
-    def addstatistic(this):
-        pass
-    def show(this):
-        pass
 
-    
+
+class statistic(object):
+    src = 'null'
+    __values = {}
+    instance = []
+
+    def __init__(this,src='null'):
+        this.src = src
+        this.instance.append(this)
+
+    def __getattr__(this,name):
+        if '__values' in name :
+            print 'err getattr'
+            print cast
+        if name not in this.__dict__:
+            tmp = statisunit(this,name)
+            super(statistic,this).__setattr__(name,tmp)
+        return getattr(this,name)
+
+    def __str__(this):
+        tmp = 'statis from src="%s"'%this.src
+        return tmp
+
+    def getv(this):
+        return this.__values
+            
 
 
 def main():
-    class test(statistic):
-        'test'
-    a = test()
-    b = test()
-    a.set(4)
-    b += 5
-    a.set(-3)
-    b -= 2
+    a = statistic(src='1')
+    a.st += 3
+    a.test += 4
 
-    print a.get()
-    print a.addsum,b.addsum
-    print a.subsum,b.subsum
+    b = statistic(src='2')
+    b.st += 4
+
+    for i in statistic.instance:
+        print i,i.st,i.test
+
 
 if __name__ == '__main__' :
     main()
