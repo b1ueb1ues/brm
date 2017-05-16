@@ -60,6 +60,7 @@ class brm(brmbase):
     melee = 1
     meleetakeiv = 1.5
     magic = 0
+    magictank = 0
 #}
     
 

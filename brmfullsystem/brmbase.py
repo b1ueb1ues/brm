@@ -83,23 +83,6 @@ class brmbase(object):
     st = 0  # stagger pool
     sttick = 0 # stagger tick
 
-    #statis
-    class meleecount(statistic):
-        pass
-    class dodgecount(statistic):
-        pass
-    class dodgecount(statistic):
-        pass
-    class dtb4st(statistic):
-        pass
-    class totaltank(statistic):
-        pass
-    class stin(statistic):
-        pass
-    class stout(statistic):
-        pass
-    class facetaken(statistic):
-        pass
 
     #totaltank = 0
     #sttaken = 0
@@ -109,13 +92,10 @@ class brmbase(object):
 
 
 
-    takephydmg_totaltank = totaltank(src='takephydmg')
-    takephydmg_dtb4st = dtb4st(src='takephydmg')
-    takephydmg_stin = stin(src='takephydmg')
-    takephydmg_facetaken = facetaken(src='takephydmg')
 
+    s_phy = statistic('takephydmg')
     def takephydmg(this,dmg=4000000,rate=0.9):
-        this.takephydmg_totaltank += this.dmg
+        this.s_phy.totaltank += dmg
         dmg -= dmg * this.armorrate
         
         if this.ironskin == 1 :
@@ -123,38 +103,32 @@ class brmbase(object):
         else :
             rate = this.srate
 
-        this.takephydmg_dtb4st += dmg
-        this.takephydmg_stin += rate * dmg
-        this.takephydmg_facetaken += dmg * (1-rate)
+        this.s_phy.dtb4st += dmg
+        this.s_phy.stin += rate * dmg
+        this.s_phy.facetaken += dmg * (1-rate)
 
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
 
-    takemagicdmg_totaltank = totaltank(src='takemagicdmg')
-    takemagicdmg_dtb4st = dtb4st(src='takemagicdmg')
-    takemagicdmg_stin = stin(src='takemagicdmg')
-    takemagicdmg_facetaken = facetaken(src='takemagicdmg')
 
+
+    s_magic = statistic('takemagicdmg')
     def takemagicdmg(this,dmg=400000):
         if this.ironskin == 1 :
             rate = this.irate * 0.7
         else :
             rate = this.srate * 0.7
-        this.takemagicdmg_totaltank += dmg
-        this.takemagicdmg_dtb4st += dmg
-        this.takemagicdmg_stin += dmg * rate
-        this.takemagcidmg_facetaken += dmg * (1-rate)
+        this.s_magic.totaltank += dmg
+        this.s_magic.dtb4st += dmg
+        this.s_magic.stin += dmg * rate
+        this.s_magic.facetaken += dmg * (1-rate)
 
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
 
-    takemelee_totaltank = totaltank(src='takemelee')
-    takemelee_dtb4st = dtb4st(src='takemelee')
-    takemelee_stin = stin(src='takemelee')
-    takemelee_facetaken = facetaken(src='takemelee')
-
+    s_melee = statistic('takemelee')
     def takemelee(this,dmg=4000000,rate=0.9):
         takemelee_totaltank += dmg
         if this.mastery == 0:
@@ -171,9 +145,9 @@ class brmbase(object):
                 else :
                     rate = this.srate
 
-                this.takemelee_dtb4st += dmg
-                this.takemelee_stin += dmg * rate
-                this.takemelee_facetaken += dmg * (1-rate)
+                this.s_melee.dtb4st += dmg
+                this.s_melee.stin += dmg * rate
+                this.s_melee.facetaken += dmg * (1-rate)
 
                 this.st += rate * dmg
                 this.sttick = this.st * this.stdmgrate
@@ -181,13 +155,14 @@ class brmbase(object):
                 this.masterystack += 1
    #}takemelee
 
-    st_stout = stout(src='takestdmg')
+    s_takestdmg = statistic('takestdmg')
     def takestdmg(this):
         if this.st <= 0 :
             return
-        this.st_stout += this.sttick
+        this.s_takestdmg.stout += this.sttick
         this.st -= this.sttick
 
+    s_pury = statistic('pb')
     def pury(this,rate=-1,src='pb'):
         if rate == -1 :
             prate = this.prate

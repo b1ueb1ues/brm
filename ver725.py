@@ -14,10 +14,11 @@ def main():
     pool = []
 
     pool.append(brm(\
-        stat=[30,25,0,20],equip=['4t','wrist'],talent=['black','ht15']   \
+        stat=[30,30,0,20],equip=['4t'],talent=['black','ht10'] ,melee=0,magic=1  \
         ))
+
     pool.append(brm(\
-        stat=[30,25,0,20],equip=['2t','t20','wrist'],talent=['black','ht15']   \
+        stat=[30,20,0,20],equip=['4t'],talent=['black','ht10'],melee=0,magic=1   \
         ))
 
     #test2haste(pool)
