@@ -8,7 +8,7 @@ def bps(haste=1,t7='ht',p=1.3,t3='black'):
 	if t7 == 'bc' :
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 30 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 35 + 8*p)/fivekegtime
 		#print 'brewhaste',brewhaste
 		brewcd /= brewhaste
 		blackcd /= brewhaste
@@ -16,20 +16,20 @@ def bps(haste=1,t7='ht',p=1.3,t3='black'):
 		haste = haste*1.1
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 25 + 8*p)/fivekegtime
 		brewcd /= brewhaste
 		blackcd /= brewhaste
 	elif t7 == 'ht15' :
 		haste = haste*1.15
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 25 + 8*p)/fivekegtime
 		brewcd /= brewhaste
 		blackcd /= brewhaste
 	elif t7 == 'ed':
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 25 + 8*p)/fivekegtime
 		brewcd /= brewhaste
 		blackcd /= brewhaste
 	else :
@@ -45,7 +45,10 @@ def bps(haste=1,t7='ht',p=1.3,t3='black'):
 
 if __name__ == '__main__':
     i = 1.5
-    a = bps(i,p=2.3,t3='black')
+    a = bps(i,p=2.3,t3='',t7='ed')
+    print 1/a
+    exit()
+
     b = bps(i,p=2.6,t3='black')
     print a  * 60
     print b * 60

@@ -99,6 +99,7 @@ class Eventlist(object):
                 return ret
         print this.time, ': rm 404', event
         print this
+        print trackstack
         exit()
         return 0
 
@@ -183,6 +184,23 @@ class Eventlist_withhaste(Eventlist):
         else:
             super(Eventlist_withhaste,this).add(event)
     #}
+
+    def add_withouthaste(this,event):
+        event.el = this
+        if event.src == 0 :
+            event.src = this.src
+        if this.debug >= 2:
+            print "%.2f"%this.time,'add',event
+        timing = event.time
+        for i in range(len(this._hastelist)) :
+            if timing <= this._hastelist[i].time  :
+                tmp = this._hastelist[:i]
+                tmp.append(event)
+                tmp += this._hastelist[i:]
+                this._hastelist = tmp
+                return True
+        this._hastelist.append(event)
+    #}
     
     def synchaste(this):
         haste = this.src.gethaste()
@@ -237,13 +255,18 @@ class Eventlist_withhaste(Eventlist):
         return #this.time
 
     def rm(this,event):
-        for i in range(len(this._list)) :
-            if this._list[i] == event :
-                ret = this._list.pop(i)
+        if event.withhaste != 0 :
+            _list = this._hastelist
+        else :
+            _list = this._list
+        for i in range(len(_list)) :
+            if _list[i] == event :
+                ret = _list.pop(i)
                 event.el = 0
                 return ret
-        print this.time, ': rm 404', event
+        print this.time, ': haste rm 404', event
         print this
+        print trackstack
         exit()
         return 0
 
@@ -257,7 +280,7 @@ class Eventlist_withhaste(Eventlist):
             e.time += offset
            # if e.time < this.time :
            #     e.time = this.time
-            this.add(e)
+            this.add_withouthaste(e)
         else :
            # if newtiming < this.time :
            #     newtiming = this.time
@@ -266,7 +289,7 @@ class Eventlist_withhaste(Eventlist):
                 print this.time,': move 404', event
                 return 
             e.time = time
-            this.add(e)
+            this.add_withouthaste(e)
 #}class repeatlist
 
 
