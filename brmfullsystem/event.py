@@ -9,11 +9,12 @@ class Event(object):
     def addto(this, el):
         el.add(this)
 
-    def __init__(this,el=0, src = 0, time=0, dst = 0, withhaste = 0):
+    def __init__(this,el=0, src = 0, time=0, dst = 0, withhaste = -2):
         this.time = time
         this.src = src
         this.dst = dst
-        this.withhaste = withhaste
+        if withhaste != -2:
+            this.withhaste = withhaste
         if el != 0:
             this.addto(el)
     def __repr__(this):
@@ -36,7 +37,7 @@ class Event(object):
 
 class RepeatEvent(Event):
     repeat = 1
-    def __init__(this,el = 0, src = 0, repeat = -2 ,time = 0.0, dst = 0, withhaste = 0):
+    def __init__(this,el = 0, src = 0, repeat = -2 ,time = 0.0, dst = 0, withhaste = -2):
         super(RepeatEvent,this).__init__(el, src, time, dst, withhaste)
         if repeat != -2 :
             this.repeat = repeat
@@ -76,7 +77,7 @@ class Eventlist(object):
         event.el = this
         if event.src == 0 :
             event.src = this.src
-        if this.debug :
+        if this.debug >= 2:
             print "%.2f"%this.time,'add',event
         timing = event.time
         for i in range(len(this._list)) :
@@ -155,6 +156,8 @@ class Eventlist_withhaste(Eventlist):
     _hastelist = []
     _oldhaste = 1
     def add_withhaste(this,event):
+        if this.debug >= 1:
+            print event.__dict__
         event.el = this
         if event.src == 0 :
             event.src = this.src
@@ -162,7 +165,6 @@ class Eventlist_withhaste(Eventlist):
             print "%.2f"%this.time,'addhaste',event
         timing = (event.time - this.time) / this._oldhaste + this.time
         event.time = timing
-        print 'timing',timing
         for i in range(len(this._hastelist)) :
             if timing <= this._hastelist[i].time  :
                 tmp = this._hastelist[:i]
@@ -174,6 +176,7 @@ class Eventlist_withhaste(Eventlist):
     #}
 
     def add(this,event):
+        #print event, event.withhaste
         if event.withhaste != 0:
             this.add_withhaste(event)
             return
@@ -189,6 +192,7 @@ class Eventlist_withhaste(Eventlist):
         for i in this._hastelist :
             tmp = i.time - this.time
             tmp = tmp/change + this.time
+            i.time = tmp
         this._oldhaste = haste
 
 

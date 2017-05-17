@@ -2,6 +2,7 @@
 # -*- encoding:utf8 -*-
 
 from brmbase import *
+from cd import *
 
 #brm(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], \
 #            iron = 8, palmcdr = 1.3, haste = 1.3, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 ):
@@ -21,14 +22,19 @@ class brm(brmbase):
         def process(this):
             this.src.takephydmg()
 
+    class TakeMagEv(RepeatEvent):
+        repeat = 1
+        def process(this):
+            this.src.takemagicdmg()
+
     class PuryEv(RepeatEvent):
         repeat = 6
         def process(this):
             this.src.pury()
 
-    class TakeMeleeEv(RepeatEvent):
+    class changehaste(Event):
         def process(this):
-            this.src.takemelee()
+            this.src.haste = 1
 
 
     def init(this):
@@ -39,6 +45,15 @@ class brm(brmbase):
         this.staggerev = brm.StaggerEv(this.el)
         this.puryev = brm.PuryEv(this.el)
         this.takephyev = brm.TakePhyEv(this.el)
+        this.takemagev = brm.TakeMagEv(this.el)
+        this.changehaste = brm.changehaste(this.el,time=5)
+
+        this.kegcd = cd(this,12,1)
+        this.somecd = cd(this,3)
+        
+        this.kegcd.cast()
+        this.somecd.cast()
+
 
         this.init = 1
 
@@ -53,12 +68,19 @@ class brm(brmbase):
 
 
     def showavoid(this):
-        print statistic.getv()
+        this.totaltank.showunit()
+        print this.totaltank.getv()
 
 
 
 def main():
-    a = brm()
+    a = brm(haste=100)
+    a.run(13)
+    a.showavoid()
+
+
+    return
+
 
     a = brm(equip=['4t'],talent=['black','ht10'], mastery = 30, meleetakeiv = 1.5)
     a.run(100000)

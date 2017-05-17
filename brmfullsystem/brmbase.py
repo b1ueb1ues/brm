@@ -24,6 +24,7 @@ def main():
             super(test,this).run(100)
 
     t = test(stat=[25,25,0,20])
+    print t.__dict__
     t.run()
 
 
@@ -43,7 +44,7 @@ class brmbase(object):
     hp = 6000000
     hpmax = 6000000
     energy = 100
-    ap = 0
+    ap = 30000
     armor = 4400
     armorrate = 0
 
@@ -90,12 +91,24 @@ class brmbase(object):
     #pbpury = 0
     waistheal = 0
 
+    #statistics
+    #totaltank = statistic('totaltank')
 
+    statisticlist = [
+        'totaltank',
+        'dtb4st',
+        'facetaken',
+        'stin',
+        'stout',
+            ]
 
+    def addstatistic(this):
+        for i in this.statisticlist :
+            tmp = statistic(i)
+            this.__setattr__(i,tmp)
 
-    s_phy = statistic('takephydmg')
     def takephydmg(this,dmg=4000000,rate=0.9):
-        this.s_phy.totaltank += dmg
+        this.totaltank.takephydmg += dmg
         dmg -= dmg * this.armorrate
         
         if this.ironskin == 1 :
@@ -103,9 +116,9 @@ class brmbase(object):
         else :
             rate = this.srate
 
-        this.s_phy.dtb4st += dmg
-        this.s_phy.stin += rate * dmg
-        this.s_phy.facetaken += dmg * (1-rate)
+        this.dtb4st.takephydmg += dmg
+        this.stin.takephydmg += rate * dmg
+        this.facetaken.takephydmg += dmg * (1-rate)
 
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
@@ -113,24 +126,22 @@ class brmbase(object):
 
 
 
-    s_magic = statistic('takemagicdmg')
     def takemagicdmg(this,dmg=400000):
         if this.ironskin == 1 :
             rate = this.irate * 0.7
         else :
             rate = this.srate * 0.7
-        this.s_magic.totaltank += dmg
-        this.s_magic.dtb4st += dmg
-        this.s_magic.stin += dmg * rate
-        this.s_magic.facetaken += dmg * (1-rate)
+        this.totaltank.takemagicdmg += dmg
+        this.dtb4st.takmagicdmg += dmg
+        this.stin.takmagicdmg += dmg * rate
+        this.facetaken.takmagicdmg += dmg * (1-rate)
 
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
 
-    s_melee = statistic('takemelee')
     def takemelee(this,dmg=4000000,rate=0.9):
-        takemelee_totaltank += dmg
+        this.totaltank.takemelee += dmg
         if this.mastery == 0:
             this.takephydmg(dmg)
         else :
@@ -145,9 +156,9 @@ class brmbase(object):
                 else :
                     rate = this.srate
 
-                this.s_melee.dtb4st += dmg
-                this.s_melee.stin += dmg * rate
-                this.s_melee.facetaken += dmg * (1-rate)
+                this.dtb4st.takemelee += dmg
+                this.stin.takemelee += dmg * rate
+                this.facetaken.takemelee += dmg * (1-rate)
 
                 this.st += rate * dmg
                 this.sttick = this.st * this.stdmgrate
@@ -155,23 +166,20 @@ class brmbase(object):
                 this.masterystack += 1
    #}takemelee
 
-    s_takestdmg = statistic('takestdmg')
     def takestdmg(this):
         if this.st <= 0 :
             return
-        this.s_takestdmg.stout += this.sttick
+        this.stout.takestdmg += this.sttick
         this.st -= this.sttick
 
-    s_pury = statistic('pb')
     def pury(this,rate=-1,src='pb'):
         if rate == -1 :
             prate = this.prate
         else :
             prate = rate
 
-        pr_stout = brm.stout(src=src)
-        pr_stout += this.st * prate
-
+        a = this.stout.gets(src) 
+        a += this.st * prate
         #print this.el.time,this.st,this.st * this.prate
         if rate == -1 and this.phrate != 0 :
             this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
@@ -296,6 +304,7 @@ class brmbase(object):
            exit()
         this.setup()
         this.statsync()
+        this.addstatistic()
 
         this.armorrate = this.getarmorrate()
 
@@ -348,7 +357,7 @@ class brmbase(object):
 
         random.seed(1)
 
-        this.el = Eventlist()
+        this.el = Eventlist_withhaste(debug =0)
         this.el.src = this
 
         this.talent = ['black']

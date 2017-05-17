@@ -9,6 +9,12 @@ class statisunit(object):
         this.__parent = p
         this.__unitname = p.unitname
         this.__src = src
+
+        if this.__unitname == 'stin' :
+            if this.__src == 'pb' :
+                print '!'
+
+
         if this.__unitname not in this.__parent.getv() :
             this.__parent.getv()[this.__unitname] = this.__value
         if this.__unitname not in this.__parent.allunits :
@@ -29,7 +35,6 @@ class statisunit(object):
         this.__value += other
         this.__parent.value += other
         this.__parent.getv()[this.__unitname] += other
-        print 'iadd',this.__parent.getv()
         return this
 
     def __str__(this):
@@ -37,6 +42,8 @@ class statisunit(object):
     def __impr__(this):
         return str(this.__value)
         
+    def getp(this):
+        return this.__parent
 
 
 
@@ -45,7 +52,6 @@ class statistic(object):
     __values = {}
     allunits = {}
     allsrcs = {}
-    srcs= {}
 
     def __new__(this,unitname='nil'):
         if unitname in this.allunits :
@@ -57,6 +63,7 @@ class statistic(object):
         this.unitname = unitname
         this.allunits[unitname] = this
         this.value = 0
+        this.srcs= {}
 
     def __getattr__(this,name):
         if '__values' in name :
@@ -77,15 +84,29 @@ class statistic(object):
     def get(this,unit,src):
         return this.units[unit].__getattr__(src)
 
+    def gets(this,name):
+        return this.__getattr__(name)
+
     def showunit(this):
         ret = ''
-        for i in this.units :
-            ret += '%s>_'%i
-            print '%s>_'%i,
-            for j in i :
-                srcname = j.src
-                value = getattr(j,i)
-                print '%s: %.2f'%(srcname,value)
+        for i in this.allunits :
+            #print i
+            #print this.allunits[i].srcs
+            #print this.allunits[i].allsrcs
+            #return
+
+            ret += '%s>_\t'%i
+            print '%s>_\t'%i,
+            s = this.allunits[i].srcs
+            for j in s :
+                #print j,
+                srcname = j
+                value = str(s[j])
+                print '%s:%s   '%(srcname,value),
+                ret += '%s:%s   '%(srcname,value)
+            print ''
+            ret += '\n'
+        return ret
 
 
 
