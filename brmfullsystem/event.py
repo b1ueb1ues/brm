@@ -50,8 +50,14 @@ class RepeatEvent(Event):
         this.process()
         if this.repeat <= 0 :
             return
+        if this.repeat == 21:
+            print '--elprocess',this.el.time,this.time,
         this.time += this.repeat
+        if this.repeat == 21:
+            print this.time,
         this.el.add(this)
+        if this.repeat == 21:
+            print this.time
 
     def process(this):
         print this.time,'repeatev proc'
@@ -186,6 +192,7 @@ class Eventlist_withhaste(Eventlist):
     #}
 
     def add_withouthaste(this,event):
+        #print 'print awh'
         event.el = this
         if event.src == 0 :
             event.src = this.src
@@ -233,7 +240,6 @@ class Eventlist_withhaste(Eventlist):
                     print 'return',this._list,this._hastelist
                 return 
             e = this._hastelist.pop(0)
-            e.time = this.time + iv2
         elif iv2 == None : #and iv1 != 0
             e = this._list.pop(0)
         elif iv1 < iv2:
@@ -277,6 +283,8 @@ class Eventlist_withhaste(Eventlist):
             if e == 0 :
                 print this.time,': move 404', event
                 return 
+            if e.time >= 9 and e.time<=11:
+                print '!!!!',offset
             e.time += offset
            # if e.time < this.time :
            #     e.time = this.time

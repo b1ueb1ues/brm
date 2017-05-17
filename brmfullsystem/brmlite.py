@@ -33,11 +33,27 @@ class brm(brmbase):
             this.src.takemelee()
 
 
-
+    '''
     class PuryEv(RepeatEvent):
-        repeat = 6
+        repeat = 10
         def process(this):
-            this.src.pury()
+            ret =this.src.brewstack.cast()
+            print 'cast pb'
+            if ret != 0:
+                this.src.pury()
+            else:
+                print this.el.time,'nobrew',this.src.brewstack.stack()
+                '''
+
+    class IronEv(RepeatEvent):
+        repeat = 9
+        def process(this):
+            ret =this.src.brewstack.cast()
+            print 'cast isb at',this.el.time
+            if ret != 0:
+                this.src.pury()
+            else:
+                print this.el.time,'nobrew',this.src.brewstack.stack()
 
     class changehaste(RepeatEvent):
         repeat = 5
@@ -50,23 +66,20 @@ class brm(brmbase):
     class Kegcd(cd):
         def endprocess(this,time):
             print 'keg at',time,
-            print 'brewat',this.src.brewstack.time(),'->',
-            this.src.brewstack.reduce(4+1+1.4*2)
-            print 'brewat',this.src.brewstack.time(),this.src.el._hastelist
-            #print this.src.el._hastelist
-            #print this.src.el._list
-
-
+            print 'brew',this.src.brewstack.time(),'->',
+            this.src.brewstack.reduce(6)
+            print this.src.brewstack.time(),this.src.brewstack._cdev.el._hastelist
             this.cast()
 
     class Brewstack(stack):
-        _stack = 1
+        _stack = 3
         _stackmax = 3
         def stackprocess(this,time):
             print '------brewstack! at',time,'event at',this.time(),
             stack,stackmax = this.stack()
-            print '[%d,%d]'%(stack,stackmax)
+            print '[%d,%d]'%(stack,stackmax),this._cdev.el._hastelist
             if stackmax - stack <= 1:
+                print 'cast pb at',this.el.time
                 this.cast()
 
 
@@ -79,12 +92,10 @@ class brm(brmbase):
         this.init = 0
 
         this.staggerev = brm.StaggerEv(this.el)
-        this.puryev = brm.PuryEv(this.el)
+        this.ironev = brm.IronEv(this.el)
         this.takephyev = brm.TakePhyEv(this.el)
         this.takemagev = brm.TakeMagEv(this.el)
-        #this.changehaste = brm.changehaste(this.el)
 
-        this.somecd = cd(this,3)
 
         this.kegcd = brm.Kegcd(this,8,1)
         this.brewstack = brm.Brewstack(this,21,1)
@@ -92,7 +103,6 @@ class brm(brmbase):
         this.brewstack.cast()
         this.kegcd.cast()
         print this.brewstack.last(),this.brewstack._cdev.time
-        this.somecd.cast()
 
 
         this.init = 1
@@ -115,7 +125,7 @@ class brm(brmbase):
 
 def main():
     a = brm(haste=50)
-    a.run(60)
+    a.run(50)
     a.showavoid()
 
 

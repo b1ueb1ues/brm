@@ -95,7 +95,8 @@ class stack(object):
         this._cdev.withhaste = this.withhaste
         this._cdev.time = this.el.time + this._cooldown
         this._cdev.repeat = this._cooldown
-        this._cdev.addto(this.el)
+        if this._stack < this._stackmax :
+            this._cdev.addto(this.el)
 
     def enable(this):
         if this._stack >= 1 :
@@ -113,6 +114,7 @@ class stack(object):
         pass
 
     def cast(this):
+        #print 'cast',this.src.el.time
         if this._stack >= this._stackmax :
             this._stack -= 1
             this._cdev.time = this.el.time + this._cooldown
