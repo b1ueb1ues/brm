@@ -52,10 +52,13 @@ class RepeatEvent(Event):
             return
         if this.repeat == 21:
             print '--elprocess',this.el.time,this.time,
-        this.time += this.repeat
+        if this.withhaste != 0:
+            this.time += this.repeat / this.src.gethaste()
+        else:
+            this.time += this.repeat
         if this.repeat == 21:
             print this.time,
-        this.el.add(this)
+        this.el.add(this,this.time)
         if this.repeat == 21:
             print this.time
 
@@ -79,12 +82,16 @@ class Eventlist(object):
         this.debug = debug
 
 
-    def add(this,event):
+    def add(this,event,time=-2):
+
+
         event.el = this
         if event.src == 0 :
             event.src = this.src
         if this.debug >= 2:
             print "%.2f"%this.time,'add',event
+        if time != -2 :
+            event.time = time
         timing = event.time
         for i in range(len(this._list)) :
             if timing <= this._list[i].time  :
@@ -182,13 +189,17 @@ class Eventlist_withhaste(Eventlist):
         this._hastelist.append(event)
     #}
 
-    def add(this,event):
+    def add(this,event,time=-2):
         #print event, event.withhaste
+        if time != -2 :
+            super(Eventlist_withhaste,this).add(event,time)
+            return
         if event.withhaste != 0:
             this.add_withhaste(event)
             return
         else:
             super(Eventlist_withhaste,this).add(event)
+            return
     #}
 
     def add_withouthaste(this,event):
