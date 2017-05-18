@@ -18,8 +18,7 @@ class brm(brmbase):
         'facetaken',
         'stin',
         'stout',
-        'meleecount',
-        'dodgecount',
+        'dodge',
             ]
 
     class ISBbuff(aura):
@@ -106,28 +105,63 @@ class brm(brmbase):
         else:
             print '-nobrew at',this.el.time, this.brewstack.stack()
 
+    ############
+    # kegsmash
     class KegEv(Event):
         def process(this):
-            this.src.castisb()
+            this.src.castks(1)
 
-    def castks(this):
-            if debug >= 2:
-                tmp = this.brewstack.time()
-            r = random.random()
-            if r < 0.2 :
-                kegev = brm.KegEv()
-                kegev.time = this.el.time + 0.3
-                kegev.addto(this.el)
+    class Kegcd(cd):
+        def endprocess(this,time):
+            print 'castks'
+            this.src.castks()
 
-            this.brewstack.reduce(this.kscdr)
-            if debug >= 1:
-                print 'keg at',this.el.time()
-                print 'brew',tmp,'->',
-                print this.src.brewstack.time()
+    def castks(this,staveoff=0):
+        if staveoff == 0:
+            this.ks.cast()
+        if debug >= 2:
+            tmp = this.brewstack.time()
+        r = random.random()
+        if r < 0.2 :
+            kegev = brm.KegEv()
+            kegev.time = this.el.time + 0.3
+            kegev.addto(this.el)
 
-    def takemelee(this,dmg=100):
+        this.brewstack.reduce(10)
+        if debug >= 1:
+            print 'keg at',this.el.time,
+            print 'brew',tmp,'->',
+            print this.brewstack.time()
+    # }kegs######
+
+    #############
+    # tigerpalm
+    class PalmEv(Event):
+        def process(this):
+            this.src.casttp()
+
+    class Palmcd(cd):
+        def endprocess(this,time):
+            print 'palm'
+            this.src.casttp()
+
+    def casttp(this):
+        this.ks.cast()
+        if debug >= 2:
+            tmp = this.brewstack.time()
+        r = random.random()
+        if r < this.tpface :
+            this.brewstack.reduce(tpcdr+1)
+        else:
+            this.brewstack.reduce(tpcdr)
+        if debug >= 1:
+            print 'palm at',this.el.time,
+            print 'brew',tmp,'->',
+            print this.brewstack.time()
+    # }kegsmash
+
+    def takemelee(this,dmg=2000000):
         this.totaltank.takemelee += dmg
-        this.meleecount.takemelee += 1
 
         dodge = this.dodgebase + this.mastery* this.masterystack
         if this.mastery != 0:
@@ -137,7 +171,7 @@ class brm(brmbase):
                 if this.wrist == 1 :
                     this.brewstack.reduce(1)
                     #this.blackcd.reduce(1)
-                this.dodgecount.takemelee += 1
+                this.dodge.takemelee += dmg
                 this.masterystack = 0
                 return
         #else{
@@ -167,16 +201,6 @@ class brm(brmbase):
             else :
                 this.src.haste = 1.5
 
-    class Kegcd(cd):
-        def endprocess(this,time):
-            if debug >= 2:
-                tmp = this.src.brewstack.time()
-            this.src.brewstack.reduce(10)
-            if debug >= 1:
-                print 'keg at',time,
-                print 'brew',tmp,'->',
-                print this.src.brewstack.time()
-            this.cast()
 
     class Brewstack(stack):
         _stack = 3
@@ -219,6 +243,7 @@ class brm(brmbase):
 
 
         this.ks = brm.Kegcd(this,8,1)
+        this.tp = brm.Kegcd(this,5,1)
         this.brewstack = brm.Brewstack(this,21,1)
 
         this.castisb()

@@ -68,7 +68,8 @@ class brmbase(object):
 
     isbduration = 8
     kscdr = 4
-    tpcdr = 1.4
+    tpcdr = 1
+    tpface = 0.4
     brewcd = 21
     brewstack = 3
     brewstackmax = 3
@@ -142,28 +143,25 @@ class brmbase(object):
 
     def takemelee(this,dmg=4000000):
         this.totaltank.takemelee += dmg
-        if this.mastery == 0:
-            this.takephydmg(dmg)
-        else :
-            r = random.random()
-            dodge = this.dodgebase + this.mastery* this.masterystack
-            if r < dodge:
-                this.masterystack = 0
-            else:
-                dmg -= dmg * this.armorrate
-                if this.ironskin == 1 :
-                    rate = this.irate
-                else :
-                    rate = this.srate
+        r = random.random()
+        dodge = this.dodgebase + this.mastery* this.masterystack
+        if r < dodge:
+            this.masterystack = 0
+        else:
+            dmg -= dmg * this.armorrate
+            if this.ironskin == 1 :
+                rate = this.irate
+            else :
+                rate = this.srate
 
-                this.dtb4st.takemelee += dmg
-                this.stin.takemelee += dmg * rate
-                this.facetaken.takemelee += dmg * (1-rate)
+            this.dtb4st.takemelee += dmg
+            this.stin.takemelee += dmg * rate
+            this.facetaken.takemelee += dmg * (1-rate)
 
-                this.st += rate * dmg
-                this.sttick = this.st * this.stdmgrate
+            this.st += rate * dmg
+            this.sttick = this.st * this.stdmgrate
 
-                this.masterystack += 1
+            this.masterystack += 1
    #}takemelee
 
     def takestdmg(this):
