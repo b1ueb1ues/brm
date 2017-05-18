@@ -3,7 +3,7 @@ count = 0
 
 class cd(object):
     _enable = 1
-    _cooldown = 10
+    cooldown = 10
     src = 0
     el = 0
     _cdev = 0
@@ -14,12 +14,15 @@ class cd(object):
     class CdEv(Event):
         def process(this):
             this.src._enable=1
+            if this.src._cdev == 0 :
+                print '====',this.now(),this.src,this.src.casttime
             this.src.endprocess(this.el.time)
+            #this.src._cdev = 0
 
     def __init__(this,src,cooldown=-2,withhaste=-2):
         this._enable = 1
         if cooldown != -2:
-            this._cooldown = cooldown
+            this.cooldown = cooldown
         if withhaste != -2:
             this.withhaste = withhaste
         this.src = src
@@ -45,17 +48,26 @@ class cd(object):
         if this._enable != 0 :
             this.casttime = this.el.time
             this._enable = 0
+
+            if this._cdev == 0:
+                this._cdev = cd.CdEv()
+                this._cdev.src = this
+                this._cdev.withhaste = this.withhaste
+
             if this.withhaste != 0:
-                this._cdev.time = this.el.time + this._cooldown/this.el._oldhaste
+                this._cdev.time = this.el.time + this.cooldown/this.el._oldhaste
             else:
-                this._cdev.time = this.el.time + this._cooldown/this.el._oldhaste
+                this._cdev.time = this.el.time + this.cooldown/this.el._oldhaste
             this._cdev.addto(this.el)
             return 1
         else :
             return 0
 
     def reduce(this,offset=1):
+        if this._cdev == 0 :
+            return 0
         this._cdev.mv(offset = 0.0-offset)
+        return 1
 
     def haste(this):
         return this.el._oldhaste
@@ -66,11 +78,15 @@ class cd(object):
     def time(this):
         return this._cdev.time
 
+    def now(this):
+        return this.el.time
+
+
 
 class stack(object):
     _stack = 0
     _stackmax = 0
-    _cooldown = 10
+    cooldown = 10
     src = 0
     el = 0
     _cdev = 0
@@ -80,7 +96,9 @@ class stack(object):
     class CdEv(RepeatEvent):
         def process(this):
             this.src._stack += 1
-            if this.src._stack >= this.src._stackmax :
+            if this.src._stack > this.src._stackmax:
+                this.src._stack = this.src._stackmax
+            if this.src._stack == this.src._stackmax :
                 this.repeat = 0
                 this.src._cdev = 0
                 this.src.stackprocess(this.el.time)
@@ -91,7 +109,7 @@ class stack(object):
 
     def __init__(this,src,cooldown=-2,withhaste=-2):
         if cooldown != -2:
-            this._cooldown = cooldown
+            this.cooldown = cooldown
         if withhaste != -2:
             this.withhaste = withhaste
 
@@ -102,11 +120,11 @@ class stack(object):
             this._cdev = stack.CdEv()
             this._cdev.src = this
             this._cdev.withhaste = this.withhaste
-            this._cdev.repeat = this._cooldown
+            this._cdev.repeat = this.cooldown
             if this.withhaste != 0 :
-                this._cdev.time = this.el.time + float(this._cooldown)/this.haste()
+                this._cdev.time = this.el.time + float(this.cooldown)/this.haste()
             else:
-                this._cdev.time = this.el.time + this._cooldown
+                this._cdev.time = this.el.time + this.cooldown
             this._cdev.addto(this.el)
 
     def enable(this):
@@ -116,6 +134,10 @@ class stack(object):
 
     def stack(this):
         return (this._stack,this._stackmax)
+    def setstack(this,stack,stackmax):
+        this._stack = stack
+        this._stackmax = stackmax
+
 
     def startprocess(this,time):
         pass
@@ -133,10 +155,10 @@ class stack(object):
             this._cdev.src = this
             this._cdev.withhaste = this.withhaste
             if this.withhaste != 0 :
-                this._cdev.time = this.now() + this._cooldown/this.haste()
+                this._cdev.time = this.now() + this.cooldown/this.haste()
             else:
-                this._cdev.time = this.now() + this._cooldown
-            this._cdev.repeat = this._cooldown
+                this._cdev.time = this.now() + this.cooldown
+            this._cdev.repeat = this.cooldown
             this._cdev.addto(this.el)
             this.startprocess(this.el.time)
 
@@ -151,9 +173,10 @@ class stack(object):
     def reduce(this,offset=1):
         if this._stack >= this._stackmax:
             print 'max'
-            return 
+            return 0
         #print this.now(),this._stack,this._stackmax,this._cdev
         this._cdev.mv(offset= 0.0-offset)
+        return 1
 
     def haste(this):
         return this.el._oldhaste

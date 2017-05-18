@@ -36,8 +36,6 @@ class brm(brmbase):
                 this.delay(this.duration - fix)
             else:
                 this.delay(this.duration)
-
-        pass
     
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -62,6 +60,37 @@ class brm(brmbase):
         dmg = 1000000
         def process(this):
             this.src.takemelee(this.dmg)
+
+    def takemelee(this,dmg=2000000):
+        this.totaltank.takemelee += dmg
+
+        dodge = this.dodgebase + this.mastery* this.masterystack
+        if this.mastery != 0:
+            r = random.random()
+            if r < dodge:
+                this.masterystack = 0
+                if this.wrist == 1 :
+                    this.stackbrew.reduce(1)
+                    #this.blackcd.reduce(1)
+                this.dodge.takemelee += dmg
+                this.masterystack = 0
+                return
+        #else{
+        dmg -= dmg * this.armorrate
+        if this.ironskin == 1 :
+            rate = this.irate
+        else :
+            rate = this.srate
+
+        this.dtb4st.takemelee += dmg
+        this.stin.takemelee += dmg * rate
+        this.facetaken.takemelee += dmg * (1-rate)
+
+        this.st += rate * dmg
+        this.sttick = this.st * this.stdmgrate
+
+        this.masterystack += 1
+   #}takemelee
 
     def gm(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
@@ -99,97 +128,64 @@ class brm(brmbase):
 
     def castisb(this):
         #print '--cast isb at',this.el.time,this.brewstack.stack()
-        ret =this.brewstack.cast()
+        ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
         else:
-            print '-nobrew at',this.el.time, this.brewstack.stack()
+            print '-nobrew at',this.el.time, this.stackbrew.stack()
 
     ############
     # kegsmash
-    class KegEv(Event):
+    class Staveoffev(Event):
         def process(this):
             this.src.castks(1)
 
     class Kegcd(cd):
         def endprocess(this,time):
-            print 'castks'
+            #print 'castks'
             this.src.castks()
 
     def castks(this,staveoff=0):
         if staveoff == 0:
             this.ks.cast()
-        if debug >= 2:
-            tmp = this.brewstack.time()
+        if debug >= 3:
+            tmp = this.stackbrew.time()
         r = random.random()
         if r < 0.2 :
-            kegev = brm.KegEv()
-            kegev.time = this.el.time + 0.3
-            kegev.addto(this.el)
+            soev = brm.Staveoffev()
+            soev.time = this.el.time + 0.3
+            soev.addto(this.el)
 
-        this.brewstack.reduce(10)
-        if debug >= 1:
+        this.stackbrew.reduce(this.kscdr)
+        this.bob.reduce(this.kscdr)
+        if debug >= 3:
             print 'keg at',this.el.time,
             print 'brew',tmp,'->',
-            print this.brewstack.time()
+            print this.stackbrew.time()
     # }kegs######
 
     #############
     # tigerpalm
-    class PalmEv(Event):
-        def process(this):
-            this.src.casttp()
-
     class Palmcd(cd):
         def endprocess(this,time):
-            print 'palm'
             this.src.casttp()
 
     def casttp(this):
-        this.ks.cast()
-        if debug >= 2:
-            tmp = this.brewstack.time()
+        this.tp.cast()
+        if debug >= 3:
+            tmp = this.stackbrew.time()
         r = random.random()
-        if r < this.tpface :
-            this.brewstack.reduce(tpcdr+1)
+        if r < this.facepalm :
+            this.stackbrew.reduce(this.tpcdr+1)
+            this.bob.reduce(this.tpcdr+1)
         else:
-            this.brewstack.reduce(tpcdr)
-        if debug >= 1:
+            this.stackbrew.reduce(this.tpcdr)
+            this.bob.reduce(this.tpcdr)
+        if debug >= 3:
             print 'palm at',this.el.time,
             print 'brew',tmp,'->',
-            print this.brewstack.time()
-    # }kegsmash
-
-    def takemelee(this,dmg=2000000):
-        this.totaltank.takemelee += dmg
-
-        dodge = this.dodgebase + this.mastery* this.masterystack
-        if this.mastery != 0:
-            r = random.random()
-            if r < dodge:
-                this.masterystack = 0
-                if this.wrist == 1 :
-                    this.brewstack.reduce(1)
-                    #this.blackcd.reduce(1)
-                this.dodge.takemelee += dmg
-                this.masterystack = 0
-                return
-        #else{
-        dmg -= dmg * this.armorrate
-        if this.ironskin == 1 :
-            rate = this.irate
-        else :
-            rate = this.srate
-
-        this.dtb4st.takemelee += dmg
-        this.stin.takemelee += dmg * rate
-        this.facetaken.takemelee += dmg * (1-rate)
-
-        this.st += rate * dmg
-        this.sttick = this.st * this.stdmgrate
-
-        this.masterystack += 1
-   #}takemelee
+            print this.stackbrew.time()
+    # }tpalm
 
 
 
@@ -200,6 +196,21 @@ class brm(brmbase):
                 this.src.haste = 1.3
             else :
                 this.src.haste = 1.5
+
+
+    class Bobcd(cd):
+        cooldown = 90
+        def endprocess(this,time):
+            print '----castbob at',time
+            brm = this.src
+            stack,stackmax = brm.stackbrew.stack()
+            for i in range(stack):
+                brm.castisb()
+            brm.stackbrew.setstack(brm.brewstackmax-1,brm.brewstackmax)
+            brm.stackbrew.reduce(21)
+            print '--this bob at',this._cdev,this.time()
+            this.cast()
+            print '--next bob at',this.time()
 
 
     class Brewstack(stack):
@@ -215,7 +226,7 @@ class brm(brmbase):
                 this.src.isb.cast()
                 this.cast()
 
-            if debug >= 1:
+            if debug >= 3:
                 print '--brew stack+ [%d,%d] at'%(stack,stackmax),this.now()
 
             if stackmax - stack <= 1:
@@ -243,12 +254,16 @@ class brm(brmbase):
 
 
         this.ks = brm.Kegcd(this,8,1)
-        this.tp = brm.Kegcd(this,5,1)
-        this.brewstack = brm.Brewstack(this,21,1)
+        this.tp = brm.Palmcd(this,5,1)
+        this.bob = brm.Bobcd(this)
+        this.stackbrew = brm.Brewstack(this,21,1)
+        this.stackbrew.setstack(this.brewstack,this.brewstackmax)
 
         this.castisb()
         this.ks.cast()
-        print this.brewstack.last(),this.brewstack._cdev.time
+        this.tp.cast()
+        this.bob.cast()
+        print this.stackbrew.last(),this.stackbrew._cdev.time
 
 
         this.init = 1
@@ -271,7 +286,7 @@ class brm(brmbase):
 
 def main():
     a = brm(haste=50)
-    a.run(100)
+    a.run(200)
     a.showavoid()
 
 

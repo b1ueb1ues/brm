@@ -69,7 +69,7 @@ class brmbase(object):
     isbduration = 8
     kscdr = 4
     tpcdr = 1
-    tpface = 0.4
+    facepalm = 0.4
     brewcd = 21
     brewstack = 3
     brewstackmax = 3
