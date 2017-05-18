@@ -107,7 +107,7 @@ class brmbase(object):
             tmp = statistic(i)
             this.__setattr__(i,tmp)
 
-    def takephydmg(this,dmg=4000000,rate=0.9):
+    def takephydmg(this,dmg=4000000):
         this.totaltank.takephydmg += dmg
         dmg -= dmg * this.armorrate
         
@@ -140,7 +140,7 @@ class brmbase(object):
         this.sttick = this.st * this.stdmgrate
 
 
-    def takemelee(this,dmg=4000000,rate=0.9):
+    def takemelee(this,dmg=4000000):
         this.totaltank.takemelee += dmg
         if this.mastery == 0:
             this.takephydmg(dmg)

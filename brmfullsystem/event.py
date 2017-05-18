@@ -22,6 +22,9 @@ class Event(object):
     def __str__(this):
         return this.__class__.__name__+" at %.2f"%this.time
 
+    def now(this):
+        return this.el.time
+
     def mv(this, offset = 0, time = 0):
         this.el.mv(this, offset, time)
 
@@ -50,17 +53,11 @@ class RepeatEvent(Event):
         this.process()
         if this.repeat <= 0 :
             return
-        if this.repeat == 21:
-            print '--elprocess',this.el.time,this.time,
         if this.withhaste != 0:
-            this.time += this.repeat / this.src.gethaste()
+            this.time += this.repeat / this.el._oldhaste
         else:
             this.time += this.repeat
-        if this.repeat == 21:
-            print this.time,
-        this.el.add(this,this.time)
-        if this.repeat == 21:
-            print this.time
+        this.el.add(this)
 
     def process(this):
         print this.time,'repeatev proc'
@@ -83,8 +80,6 @@ class Eventlist(object):
 
 
     def add(this,event,time=-2):
-
-
         event.el = this
         if event.src == 0 :
             event.src = this.src
@@ -169,7 +164,7 @@ class Eventlist(object):
 class Eventlist_withhaste(Eventlist):
     _hastelist = []
     _oldhaste = 1
-    def add_withhaste(this,event):
+    def add_withhaste(this,event,time=-2):
         if this.debug >= 1:
             print event.__dict__
         event.el = this
@@ -177,8 +172,9 @@ class Eventlist_withhaste(Eventlist):
             event.src = this.src
         if this.debug :
             print "%.2f"%this.time,'addhaste',event
-        timing = (event.time - this.time) / this._oldhaste + this.time
-        event.time = timing
+        if time != -2 :
+            event.time = time
+        timing = event.time
         for i in range(len(this._hastelist)) :
             if timing <= this._hastelist[i].time  :
                 tmp = this._hastelist[:i]
@@ -190,34 +186,33 @@ class Eventlist_withhaste(Eventlist):
     #}
 
     def add(this,event,time=-2):
-        #print event, event.withhaste
-        if time != -2 :
-            super(Eventlist_withhaste,this).add(event,time)
-            return
+
         if event.withhaste != 0:
-            this.add_withhaste(event)
+            this.add_withhaste(event,time)
             return
         else:
-            super(Eventlist_withhaste,this).add(event)
+            this.add_withouthaste(event,time)
             return
     #}
 
-    def add_withouthaste(this,event):
+    def add_withouthaste(this,event,time=-2):
         #print 'print awh'
         event.el = this
         if event.src == 0 :
             event.src = this.src
         if this.debug >= 2:
             print "%.2f"%this.time,'add',event
+        if time != -2:
+            event.time = time
         timing = event.time
-        for i in range(len(this._hastelist)) :
-            if timing <= this._hastelist[i].time  :
-                tmp = this._hastelist[:i]
+        for i in range(len(this._list)) :
+            if timing <= this._list[i].time  :
+                tmp = this._list[:i]
                 tmp.append(event)
-                tmp += this._hastelist[i:]
-                this._hastelist = tmp
+                tmp += this._list[i:]
+                this._list = tmp
                 return True
-        this._hastelist.append(event)
+        this._list.append(event)
     #}
     
     def synchaste(this):
@@ -294,12 +289,8 @@ class Eventlist_withhaste(Eventlist):
             if e == 0 :
                 print this.time,': move 404', event
                 return 
-            if e.time >= 9 and e.time<=11:
-                print '!!!!',offset
             e.time += offset
-           # if e.time < this.time :
-           #     e.time = this.time
-            this.add_withouthaste(e)
+            this.add(e)
         else :
            # if newtiming < this.time :
            #     newtiming = this.time
@@ -308,7 +299,7 @@ class Eventlist_withhaste(Eventlist):
                 print this.time,': move 404', event
                 return 
             e.time = time
-            this.add_withouthaste(e)
+            this.add(e)
 #}class repeatlist
 
 

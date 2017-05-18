@@ -4,6 +4,7 @@ class statisunit(object):
     __unitname = 'nil'
     __src = 'null'
     __parent = 0
+    __count = 0
 
     def __init__(this,p,src = 'null'):
         this.__parent = p
@@ -33,7 +34,9 @@ class statisunit(object):
 
     def __iadd__(this,other):
         this.__value += other
+        this.__count += 1
         this.__parent.value += other
+        this.__parent.count += 1
         this.__parent.getv()[this.__unitname] += other
         return this
 
@@ -41,6 +44,10 @@ class statisunit(object):
         return str(this.__value)
     def __impr__(this):
         return str(this.__value)
+    def getc(this):
+        return this.__count
+    def value(this):
+        return this.__value
         
     def getp(this):
         return this.__parent
@@ -50,6 +57,7 @@ class statisunit(object):
 class statistic(object):
     unitname = 'nil'
     __values = {}
+    __counts = {}
     allunits = {}
     allsrcs = {}
 
@@ -63,6 +71,7 @@ class statistic(object):
         this.unitname = unitname
         this.allunits[unitname] = this
         this.value = 0
+        this.count = 0
         this.srcs= {}
 
     def __getattr__(this,name):
@@ -95,15 +104,17 @@ class statistic(object):
             #print this.allunits[i].allsrcs
             #return
 
-            ret += '%s>_\t'%i
-            print '%s>_\t'%i,
+            ret += '%s>_\t\n'%i
+            print '%s>_\t'%i
             s = this.allunits[i].srcs
             for j in s :
                 #print j,
                 srcname = j
-                value = str(s[j])
-                print '%s:%s   '%(srcname,value),
-                ret += '%s:%s   '%(srcname,value)
+                value = s[j].value()
+                sumvalue = s[j].getp().value
+                count = str(s[j].getc())
+                print '\t%s: %dw(%.2f%%) | %s hits'%(srcname,value/10000,float(value)/sumvalue*100,count)
+                ret += '\t%s: %dw(%.2f%%) | %s hits\n'%(srcname,value/10000,float(value)/sumvalue*100,count)
             print ''
             ret += '\n'
         return ret
