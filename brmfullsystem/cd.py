@@ -16,8 +16,18 @@ class cd(object):
             this.src._enable=1
             if this.src._cdev == 0 :
                 print '====',this.now(),this.src,this.src.casttime
-            this.src.endprocess(this.el.time)
-            #this.src._cdev = 0
+
+            tmpev = cd.callbackev()
+            tmpev.src = this.src
+            tmpev.time = this.src.el.time
+            tmpev.addto(this.src.el)
+            print tmpev,this.src
+
+            this.src._cdev = 0
+
+    class callbackev(Event):
+        def process(this):
+            this.src.endprocess(this.time)
 
     def __init__(this,src,cooldown=-2,withhaste=-2):
         this._enable = 1
@@ -57,7 +67,7 @@ class cd(object):
             if this.withhaste != 0:
                 this._cdev.time = this.el.time + this.cooldown/this.el._oldhaste
             else:
-                this._cdev.time = this.el.time + this.cooldown/this.el._oldhaste
+                this._cdev.time = this.el.time + this.cooldown
             this._cdev.addto(this.el)
             return 1
         else :
@@ -76,7 +86,10 @@ class cd(object):
         return this._cdev.time - this.el.time
 
     def time(this):
-        return this._cdev.time
+        if this._cdev != 0:
+            return this._cdev.time
+        else:
+            return -1
 
     def now(this):
         return this.el.time
@@ -93,6 +106,10 @@ class stack(object):
     withhaste = 0
 
 
+    class stackcallbackev(Event):
+        def process(this):
+            this.src.stackprocess(this.time)
+
     class CdEv(RepeatEvent):
         def process(this):
             this.src._stack += 1
@@ -100,12 +117,24 @@ class stack(object):
                 this.src._stack = this.src._stackmax
             if this.src._stack == this.src._stackmax :
                 this.repeat = 0
-                this.src._cdev = 0
-                this.src.stackprocess(this.el.time)
-                this.src.endprocess(this.el.time)
-            else:
-                this.src.stackprocess(this.el.time)
 
+                tmpev = stack.stackcallbackev()
+                tmpev.src = this.src
+                tmpev.time = this.src.el.time
+                tmpev.addto(this.src.el)
+
+                tmpev = cd.callbackev()
+                tmpev.src = this.src
+                tmpev.time = this.src.el.time
+                tmpev.addto(this.src.el)
+
+                this.src._cdev = 0
+            else:
+                tmpev = stack.stackcallbackev()
+                tmpev.src = this.src
+                tmpev.time = this.src.el.time
+                tmpev.addto(this.src.el)
+    
 
     def __init__(this,src,cooldown=-2,withhaste=-2):
         if cooldown != -2:
@@ -175,8 +204,13 @@ class stack(object):
             print 'max'
             return 0
         #print this.now(),this._stack,this._stackmax,this._cdev
-        this._cdev.mv(offset= 0.0-offset)
-        return 1
+        if this._cdev != 0:
+            this._cdev.mv(offset= 0.0-offset)
+            return 1
+        else:
+            print this.stack()
+            print tstsaektl
+            return 0
 
     def haste(this):
         return this.el._oldhaste

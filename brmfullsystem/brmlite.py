@@ -208,7 +208,8 @@ class brm(brmbase):
                 brm.castisb()
             brm.stackbrew.setstack(brm.brewstackmax-1,brm.brewstackmax)
             brm.stackbrew.reduce(21)
-            print '--this bob at',this._cdev,this.time()
+
+            
             this.cast()
             print '--next bob at',this.time()
 

@@ -245,6 +245,8 @@ class brmbase(object):
         this.__init__(transfer=tmpdic)
         return
 
+    def now(this):
+        return this.el.time
     def run(this, time=9999):
         #this.refresh()
         this.init()
