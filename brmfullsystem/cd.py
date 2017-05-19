@@ -21,7 +21,6 @@ class cd(object):
             tmpev.src = this.src
             tmpev.time = this.src.el.time
             tmpev.addto(this.src.el)
-            print tmpev,this.src
 
             this.src._cdev = 0
 

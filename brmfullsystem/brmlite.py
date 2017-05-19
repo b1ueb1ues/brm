@@ -19,23 +19,9 @@ class brm(brmbase):
         'stin',
         'stout',
         'dodge',
+        'cast'
             ]
 
-    class ISBbuff(aura):
-        def startprocess(this,time):
-            this.src.ironskin = 1
-        def endprocess(this,time):
-            this.src.ironskin = 0
-            this.src.castisb()
-                
-        def refreshprocess(this,time):
-            time = this.time() + this.duration
-            time2 = this.now() + this.duration * 3
-            fix = time - time2
-            if fix > 0 :
-                this.delay(this.duration - fix)
-            else:
-                this.delay(this.duration)
     
     class StaggerEv(RepeatEvent):
         repeat = 0.5
@@ -126,13 +112,33 @@ class brm(brmbase):
                 print '-nobrew at',this.el.time,this.src.brewstack.stack()
                 '''
 
+    #########
+    # isb
     def castisb(this):
         #print '--cast isb at',this.el.time,this.brewstack.stack()
         ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
+            this.cast.isb += 1
         else:
             print '-nobrew at',this.el.time, this.stackbrew.stack()
+
+    class ISBbuff(aura):
+        def startprocess(this,time):
+            this.src.ironskin = 1
+        def endprocess(this,time):
+            this.src.ironskin = 0
+            this.src.castisb()
+                
+        def refreshprocess(this,time):
+            time = this.time() + this.duration
+            time2 = this.now() + this.duration * 3
+            fix = time - time2
+            if fix > 0 :
+                this.delay(this.duration - fix)
+            else:
+                this.delay(this.duration)
+                
 
     ############
     # kegsmash
@@ -147,6 +153,7 @@ class brm(brmbase):
 
     def castks(this,staveoff=0):
         if staveoff == 0:
+            this.cast.ks += 1
             this.ks.cast()
         if debug >= 3:
             tmp = this.stackbrew.time()
@@ -172,6 +179,7 @@ class brm(brmbase):
 
     def casttp(this):
         this.tp.cast()
+        this.cast.tp += 1
         if debug >= 3:
             tmp = this.stackbrew.time()
         r = random.random()
@@ -201,6 +209,7 @@ class brm(brmbase):
     class Bobcd(cd):
         cooldown = 90
         def endprocess(this,time):
+            this.src.cast.bob += 1
             print '----castbob at',time
             brm = this.src
             stack,stackmax = brm.stackbrew.stack()
@@ -232,6 +241,7 @@ class brm(brmbase):
 
             if stackmax - stack <= 1:
                 print 'cast pb at',this.el.time
+                this.src.cast.pb += 1
                 this.src.pury()
                 this.cast()
         def endprocess(this,time):
@@ -246,6 +256,9 @@ class brm(brmbase):
         this.init = 0
 
         this.staggerev = brm.StaggerEv(this.el)
+
+        #this.ch = brm.changehaste(this.el)
+
         this.isbduration = 9
         this.isb = brm.ISBbuff(this,duration=this.isbduration)
 
@@ -286,7 +299,7 @@ class brm(brmbase):
 
 
 def main():
-    a = brm(haste=50)
+    a = brm(stat=[25,50,0,20],talent=['ht'],equip=['4t'])
     a.run(200)
     a.showavoid()
 

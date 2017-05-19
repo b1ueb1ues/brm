@@ -14,7 +14,18 @@ class aura(object):
     class AuraEv(Event):
         def process(this):
             this.src._enable=0
-            this.src.endprocess(this.el.time)
+
+            tmpev = aura.callbackev()
+            tmpev.src = this.src
+            tmpev.time = this.src.el.time
+            tmpev.addto(this.src.el)
+
+            this.src._auraev = 0
+
+    class callbackev(Event):
+        def process(this):
+            this.src.endprocess(this.time)
+
 
     def __init__(this,src,duration=-2,withhaste=-2,el=0):
         this._enable = 0
@@ -49,6 +60,11 @@ class aura(object):
         this.casttime = this.el.time
         if this._enable == 0 :
             this._enable = 1
+            if this._auraev == 0:
+                this._auraev = aura.AuraEv()
+                this._auraev.src = this
+                this._auraev.withhaste = this.withhaste
+
             if this.withhaste != 0:
                 this._auraev.time = this.el.time + this.duration/this.el._oldhaste
             else:
