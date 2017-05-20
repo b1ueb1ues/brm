@@ -119,6 +119,7 @@ class brm(brmbase):
         ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
+            #print 'cast isb at',this.now(),'buff at',this.isb.time()
             this.cast.isb += 1
         else:
             print '-nobrew at',this.el.time, this.stackbrew.stack()
@@ -217,10 +218,8 @@ class brm(brmbase):
                 brm.castisb()
             brm.stackbrew.setstack(brm.brewstackmax-1,brm.brewstackmax)
             brm.stackbrew.reduce(21)
-
-            
             this.cast()
-            print '--next bob at',this.time()
+            #print '--next bob at',this.time()
 
 
     class Brewstack(stack):
@@ -240,12 +239,12 @@ class brm(brmbase):
                 print '--brew stack+ [%d,%d] at'%(stack,stackmax),this.now()
 
             if stackmax - stack <= 1:
-                print 'cast pb at',this.el.time
+                #print 'cast pb at',this.el.time
                 this.src.cast.pb += 1
                 this.src.pury()
                 this.cast()
         def endprocess(this,time):
-            print 'cast isb(brewmax) at',this.now()
+            #print 'cast isb(brewmax) at',this.now()
             this.src.castisb()
 
 
