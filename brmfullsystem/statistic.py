@@ -11,11 +11,7 @@ class statisunit(object):
         this.__unitname = p.unitname
         this.__src = src
 
-        if this.__unitname == 'stin' :
-            if this.__src == 'pb' :
-                print '!'
-
-
+	'''
         if this.__unitname not in this.__parent.getv() :
             this.__parent.getv()[this.__unitname] = this.__value
         if this.__unitname not in this.__parent.allunits :
@@ -28,6 +24,7 @@ class statisunit(object):
             this.__parent.allsrcs[this.__src] = [this.__parent]
         else: 
             this.__parent.allsrcs[this.__src].append(this.__parent)
+	'''
 
         #else :
         #    this.__parent.units[this.__name].append(this.__parent)
@@ -69,6 +66,11 @@ class statistic(object):
 
     def __init__(this,unitname='nil'):
         this.unitname = unitname
+	if unitname not in this.__values :
+	    this.__values[unitname] = 0
+	if unitname not in this.allunits :
+	    this.allunits[unitname] = this
+
         this.allunits[unitname] = this
         this.value = 0
         this.count = 0
@@ -79,8 +81,33 @@ class statistic(object):
             print 'err getattr'
             print cast
         if name not in this.__dict__:
+	    src = name
+	    print '#',name,this.srcs
             tmp = statisunit(this,name)
             setattr(this,name,tmp)
+
+	    if src not in this.srcs:
+		this.srcs[src] = tmp
+
+	    if src not in this.allsrcs:
+		this.allsrcs[src] = [this]
+	    else:
+		this.allsrcs[src].append(this)
+
+	'''
+        if this.__unitname not in this.__parent.getv() :
+            this.__parent.getv()[this.__unitname] = this.__value
+        if this.__unitname not in this.__parent.allunits :
+            this.__parent.allunits[this.__unitname] = this.__parent
+
+        if this.__src not in this.__parent.srcs :
+            this.__parent.srcs[this.__src] = this
+
+        if this.__src not in this.__parent.allsrcs:
+            this.__parent.allsrcs[this.__src] = [this.__parent]
+        else: 
+            this.__parent.allsrcs[this.__src].append(this.__parent)
+	'''
         return super(statistic,this).__getattribute__(name)
 
     def __str__(this):
@@ -95,6 +122,25 @@ class statistic(object):
 
     def gets(this,name):
         return this.__getattr__(name)
+	
+    def clean(this) :
+	print this.__dict__
+	attrname = []
+	for i in this.__dict__ :
+	    attrname.append(i)   
+	for i in attrname:
+	    print '-del---------',i
+	    this.__delattr__(i)
+
+	this.__values = {}
+	this.__counts = {}
+	this.allunits = {}
+	this.allsrcs = {}
+        this.value = 0
+        this.count = 0
+        this.srcs= {}
+	print '-values----------',this.__values
+	#exit()
 
     def showunit(this):
         ret = ''

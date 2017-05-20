@@ -52,10 +52,16 @@ class brmbase(object):
     equip = []
     stat = []
 
+    #equip
     ring = 0
     waist = 0
     wrist = 0
     chest = 0
+
+    #talent
+    ht = 0
+    ed = 0
+    bc = 0
 
     #stat
     dodgebase = 0.10
@@ -104,9 +110,17 @@ class brmbase(object):
             ]
 
     def addstatistic(this):
+	tmp = statistic()
+	print '>>>>>>>>>',tmp.getv(),tmp.__dict__
+	tmp.clean()
+	print '>>>>>>>>>',tmp.getv(),tmp.__dict__
+	del(tmp)
         for i in this.statisticlist :
             tmp = statistic(i)
             this.__setattr__(i,tmp)
+	print '>>>>>>>>>',
+	print tmp.__dict__
+	print '>>>>>>>',tmp.allunits
 
     def takephydmg(this,dmg=4000000):
         this.totaltank.takephydmg += dmg
@@ -290,7 +304,7 @@ class brmbase(object):
             '113':8164
         }
         C = armorC[level]
-        return this.armor / (this.armor + C)
+        return float(this.armor) / (this.armor + C)
 
     def setup(this):
         argv = this.initargv
@@ -310,6 +324,7 @@ class brmbase(object):
 
         for t in this.talent:
             if t == 'ht' or t == 'ht1' or t == 'ht10':
+		this.ht = 1
                 this.srate += 0.10
                 this.irate += 0.10
                 '''

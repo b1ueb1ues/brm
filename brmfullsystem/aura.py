@@ -84,6 +84,12 @@ class aura(object):
 
     def now(this):
         return this.el.time
+	
+	def gethaste(this):
+		return 1.3
+
+
+
 
 
     def last(this):

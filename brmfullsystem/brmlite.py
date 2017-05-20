@@ -248,6 +248,19 @@ class brm(brmbase):
             this.src.castisb()
 
 
+    def gethaste(this):
+	if this.ht != 0 :
+	    stpercent = this.st / this.hpmax
+	    if stpercent > 0.6 :
+		return this.haste * 1.15
+	    elif stpercent > 0.3 :
+		return this.haste * 1.1
+	    elif this.st != 0 :
+		return this.haste * 1.05
+	    else :
+		return this.haste
+	else:
+	    return this.haste
 
 
     def init(this):
@@ -298,9 +311,15 @@ class brm(brmbase):
 
 
 def main():
-    a = brm(stat=[25,50,0,20],talent=['ht'],equip=['4t'])
+    a = brm(stat=[25,50,0,20],talent=['ed'],equip=['4t'])
+    b = brm(stat=[25,50,0,20],talent=['bc'],equip=['4t'])
+    c = brm(stat=[25,50,0,20],talent=['ht'],equip=['4t'])
     a.run(200)
     a.showavoid()
+    b.run(200)
+    b.showavoid()
+    c.run(200)
+    c.showavoid()
 
 
     return
