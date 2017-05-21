@@ -9,7 +9,7 @@ debug = 0
 
 def main():
 #    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], stat=[25,25,0,20],\
-#            iduration = 8, palmcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
+#            iduration = 8, tpcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
 
     b = brmbase(stat=[30,20,0,16],equip=['ring','waist','4t'],iduration=9)
     b.haste=32
@@ -111,16 +111,11 @@ class brmbase(object):
 
     def addstatistic(this):
 	tmp = statistic()
-	print '>>>>>>>>>',tmp.getv(),tmp.__dict__
 	tmp.clean()
-	print '>>>>>>>>>',tmp.getv(),tmp.__dict__
 	del(tmp)
         for i in this.statisticlist :
             tmp = statistic(i)
             this.__setattr__(i,tmp)
-	print '>>>>>>>>>',
-	print tmp.__dict__
-	print '>>>>>>>',tmp.allunits
 
     def takephydmg(this,dmg=4000000):
         this.totaltank.takephydmg += dmg
@@ -339,7 +334,7 @@ class brmbase(object):
             elif t == 'ednobuff' :
                 this.prate += 0.15
             elif t == 'bc':
-                this.kegcdr = 6
+                this.kscdr = 6
             elif t == 'light':
                 this.brewcd = 18
                 this.brewstack = 4
@@ -352,7 +347,7 @@ class brmbase(object):
             if e == '4t19' :
                 this.irate += 0.05
                 this.srate += 0.05
-                this.palmcdr += 1
+                this.tpcdr += 1
             if e == 'ring':
                 this.ring =1
                 this.stdmgrate = 1.0/26

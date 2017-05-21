@@ -11,24 +11,6 @@ class statisunit(object):
         this.__unitname = p.unitname
         this.__src = src
 
-	'''
-        if this.__unitname not in this.__parent.getv() :
-            this.__parent.getv()[this.__unitname] = this.__value
-        if this.__unitname not in this.__parent.allunits :
-            this.__parent.allunits[this.__unitname] = this.__parent
-
-        if this.__src not in this.__parent.srcs :
-            this.__parent.srcs[this.__src] = this
-
-        if this.__src not in this.__parent.allsrcs:
-            this.__parent.allsrcs[this.__src] = [this.__parent]
-        else: 
-            this.__parent.allsrcs[this.__src].append(this.__parent)
-	'''
-
-        #else :
-        #    this.__parent.units[this.__name].append(this.__parent)
-
     def __iadd__(this,other):
         this.__value += other
         this.__count += 1
@@ -82,7 +64,6 @@ class statistic(object):
             print cast
         if name not in this.__dict__:
 	    src = name
-	    print '#',name,this.srcs
             tmp = statisunit(this,name)
             setattr(this,name,tmp)
 
@@ -93,21 +74,6 @@ class statistic(object):
 		this.allsrcs[src] = [this]
 	    else:
 		this.allsrcs[src].append(this)
-
-	'''
-        if this.__unitname not in this.__parent.getv() :
-            this.__parent.getv()[this.__unitname] = this.__value
-        if this.__unitname not in this.__parent.allunits :
-            this.__parent.allunits[this.__unitname] = this.__parent
-
-        if this.__src not in this.__parent.srcs :
-            this.__parent.srcs[this.__src] = this
-
-        if this.__src not in this.__parent.allsrcs:
-            this.__parent.allsrcs[this.__src] = [this.__parent]
-        else: 
-            this.__parent.allsrcs[this.__src].append(this.__parent)
-	'''
         return super(statistic,this).__getattribute__(name)
 
     def __str__(this):
@@ -129,17 +95,19 @@ class statistic(object):
 	for i in this.__dict__ :
 	    attrname.append(i)   
 	for i in attrname:
-	    print '-del---------',i
 	    this.__delattr__(i)
 
 	this.__values = {}
 	this.__counts = {}
 	this.allunits = {}
 	this.allsrcs = {}
+        statistic.allunits = {}
+        statistic.allsrcs = {}
+        statistic.__values = {}
+        statistic.__counts = {}
         this.value = 0
         this.count = 0
         this.srcs= {}
-	print '-values----------',this.__values
 	#exit()
 
     def showunit(this):
@@ -159,8 +127,12 @@ class statistic(object):
                 value = s[j].value()
                 sumvalue = s[j].getp().value
                 count = str(s[j].getc())
-                print '\t%s: %dw(%.2f%%) | %s hits'%(srcname,value/10000,float(value)/sumvalue*100,count)
-                ret += '\t%s: %dw(%.2f%%) | %s hits\n'%(srcname,value/10000,float(value)/sumvalue*100,count)
+                if value >= 10000 :
+                    print '\t%s: %dw(%.2f%%) | %s hits'%(srcname,value/10000,float(value)/sumvalue*100,count)
+                    ret += '\t%s: %dw(%.2f%%) | %s hits\n'%(srcname,value/10000,float(value)/sumvalue*100,count)
+                else :
+                    print '\t%s: %d(%.2f%%) | %s hits'%(srcname,value,float(value)/sumvalue*100,count)
+                    ret += '\t%s: %d(%.2f%%) | %s hits\n'%(srcname,value,float(value)/sumvalue*100,count)
             print ''
             ret += '\n'
         return ret

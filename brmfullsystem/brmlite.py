@@ -211,7 +211,6 @@ class brm(brmbase):
         cooldown = 90
         def endprocess(this,time):
             this.src.cast.bob += 1
-            print '----castbob at',time
             brm = this.src
             stack,stackmax = brm.stackbrew.stack()
             for i in range(stack):
@@ -289,7 +288,6 @@ class brm(brmbase):
         this.ks.cast()
         this.tp.cast()
         this.bob.cast()
-        print this.stackbrew.last(),this.stackbrew._cdev.time
 
 
         this.init = 1
@@ -305,6 +303,8 @@ class brm(brmbase):
 
 
     def showavoid(this):
+        print '\n################'
+        print '## showunit test'
         this.totaltank.showunit()
         print this.totaltank.getv()
 
