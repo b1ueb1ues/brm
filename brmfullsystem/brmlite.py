@@ -19,7 +19,8 @@ class brm(brmbase):
         'stin',
         'stout',
         'dodge',
-        'cast'
+        'cast',
+        'heal',
             ]
 
     
@@ -89,29 +90,6 @@ class brm(brmbase):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         pass
 
-
-    '''
-    class PuryEv(RepeatEvent):
-        repeat = 10
-        def process(this):
-            ret =this.src.brewstack.cast()
-            print 'cast pb'
-            if ret != 0:
-                this.src.pury()
-            else:
-                print this.el.time,'nobrew',this.src.brewstack.stack()
-
-    class IronEv(RepeatEvent):
-        repeat = 9
-        def process(this):
-            ret =this.src.brewstack.cast()
-            print 'cast isb at',this.el.time,this.src.brewstack.stack()
-            if ret != 0:
-                pass
-            else:
-                print '-nobrew at',this.el.time,this.src.brewstack.stack()
-                '''
-
     #########
     # isb
     def castisb(this):
@@ -140,6 +118,10 @@ class brm(brmbase):
             else:
                 this.delay(this.duration)
                 
+    class brewstache(aura):
+        def startprocess(this,time):
+            this.brewstache = 1
+
 
     ############
     # kegsmash
@@ -195,16 +177,6 @@ class brm(brmbase):
             print 'brew',tmp,'->',
             print this.stackbrew.time()
     # }tpalm
-
-
-
-    class changehaste(RepeatEvent):
-        repeat = 5
-        def process(this):
-            if this.src.haste == 1.5 :
-                this.src.haste = 1.3
-            else :
-                this.src.haste = 1.5
 
 
     class Bobcd(cd):
@@ -311,14 +283,14 @@ class brm(brmbase):
 
 
 def main():
-    a = brm(stat=[25,50,0,20],talent=['ed'],equip=['4t'])
-    b = brm(stat=[25,50,0,20],talent=['bc'],equip=['4t'])
-    c = brm(stat=[25,50,0,20],talent=['ht'],equip=['4t'])
-    a.run(200)
+    a = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t'])
+    b = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring','waist'])
+    c = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','wrist','waist'])
+    a.run(100000)
     a.showavoid()
-    b.run(200)
+    b.run(100000)
     b.showavoid()
-    c.run(200)
+    c.run(100000)
     c.showavoid()
 
 

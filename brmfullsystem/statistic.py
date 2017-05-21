@@ -90,7 +90,7 @@ class statistic(object):
         return this.__getattr__(name)
 	
     def clean(this) :
-	print this.__dict__
+	#print this.__dict__
 	attrname = []
 	for i in this.__dict__ :
 	    attrname.append(i)   
@@ -127,7 +127,10 @@ class statistic(object):
                 value = s[j].value()
                 sumvalue = s[j].getp().value
                 count = str(s[j].getc())
-                if value >= 10000 :
+                if value >= 1000000:
+                    print '\t%s: %dm(%.2f%%) | %s hits'%(srcname,value/1000000,float(value)/sumvalue*100,count)
+                    ret += '\t%s: %dm(%.2f%%) | %s hits\n'%(srcname,value/1000000,float(value)/sumvalue*100,count)
+                elif value >= 10000 :
                     print '\t%s: %dw(%.2f%%) | %s hits'%(srcname,value/10000,float(value)/sumvalue*100,count)
                     ret += '\t%s: %dw(%.2f%%) | %s hits\n'%(srcname,value/10000,float(value)/sumvalue*100,count)
                 else :

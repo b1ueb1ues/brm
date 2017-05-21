@@ -189,7 +189,10 @@ class brmbase(object):
         a += this.st * prate
         #print this.el.time,this.st,this.st * this.prate
         if rate == -1 and this.phrate != 0 :
-            this.puryheal += this.phrate * this.st * ( 1 + this.crit * 0.65 )
+            this.heal.pb += this.phrate * this.st 
+            r = random.random()
+            if r < this.crit :
+                this.heal.pbcele += this.phrate * this.st * 0.65 
         this.st -= this.st * prate
         this.sttick -= this.sttick * prate
 
