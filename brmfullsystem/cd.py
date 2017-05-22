@@ -82,7 +82,9 @@ class cd(object):
         return this.el._oldhaste
 
     def last(this):
-        return this._cdev.time - this.el.time
+        if this._cdev != 0:
+            return this._cdev.time - this.el.time
+        return 0
 
     def time(this):
         if this._cdev != 0:
@@ -200,7 +202,7 @@ class stack(object):
 
     def reduce(this,offset=1):
         if this._stack >= this._stackmax:
-            print 'max'
+            #print 'max'
             return 0
         #print this.now(),this._stack,this._stackmax,this._cdev
         if this._cdev != 0:
@@ -223,7 +225,9 @@ class stack(object):
             return None
 
     def last(this):
-        return this._cdev.time - this.el.time
+        if this._cdev != 0:
+            return this._cdev.time - this.el.time
+        return 0
 
 
 

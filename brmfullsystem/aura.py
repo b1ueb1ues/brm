@@ -8,6 +8,7 @@ class aura(object):
     _auraev = 0
     withhaste = 0
     casttime = 0
+    value = 0
 
 
 
@@ -84,13 +85,6 @@ class aura(object):
 
     def now(this):
         return this.el.time
-	
-	def gethaste(this):
-		return 1.3
-
-
-
-
 
     def last(this):
         return this._auraev.time - this.el.time

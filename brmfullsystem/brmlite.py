@@ -21,6 +21,9 @@ class brm(brmbase):
         'dodge',
         'cast',
         'heal',
+        'brewstachetime',
+        'edlevel',
+        'stlevel'
             ]
 
     
@@ -51,14 +54,13 @@ class brm(brmbase):
     def takemelee(this,dmg=2000000):
         this.totaltank.takemelee += dmg
 
-        dodge = this.dodgebase + this.mastery* this.masterystack
         if this.mastery != 0:
             r = random.random()
-            if r < dodge:
+            if r < this.getdodge():
                 this.masterystack = 0
                 if this.wrist == 1 :
                     this.stackbrew.reduce(1)
-                    #this.blackcd.reduce(1)
+                    this.bob.reduce(1)
                 this.dodge.takemelee += dmg
                 this.masterystack = 0
                 return
@@ -97,6 +99,8 @@ class brm(brmbase):
         ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
+            #print '-isbcast----',this.el.time
+            this.brewstachebuff.cast()
             #print 'cast isb at',this.now(),'buff at',this.isb.time()
             this.cast.isb += 1
         else:
@@ -118,9 +122,61 @@ class brm(brmbase):
             else:
                 this.delay(this.duration)
                 
-    class brewstache(aura):
+    class Brewstachebuff(aura):
+        starttime = 0
+        duration = 4.5
         def startprocess(this,time):
-            this.brewstache = 1
+            this.value = 0.1
+            this.starttime = time
+        def endprocess(this,time):
+            bs = this
+            brm = bs.src
+            bs.value = 0
+            brm.brewstachetime.time += (time - bs.starttime)
+        def refreshprocess(this,time):
+            super(brm.Brewstachebuff,this).refreshprocess(time)
+            bs = this
+            bm = this.src
+            bm.brewstachetime.time += (time - bs.starttime)
+            bs.starttime = time
+
+    class Edbuff(aura):
+        starttime = 0
+        duration = 6
+        def startprocess(this,time):
+            ed = this
+            brm = ed.src
+            if brm.st / brm.hpmax > 0.6:
+                ed.value = (ed.value * ed.last() + 0.2*6) / 6
+            elif brm.st / brm.hpmax > 0.3:
+                ed.value = (ed.value * ed.last() + 0.2 * 2/3 * 6) / 6
+            else :
+                ed.value = (ed.value * ed.last() + 0.2 * 1/3 * 6) / 6
+            ed.starttime = time
+
+        def refreshprocess(this,time):
+            ed = this
+            bm = ed.src
+            if bm.st / bm.hpmax > 0.6:
+                ed.value = float(ed.value * ed.last())/6 + 0.2
+            elif bm.st / bm.hpmax > 0.3:
+                ed.value = float(ed.value * ed.last())/6 + 0.2/3*2
+            else :
+                ed.value = float(ed.value * ed.last())/6 + 0.2/3
+
+            tmp = bm.edlevel.__getattr__('percent_%d'%(ed.value*100)) 
+            tmp += (time - ed.starttime)
+            ed.starttime = time
+            super(brm.Edbuff,this).refreshprocess(time)
+
+
+
+        def endprocess(this,time):
+            ed = this
+            brm = ed.src
+            tmp = brm.edlevel.__getattr__('percent_%d'%(ed.value*100)) 
+            tmp += (time - ed.starttime)
+            ed.value = 0
 
 
     ############
@@ -179,6 +235,8 @@ class brm(brmbase):
     # }tpalm
 
 
+    ##############
+    # brews
     class Bobcd(cd):
         cooldown = 90
         def endprocess(this,time):
@@ -196,6 +254,15 @@ class brm(brmbase):
     class Brewstack(stack):
         _stack = 3
         _stackmax = 3
+        def reduce(this,offset=1):
+            super(brm.Brewstack,this).reduce(offset)
+            if this._stack >= this._stackmax - 1 :
+                if this.last() < this.src.kscdr + 6 :
+                    this.src.pury()
+                    this.src.cast.pb += 1
+                    this.cast()
+
+
         def stackprocess(this,time):
             if debug >= 3:
                 print '------brewstack! at',time,'event at',this.time(),
@@ -211,17 +278,43 @@ class brm(brmbase):
 
             if stackmax - stack <= 1:
                 #print 'cast pb at',this.el.time
-                this.src.cast.pb += 1
-                this.src.pury()
-                this.cast()
+                pass
+            #    tmp = brm.lagev()
+            #    tmp.time = time + 
+
+            #    this.src.cast.pb += 1
+            #    this.src.pury()
+            #    this.cast()
         def endprocess(this,time):
             #print 'cast isb(brewmax) at',this.now()
             this.src.castisb()
 
 
+    def pury(this):
+        #print '-pbcast----',this.el.time
+        bm = this
+        bm.brewstachebuff.cast()
+        if bm.ed != 0:
+            bm.edbuff.cast()
+        brmbase.pury(this)
+
+    
+    laststleveltime = 0
     def gethaste(this):
+        stpercent = this.st / this.hpmax
+        if stpercent > 0.6 :
+            stlevel = 'h'
+        elif stpercent > 0.3 :
+            stlevel = 'm'
+        elif this.st != 0 :
+            stlevel = 'l'
+        else :
+            stlevel = 'nil'
+        tmp = this.stlevel.__getattr__(stlevel)
+        tmp += this.now() - this.laststleveltime
+        this.laststleveltime = this.now()
+
 	if this.ht != 0 :
-	    stpercent = this.st / this.hpmax
 	    if stpercent > 0.6 :
 		return this.haste * 1.15
 	    elif stpercent > 0.3 :
@@ -232,6 +325,9 @@ class brm(brmbase):
 		return this.haste
 	else:
 	    return this.haste
+
+    def getdodge(this):
+        return this.dodgebase + this.masterystack * this.mastery + this.brewstachebuff.value + this.edbuff.value
 
 
     def init(this):
@@ -255,11 +351,17 @@ class brm(brmbase):
         this.bob = brm.Bobcd(this)
         this.stackbrew = brm.Brewstack(this,21,1)
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
+        this.brewstachebuff = brm.Brewstachebuff(this)
 
         this.castisb()
         this.ks.cast()
         this.tp.cast()
         this.bob.cast()
+
+
+        this.edbuff = brm.Edbuff(this)
+        if 'ed' in this.talent:
+            this.ed = 1
 
 
         this.init = 1
@@ -283,7 +385,18 @@ class brm(brmbase):
 
 
 def main():
-    a = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t'])
+    c = brm(stat=[25,20,0,20],talent=['ht'],equip=['4t'])
+    c.run(100000)
+    c.showavoid()
+    a = brm(stat=[25,20,0,20],talent=['ht'],equip=['4t','wrist'])
+    a.run(100000)
+    a.showavoid()
+    b = brm(stat=[25,20,0,20],talent=['ht'],equip=['4t','ring'])
+    b.run(100000)
+    b.showavoid()
+
+    exit()
+
     b = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring','waist'])
     c = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','wrist','waist'])
     a.run(100000)

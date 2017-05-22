@@ -149,12 +149,13 @@ class brmbase(object):
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
+    def getdodge(this):
+        return this.dodgebase + this.mastery * this.masterystack
 
     def takemelee(this,dmg=4000000):
         this.totaltank.takemelee += dmg
         r = random.random()
-        dodge = this.dodgebase + this.mastery* this.masterystack
-        if r < dodge:
+        if r < this.getdodge():
             this.masterystack = 0
         else:
             dmg -= dmg * this.armorrate
