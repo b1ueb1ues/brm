@@ -12,6 +12,8 @@ debug = 2
 
 class brm(brmbase):
 
+    quicksip = 1
+
     statisticlist = [
         'totaltank',
         'dtb4st',
@@ -99,6 +101,7 @@ class brm(brmbase):
         ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
+            this.pury(rate=0.05,src='quicksip')
             #print '-isbcast----',this.el.time
             this.brewstachebuff.cast()
             #print 'cast isb at',this.now(),'buff at',this.isb.time()
@@ -290,13 +293,16 @@ class brm(brmbase):
             this.src.castisb()
 
 
-    def pury(this):
-        #print '-pbcast----',this.el.time
-        bm = this
-        bm.brewstachebuff.cast()
-        if bm.ed != 0:
-            bm.edbuff.cast()
-        brmbase.pury(this)
+    def pury(this,rate=-2,src='pb'):
+        if rate == -2 :
+            #print '-pbcast----',this.el.time
+            bm = this
+            bm.brewstachebuff.cast()
+            if bm.ed != 0:
+                bm.edbuff.cast()
+            if this.quicksip != 0:
+                this.isb.delay(1)
+        brmbase.pury(this,rate,src)
 
     
     laststleveltime = 0
@@ -385,13 +391,14 @@ class brm(brmbase):
 
 
 def main():
-    c = brm(stat=[25,20,0,20],talent=['ht'],equip=['4t'])
+    c = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring'],quicksip=0)
     c.run(100000)
     c.showavoid()
-    a = brm(stat=[25,20,0,20],talent=['ht'],equip=['4t','wrist'])
+    a = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring'])
     a.run(100000)
     a.showavoid()
-    b = brm(stat=[25,20,0,20],talent=['ht'],equip=['4t','ring'])
+    return
+    b = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring'])
     b.run(100000)
     b.showavoid()
 

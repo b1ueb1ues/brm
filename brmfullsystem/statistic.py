@@ -127,15 +127,19 @@ class statistic(object):
                 value = s[j].value()
                 sumvalue = s[j].getp().value
                 count = str(s[j].getc())
+                #if i == 'stout':
+                #    print srcname
+                #    print value
+                #    exit()
                 if value >= 1000000:
-                    print '\t%s: %dm(%.2f%%) | %s hits'%(srcname,value/1000000,float(value)/sumvalue*100,count)
-                    ret += '\t%s: %dm(%.2f%%) | %s hits\n'%(srcname,value/1000000,float(value)/sumvalue*100,count)
+                    print '\t%s: %dm(%.2f%%) | %s hits'%(srcname,int(value/1000000),float(value)/sumvalue*100,count)
+                    ret += '\t%s: %dm(%.2f%%) | %s hits\n'%(srcname,int(value/1000000),float(value)/sumvalue*100,count)
                 elif value >= 10000 :
-                    print '\t%s: %dw(%.2f%%) | %s hits'%(srcname,value/10000,float(value)/sumvalue*100,count)
-                    ret += '\t%s: %dw(%.2f%%) | %s hits\n'%(srcname,value/10000,float(value)/sumvalue*100,count)
+                    print '\t%s: %dw(%.2f%%) | %s hits'%(srcname,int(value/10000),float(value)/sumvalue*100,count)
+                    ret += '\t%s: %dw(%.2f%%) | %s hits\n'%(srcname,int(value/10000),float(value)/sumvalue*100,count)
                 else :
-                    print '\t%s: %d(%.2f%%) | %s hits'%(srcname,value,float(value)/sumvalue*100,count)
-                    ret += '\t%s: %d(%.2f%%) | %s hits\n'%(srcname,value,float(value)/sumvalue*100,count)
+                    print '\t%s: %d(%.2f%%) | %s hits'%(srcname,int(value),float(value)/sumvalue*100,count)
+                    ret += '\t%s: %d(%.2f%%) | %s hits\n'%(srcname,int(value),float(value)/sumvalue*100,count)
             print ''
             ret += '\n'
         return ret

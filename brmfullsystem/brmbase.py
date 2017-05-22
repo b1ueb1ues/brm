@@ -180,8 +180,8 @@ class brmbase(object):
         this.stout.takestdmg += this.sttick
         this.st -= this.sttick
 
-    def pury(this,rate=-1,src='pb'):
-        if rate == -1 :
+    def pury(this,rate=-2,src='pb'):
+        if rate == -2 :
             prate = this.prate
         else :
             prate = rate
@@ -196,6 +196,10 @@ class brmbase(object):
                 this.heal.pbcele += this.phrate * this.st * 0.65 
         this.st -= this.st * prate
         this.sttick -= this.sttick * prate
+
+    apup
+    def orb(this):
+
 
     def showavoid(this):
         print 'stat\t',this.stat
