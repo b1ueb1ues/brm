@@ -13,6 +13,7 @@ debug = 2
 class brm(brmbase):
 
     quicksip = 1
+    overflowrate = 0
 
     statisticlist = [
         'totaltank',
@@ -24,8 +25,9 @@ class brm(brmbase):
         'cast',
         'heal',
         'brewstachetime',
+        'overheal',
         'edlevel',
-        'stlevel'
+        'stlevel',
             ]
 
     
@@ -102,6 +104,9 @@ class brm(brmbase):
         if ret != 0:
             this.isb.cast()
             this.pury(rate=0.05,src='quicksip')
+            if 't20' in this.equip:
+                this.gift()
+
             #print '-isbcast----',this.el.time
             this.brewstachebuff.cast()
             #print 'cast isb at',this.now(),'buff at',this.isb.time()
@@ -292,6 +297,55 @@ class brm(brmbase):
             #print 'cast isb(brewmax) at',this.now()
             this.src.castisb()
 
+    def gift(this):
+        r = random.random()
+        h = 0
+        celeh = 0
+        if r < this.overflowrate :
+            h = this.ap * 7.5
+        else:
+            h = this.ap * 15
+        r = random.random()
+        if r < this.crit :
+            h += h
+        r = random.random()
+        this.getheal(h,'gift')
+
+
+    def getheal(this,amount,src='ext'):
+        h = amount
+        s_h = this.heal.__getattr__(src)
+        s_ch = this.heal.__getattr__('cele_'+src)
+        s_oh = this.overheal.__getattr__(src)
+        s_coh = this.overheal.__getattr__('cele_'+src)
+
+
+        this.hp += h
+        if this.hp > this.hpmax:
+            oh = this.hp - this.hpmax
+            s_oh += oh
+            s_h += (h - oh)
+            this.hp = this.hpmax
+        else :
+            s_h += h
+
+        r = random.random()
+        if r < this.crit:
+            celeh = h * 0.65
+
+            this.hp += celeh
+            if this.hp > this.hpmax:
+                oh = this.hp - this.hpmax
+                s_coh += oh
+                s_ch += (celeh - oh)
+                this.hp = this.hpmax
+            else :
+                s_ch += h
+
+
+
+
+
 
     def pury(this,rate=-2,src='pb'):
         if rate == -2 :
@@ -344,6 +398,8 @@ class brm(brmbase):
 
         #this.ch = brm.changehaste(this.el)
 
+        this.ap = this.agi * (1+this.mastery) * 1.05
+        
         this.isbduration = 9
         this.isb = brm.ISBbuff(this,duration=this.isbduration)
 
@@ -391,10 +447,11 @@ class brm(brmbase):
 
 
 def main():
-    c = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring'],quicksip=0)
+    c = brm(stat=[25,25,0,30],talent=['ht'],equip=['t20','4t','ring'])
     c.run(100000)
     c.showavoid()
-    a = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t','ring'])
+    return
+    a = brm(stat=[25,25,0,30],talent=['ed'],equip=['4t','ring'])
     a.run(100000)
     a.showavoid()
     return

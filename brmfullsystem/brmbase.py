@@ -44,7 +44,8 @@ class brmbase(object):
     hp = 6000000
     hpmax = 6000000
     energy = 100
-    ap = 30000
+    ap = 0
+    agi = 30000
     armor = 4400
     armorrate = 0
 
@@ -193,12 +194,9 @@ class brmbase(object):
             this.heal.pb += this.phrate * this.st 
             r = random.random()
             if r < this.crit :
-                this.heal.pbcele += this.phrate * this.st * 0.65 
+                this.heal.cele_waist += this.phrate * this.st * 0.65 
         this.st -= this.st * prate
         this.sttick -= this.sttick * prate
-
-    apup
-    def orb(this):
 
 
     def showavoid(this):

@@ -131,6 +131,8 @@ class statistic(object):
                 #    print srcname
                 #    print value
                 #    exit()
+                if sumvalue == 0 :
+                    sumvalue = 1
                 if value >= 1000000:
                     print '\t%s: %dm(%.2f%%) | %s hits'%(srcname,int(value/1000000),float(value)/sumvalue*100,count)
                     ret += '\t%s: %dm(%.2f%%) | %s hits\n'%(srcname,int(value/1000000),float(value)/sumvalue*100,count)
