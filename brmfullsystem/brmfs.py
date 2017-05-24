@@ -283,7 +283,7 @@ class brm(brmbase):
         def process(this):
             this.src.castks(1)
 
-    class Kegcd(cd):
+    class Kegcd(Cd):
         def endprocess(this,time):
             #print 'castks'
             this.src.castks()
@@ -310,7 +310,7 @@ class brm(brmbase):
 
     #############
     # tigerpalm
-    class Palmcd(cd):
+    class Palmcd(Cd):
         def endprocess(this,time):
             this.src.casttp()
 
@@ -335,7 +335,7 @@ class brm(brmbase):
 
     ##############
     # brews
-    class Bobcd(cd):
+    class Bobcd(Cd):
         cooldown = 90
         def endprocess(this,time):
             this.src.cast.bob += 1
@@ -356,7 +356,7 @@ class brm(brmbase):
         if '2t20' in this.equip or '4t20' in this.equip :
             this.gift(src='2t20')
 
-    class Brewstack(stack):
+    class Brewstack(Stack):
         _stack = 3
         _stackmax = 3
         def reduce(this,offset=1):

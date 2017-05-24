@@ -1,7 +1,7 @@
 from event import *
 count = 0
 
-class cd(object):
+class Cd(object):
     _enable = 1
     cooldown = 10
     src = 0
@@ -15,13 +15,13 @@ class cd(object):
         def __str__(this):
             return object.__str__(this)
         def __repr__(this):
-            return object.__repr__(this) + str(this.src)
+            return object.__repr__(this)
         def process(this):
             this.src._enable=1
             if this.src._cdev == 0 :
                 print '====',this.now(),this.src,this.src.casttime
 
-            tmpev = cd.callbackev()
+            tmpev = Cd.callbackev()
             tmpev.src = this.src
             tmpev.time = this.src.el.time
             tmpev.addto(this.src.el)
@@ -40,7 +40,7 @@ class cd(object):
             this.withhaste = withhaste
         this.src = src
         this.el = src.el
-        this._cdev = cd.CdEv()
+        this._cdev = Cd.CdEv()
         this._cdev.src = this
         this._cdev.withhaste = this.withhaste
 
@@ -63,7 +63,7 @@ class cd(object):
             this._enable = 0
 
             if this._cdev == 0:
-                this._cdev = cd.CdEv()
+                this._cdev = Cd.CdEv()
                 this._cdev.src = this
                 this._cdev.withhaste = this.withhaste
 
@@ -101,7 +101,7 @@ class cd(object):
 
 
 
-class stack(object):
+class Stack(object):
     _stack = 0
     _stackmax = 0
     cooldown = 10
@@ -111,15 +111,18 @@ class stack(object):
     withhaste = 0
 
 
-    class stackcallbackev(Event):
+    class Stackcallbackev(Event):
+        def process(this):
+            this.src.stackprocess(this.time)
+    class Endcallbackev(Event):
         def process(this):
             this.src.stackprocess(this.time)
 
-    class CdEv(RepeatEvent):
+    class StackCdEv(RepeatEvent):
         def __str__(this):
-            return object.__str__(this)
+            return 'stackcd'+object.__str__(this)
         def __repr__(this):
-            return object.__repr__(this)
+            return 'stackcd'+object.__repr__(this)+str(this.__class__)
 
         def process(this):
             this.src._stack += 1
@@ -128,19 +131,19 @@ class stack(object):
             if this.src._stack == this.src._stackmax :
                 this.repeat = 0
 
-                tmpev = stack.stackcallbackev()
+                tmpev = Stack.Stackcallbackev()
                 tmpev.src = this.src
                 tmpev.time = this.src.el.time
                 tmpev.addto(this.src.el)
 
-                tmpev = cd.callbackev()
+                tmpev = Stack.Endcallbackev()
                 tmpev.src = this.src
                 tmpev.time = this.src.el.time
                 tmpev.addto(this.src.el)
 
                 this.src._cdev = 0
             else:
-                tmpev = stack.stackcallbackev()
+                tmpev = Stack.Stackcallbackev()
                 tmpev.src = this.src
                 tmpev.time = this.src.el.time
                 tmpev.addto(this.src.el)
@@ -156,7 +159,7 @@ class stack(object):
         this.el = src.el
 
         if this._stack < this._stackmax :
-            this._cdev = stack.CdEv()
+            this._cdev = stack.StackCdEv()
             this._cdev.src = this
             this._cdev.withhaste = this.withhaste
             this._cdev.repeat = this.cooldown
@@ -192,15 +195,21 @@ class stack(object):
 
     def cast(this):
         if this._stack >= this._stackmax :
+            if this._stack > this._stackmax:
+                print 'stack>max err'
+                exit()
             this._stack -= 1
+
             if this._cdev != 0 :
-                this._cdev.rm()
-            #    print this._cdev.time,
-                this._cdev = 0
-                #return
+                this.test = 0
+                if this.test == 0:
+                    this._cdev.rm()
+                    this._cdev = 0
+                else:
+                    return
             #    this._cdev.rm()
             #    return
-            this._cdev = stack.CdEv()
+            this._cdev = Stack.StackCdEv()
             this._cdev.src = this
             this._cdev.withhaste = this.withhaste
             if this.withhaste != 0 :

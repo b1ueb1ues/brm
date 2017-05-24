@@ -57,11 +57,19 @@ class RepeatEvent(Event):
             try:
                 this.time += this.repeat / this.el._oldhaste
             except Exception,e:
-                print this, this.time, this.el, this.src.src.el
-                print this.withhaste
+                print this, this.time, this.el
+                print '-this--',this
+                print '-src--',this.src, this.src.stack()
+                print '-el---',this.src.src.el
+                print '-repeat----',this.repeat
+                print '-now---',this.src.src.el.time
                 print e
                 exit()
         else:
+            #print this.el._list
+            if 'd' in str(this):
+                print '!'
+                exit()
             this.time += this.repeat
         this.el.add(this)
 
@@ -170,6 +178,11 @@ class Eventlist(object):
 class Eventlist_withhaste(Eventlist):
     _hastelist = []
     _oldhaste = 1
+    def __init__(this,src=0,debug=0):
+        super(Eventlist_withhaste,this).__init__(src,debug)
+        _hastelist = []
+        _oldhaste = 1
+    #}__init__
     def add_withhaste(this,event,time=-2):
         if this.debug >= 1:
             print event.__dict__
