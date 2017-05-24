@@ -109,6 +109,7 @@ class Stack(object):
     el = 0
     _cdev = 0
     withhaste = 0
+    test=0
 
 
     class Stackcallbackev(Event):
@@ -179,7 +180,6 @@ class Stack(object):
     def setstack(this,stack,stackmax):
         this._stack = stack
         this._stackmax = stackmax
-        return
         if stack >= stackmax:
             if this._cdev != 0 :
                 this._cdev.rm()
@@ -202,11 +202,18 @@ class Stack(object):
 
             if this._cdev != 0 :
                 this.test = 0
-                if this.test == 0:
+                if this.test == 1:
+                    print '------'
+                    print this.src.el._hastelist
+                    print this._cdev.el
+                    print '-rm-@',this.now(),this,this._cdev
+                    this._cdev.rm()
+                    print this._cdev.el
+                    print this.src.el._hastelist
+                    print '------'
+                else:
                     this._cdev.rm()
                     this._cdev = 0
-                else:
-                    return
             #    this._cdev.rm()
             #    return
             this._cdev = Stack.StackCdEv()

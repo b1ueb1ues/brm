@@ -60,16 +60,17 @@ class RepeatEvent(Event):
                 print this, this.time, this.el
                 print '-this--',this
                 print '-src--',this.src, this.src.stack()
-                print '-el---',this.src.src.el
+                print '-srcsrc--',this.src.src
+                print '-el-haste--',this.src.src.el._hastelist
+                print '-el---',this.src.src.el._list
                 print '-repeat----',this.repeat
                 print '-now---',this.src.src.el.time
+                print '-removeat---',this.removeat
+                print '-brmstack--haste-',this.src.src.stackbrew,this.src.src.gethaste()
                 print e
                 exit()
         else:
             #print this.el._list
-            if 'd' in str(this):
-                print '!'
-                exit()
             this.time += this.repeat
         this.el.add(this)
 
@@ -181,6 +182,7 @@ class Eventlist_withhaste(Eventlist):
     def __init__(this,src=0,debug=0):
         super(Eventlist_withhaste,this).__init__(src,debug)
         _hastelist = []
+        _list = []
         _oldhaste = 1
     #}__init__
     def add_withhaste(this,event,time=-2):
@@ -294,6 +296,13 @@ class Eventlist_withhaste(Eventlist):
             if _list[i] == event :
                 ret = _list.pop(i)
                 event.el = 0
+                event.removeat = this.time
+                #return ret
+                if 0 or this.time>38.598 and this.time<38.59877:
+                    print '-event',event,event.src,this.time
+                    print '-_list',_list
+                    print '-_thislist',this._list
+                    print '-_thishastlist',this._hastelist
                 #print '--rm',this.time,event
                 return ret
         print this.time, ': haste rm 404', event
