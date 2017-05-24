@@ -15,6 +15,9 @@ class brm(brmbase):
     quicksip = 1
     overflowrate = 0
     giftcount = 0
+    fbmastery = 1
+    bsmastery = 1
+    mode = 'gm'
 #    facepalm = 0.4
 
     statisticlist = [
@@ -150,11 +153,11 @@ class brm(brmbase):
 
 
     def gm(this):
-       # this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
-       # this.takemeleeev.dmg = 6000000
-        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 1000000
-        this.armorrate = 0
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
+        this.takemeleeev.dmg = 5000000
+        #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        #this.takemeleeev.dmg = 1000000
+        #this.armorrate = 0
         pass
 
     def krosus(this):
@@ -162,6 +165,25 @@ class brm(brmbase):
         this.takemagev = brm.TakeMagEv(this.el,repeat = 1)
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         pass
+
+    def star(this):
+        this.takemagev = brm.TakeMagEv(this.el,repeat = 1.5)
+        this.takemagev.dmg = 5000000
+        pass
+    ###########
+    # fbbs
+    class FBEv(RepeatEvent):
+        repeat = 15
+        def process(this):
+            this.src.masterystack+=this.src.fbmastery
+            this.src.cast.fb += 1
+
+    class BSEv(RepeatEvent):
+        repeat = 5
+        def process(this):
+            this.src.masterystack+=this.src.bsmastery
+            this.src.cast.bs += 1
+
 
     #########
     # isb
@@ -379,7 +401,7 @@ class brm(brmbase):
         tmpev.time = this.now() + 1.5
         if this.hp < 0 :
             this.dc += 1
-            print '----dead',this.dc
+            #print '----dead',this.dc
             tmpev.amount = this.hpmax/2 - this.hp
         else :
             #tmpev.amount = (this.hpmax - this.hp)/2
@@ -496,16 +518,28 @@ class brm(brmbase):
 
         #this.ap = this.agi * (1+this.mastery) * 1.05
 
-        this.gm()
+        if this.mode == 'gm':
+            this.gm()
+        elif this.mode == 'star':
+            this.star()
 
         this.staggerev = brm.StaggerEv(this.el)
         this.staggerev.threashold = this.hpmax * 0.5
         this.staggerev.threashold2 = this.hpmax * 0.35
 
 
+       # this.bsmastery = 0
+       # this.fbmastery = 0
+        if this.bsmastery != 0:
+            this.bsev = brm.BSEv(this.el,withhaste=1)
+        if this.fbmastery != 0 :
+            if 'chest' in this.equip:
+                this.fbev = brm.FBEv(this.el ,repeat = 8,withhaste=1)
+            else :
+                this.fbev = brm.FBEv(this.el ,repeat = 15)
         #cd
         this.ks = brm.Kegcd(this,8,1)
-        this.tp = brm.Palmcd(this,5,1)
+        this.tp = brm.Palmcd(this,4,1)
         this.bob = brm.Bobcd(this)
         this.stackbrew = brm.Brewstack(this,21,1)
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
@@ -558,31 +592,80 @@ class brm(brmbase):
         print '----------------------------'
         print ' ehr ->| %.4f%% |<- reduced'%(avoidance*100)
         print '----------------------------'
-        print 'melee'
-        print '\ttotaltank',this.totaltank.takemelee
-        if this.mastery != 0 :
+
+        print 'melee>_'
+        print 'totaltank>_',this.totaltank
+        for i in this.totaltank.srcs :
+            print '\t',i,this.totaltank.srcs[i]
+        if this.mastery != 0 and this.totaltank.takemelee.count != 0:
             print "\tdodge %.2f%%"%(float(this.dodge.takemelee.count)*100/this.totaltank.takemelee.count)
-        print 'dmgtaken b4st',this.dtb4st
-        print 'stagger in>_'
+        print '\ndmgtaken b4st>_',this.dtb4st
+        for i in this.dtb4st.srcs :
+            print '\t',i,this.dtb4st.srcs[i]
+        print '\nstagger in>_'
         for i in this.stin.srcs :
             print '\t',i,this.stin.srcs[i]
-        print 'stagger out>_'
+        print '\nstagger out>_'
         for i in this.stout.srcs :
             print '\t',i,this.stout.srcs[i],'(%.2f%%)'%(this.stout.srcs[i].value/this.stout.value*100)
-        print 'heal>_'
+        print '\nheal>_',this.heal,' | overheal',this.overheal,'(%.2f%%)'%(100*this.overheal.value/(this.heal.value+this.overheal.value))
+        cele = []
+        celesum = 0
+        gift = []
+        giftsum = 0
         for i in this.heal.srcs :
+            if 'cele_' in i:
+                cele.append(this.heal.srcs[i])
+                celesum += this.heal.srcs[i].value
+                continue
+            if 'gift_' in i :
+                gift.append(this.heal.srcs[i])
+                giftsum += this.heal.srcs[i].value
+                continue
             print '\t',i,this.heal.srcs[i],'(%.2f%%) | %d hit'%(this.heal.srcs[i].value/this.heal.value*100,this.heal.srcs[i].count),
             if i in this.overheal.srcs :
                 print ' | overheal %s(%.2f%%)'%(this.overheal.srcs[i],100*this.overheal.srcs[i].value/(this.overheal.srcs[i].value+this.heal.srcs[i].value))
+        if celesum > 1000000:
+            celesumstr = '%.2f'%(celesum/1000000) + 'm'
+        elif celesum > 10000:
+            celesumstr = '%.2f'%(celesum/10000) + 'w'
+        else :
+            celesumstr = '%.2f'%celesum
+        if giftsum > 1000000:
+            giftsumstr = '%.2f'%(giftsum/1000000) + 'm'
+        elif giftsum > 10000:
+            giftsumstr = '%.2f'%(giftsum/10000) + 'w'
+        else :
+            giftsumstr = '%.2f'%giftsum
+        if cele != []:
+            print '\tcele',celesumstr,'(%.2f%%)'%(celesum/this.heal.value*100)
+            for i in cele:
+                o = this.overheal.srcs[i.getsname()].value
+                h = i.value
+                ohpercent = o / (o + h)
+                print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
+        if gift != []:
+            print '\tgift',giftsumstr,'(%.2f%%)'%(giftsum/this.heal.value*100)
+            for i in gift:
+                o = this.overheal.srcs[i.getsname()].value
+                h = i.value
+                ohpercent = o / (o + h)
+                print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
 
 
-        print 'cast>_'
+        print '\ncast>_'
         for i in this.cast.srcs :
+            if i in ['isb','pb','bob']:
+                continue
             print '\t',i,this.cast.srcs[i].count
-        print 'staggerlevel>_'
+        print '\tbrew',this.cast.isb.count+this.cast.pb.count,'+',this.cast.bob.count
+        print '\t\tpb',this.cast.pb.count
+        print '\t\tisb',this.cast.isb.count
+        print '\t\tbob',this.cast.bob.count
+        print '\nstaggerlevel>_'
         for i in this.stlevel.srcs :
             print '\t',i,'%.2f%%'%(this.stlevel.srcs[i].value/this.stlevel.value*100)
-        print 'brewstachetime>_'
+        print '\nbrewstachetime>_'
         for i in this.brewstachetime.srcs :
             print '\t',i,'%.2f%%'%(this.brewstachetime.srcs[i].value/this.simctime*100)
 
@@ -592,6 +675,7 @@ class brm(brmbase):
 
 def main():
     c = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t19','ring','waist'])
+    c.mode = 'gm'
     c.run(100000)
     c.showavoid()
     return

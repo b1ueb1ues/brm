@@ -33,6 +33,8 @@ class statisunit(object):
         
     def getp(this):
         return this.__parent
+    def getsname(this):
+        return this.__src
 
 
 
@@ -81,9 +83,9 @@ class statistic(object):
 
     def __str__(this):
         if this.value > 1000000 :
-            return str(this.value/1000000)+'m'
+            return '%.2f'%(this.value/1000000)+'m'
         elif this.value > 10000 :
-            return str(this.value/10000)+'w'
+            return '%.2f'%(this.value/10000)+'w'
         else:
             return str(this.value)
         tmp = 'statis unit="%s"'%this.unitname
