@@ -14,6 +14,8 @@ class brm(brmbase):
 
     quicksip = 1
     overflowrate = 0
+    giftcount = 0
+#    facepalm = 0.4
 
     statisticlist = [
         'totaltank',
@@ -35,6 +37,11 @@ class brm(brmbase):
         repeat = 0.5
         def process(this):
             this.src.takestdmg()
+            if this.src.hp < this.threashold :
+                this.src.paladin()
+            if this.src.hp < this.threashold2 :
+                this.src.gift(src='od')
+            #print this.src.gethaste()
             #print this.src.st
 
     class TakePhyEv(RepeatEvent):
@@ -54,6 +61,45 @@ class brm(brmbase):
         dmg = 1000000
         def process(this):
             this.src.takemelee(this.dmg)
+
+    def obtaingift(this,dmg):
+        this.giftcount += dmg
+        if this.giftcount > this.hpmax:
+            this.gift()
+            this.giftcount = 0
+
+    def takephydmg(this,dmg=4000000):
+        this.totaltank.takephydmg += dmg
+        dmg -= dmg * this.armorrate
+        
+        if this.ironskin == 1 :
+            rate = this.irate
+        else :
+            rate = this.srate
+
+        this.dtb4st.takephydmg += dmg
+        this.obtaingift(dmg)
+        this.stin.takephydmg += rate * dmg
+        this.facetaken.takephydmg += dmg * (1-rate)
+        this.hp -= dmg * (1-rate)
+
+        this.st += rate * dmg
+        this.sttick = this.st * this.stdmgrate
+
+    def takemagicdmg(this,dmg=400000):
+        if this.ironskin == 1 :
+            rate = this.irate * 0.7
+        else :
+            rate = this.srate * 0.7
+        this.totaltank.takemagicdmg += dmg
+        this.dtb4st.takmagicdmg += dmg
+        this.obtaingift(dmg)
+        this.stin.takmagicdmg += dmg * rate
+        this.facetaken.takmagicdmg += dmg * (1-rate)
+        this.hp -= dmg * (1-rate)
+
+        this.st += rate * dmg
+        this.sttick = this.st * this.stdmgrate
 
     def takemelee(this,dmg=2000000):
         this.totaltank.takemelee += dmg
@@ -76,18 +122,39 @@ class brm(brmbase):
             rate = this.srate
 
         this.dtb4st.takemelee += dmg
+        this.obtaingift(dmg)
         this.stin.takemelee += dmg * rate
         this.facetaken.takemelee += dmg * (1-rate)
-
+        this.hp -= dmg * (1-rate)
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
         this.masterystack += 1
    #}takemelee
 
+    def basepury(this,rate=-2,src='pb'):
+        if rate == -2 :
+            prate = this.prate
+        else :
+            prate = rate
+
+        a = this.stout.gets(src) 
+        a += this.st * prate
+        #print this.el.time,this.st,this.st * this.prate
+        if rate == -2 and this.phrate != 0 :
+            #print this.phrate
+            #this.heal.waist += this.phrate * this.st 
+            this.getheal(amount=this.phrate*this.st,src='waist')
+        this.st -= this.st * prate
+        this.sttick -= this.sttick * prate
+
+
     def gm(this):
+       # this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
+       # this.takemeleeev.dmg = 6000000
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 4000000
+        this.takemeleeev.dmg = 1000000
+        this.armorrate = 0
         pass
 
     def krosus(this):
@@ -105,7 +172,7 @@ class brm(brmbase):
             this.isb.cast()
             this.pury(rate=0.05,src='quicksip')
             if 't20' in this.equip:
-                this.gift()
+                this.gift(src='t20')
 
             #print '-isbcast----',this.el.time
             this.brewstachebuff.cast()
@@ -249,14 +316,13 @@ class brm(brmbase):
         cooldown = 90
         def endprocess(this,time):
             this.src.cast.bob += 1
-            brm = this.src
-            stack,stackmax = brm.stackbrew.stack()
+            bm = this.src
+            stack,stackmax = bm.stackbrew.stack()
             for i in range(stack):
-                brm.castisb()
-            brm.stackbrew.setstack(brm.brewstackmax-1,brm.brewstackmax)
-            brm.stackbrew.reduce(21)
+                bm.castisb()
+            bm.stackbrew.setstack(bm.brewstackmax,bm.brewstackmax)
             this.cast()
-            #print '--next bob at',this.time()
+            ##print '--next bob at',this.time()
 
 
     class Brewstack(stack):
@@ -297,7 +363,30 @@ class brm(brmbase):
             #print 'cast isb(brewmax) at',this.now()
             this.src.castisb()
 
-    def gift(this):
+    class PaladinEv(RepeatEvent):
+        repeat = 8
+        def process(this):
+            if this.src.hp < this.src.hpmax/2 :
+                this.src.paladin()
+
+    dc = 0
+    def paladin(this):
+        amount = 0
+        class healev(Event):
+            def process(this):
+                this.src.getheal(this.amount)
+        tmpev = healev()
+        tmpev.time = this.now() + 1.5
+        if this.hp < 0 :
+            this.dc += 1
+            print '----dead',this.dc
+            tmpev.amount = this.hpmax/2 - this.hp
+        else :
+            #tmpev.amount = (this.hpmax - this.hp)/2
+            tmpev.amount = 1000000
+        tmpev.addto(this.el)
+
+    def odgift(this):
         r = random.random()
         h = 0
         celeh = 0
@@ -309,7 +398,21 @@ class brm(brmbase):
         if r < this.crit :
             h += h
         r = random.random()
-        this.getheal(h,'gift')
+        this.getheal(h,'gift_od')
+
+    def gift(this,src='origin'):
+        r = random.random()
+        h = 0
+        celeh = 0
+        if r < this.overflowrate :
+            h = this.ap * 7.5
+        else:
+            h = this.ap * 15
+        r = random.random()
+        if r < this.crit :
+            h += h
+        r = random.random()
+        this.getheal(h,'gift_'+src)
 
 
     def getheal(this,amount,src='ext'):
@@ -344,9 +447,6 @@ class brm(brmbase):
 
 
 
-
-
-
     def pury(this,rate=-2,src='pb'):
         if rate == -2 :
             #print '-pbcast----',this.el.time
@@ -356,7 +456,7 @@ class brm(brmbase):
                 bm.edbuff.cast()
             if this.quicksip != 0:
                 this.isb.delay(1)
-        brmbase.pury(this,rate,src)
+        this.basepury(rate,src)
 
     
     laststleveltime = 0
@@ -394,37 +494,35 @@ class brm(brmbase):
         super(brm,this).init()
         this.init = 0
 
-        this.staggerev = brm.StaggerEv(this.el)
-
-        #this.ch = brm.changehaste(this.el)
-
-        this.ap = this.agi * (1+this.mastery) * 1.05
-        
-        this.isbduration = 9
-        this.isb = brm.ISBbuff(this,duration=this.isbduration)
-
-        #this.ironev = brm.IronEv(this.el)
+        #this.ap = this.agi * (1+this.mastery) * 1.05
 
         this.gm()
 
+        this.staggerev = brm.StaggerEv(this.el)
+        this.staggerev.threashold = this.hpmax * 0.5
+        this.staggerev.threashold2 = this.hpmax * 0.35
 
+
+        #cd
         this.ks = brm.Kegcd(this,8,1)
         this.tp = brm.Palmcd(this,5,1)
         this.bob = brm.Bobcd(this)
         this.stackbrew = brm.Brewstack(this,21,1)
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
+        #buff
         this.brewstachebuff = brm.Brewstachebuff(this)
+        this.isbduration = 9
+        this.isb = brm.ISBbuff(this,duration=this.isbduration)
+        this.edbuff = brm.Edbuff(this)
+        if 'ed' in this.talent:
+            this.ed = 1
 
         this.castisb()
         this.ks.cast()
         this.tp.cast()
         this.bob.cast()
 
-
-        this.edbuff = brm.Edbuff(this)
-        if 'ed' in this.talent:
-            this.ed = 1
-
+        #this.paladinev = brm.PaladinEv(this.el)
 
         this.init = 1
 
@@ -438,16 +536,62 @@ class brm(brmbase):
         return "%.5f\t"%(brmbase.getavoid(this))
 
 
+   # def showavoid(this):
+   #     print '\n################'
+   #     print '## showunit test'
+   #     this.totaltank.showunit()
+   #     print this.totaltank.getv()
+
+    def getehr(this):
+        return this.heal.ext.value
+
+    def getehrr(this):
+        ehr = this.getehr()
+        return 1 - ehr / this.totaltank.value
+
     def showavoid(this):
-        print '\n################'
-        print '## showunit test'
-        this.totaltank.showunit()
-        print this.totaltank.getv()
+        print 'stat\t',this.stat
+        print 'talent\t',this.talent
+        print 'equip\t',this.equip
+#
+        avoidance = this.getehrr()
+        print '----------------------------'
+        print ' ehr ->| %.4f%% |<- reduced'%(avoidance*100)
+        print '----------------------------'
+        print 'melee'
+        print '\ttotaltank',this.totaltank.takemelee
+        if this.mastery != 0 :
+            print "\tdodge %.2f%%"%(float(this.dodge.takemelee.count)*100/this.totaltank.takemelee.count)
+        print 'dmgtaken b4st',this.dtb4st
+        print 'stagger in>_'
+        for i in this.stin.srcs :
+            print '\t',i,this.stin.srcs[i]
+        print 'stagger out>_'
+        for i in this.stout.srcs :
+            print '\t',i,this.stout.srcs[i],'(%.2f%%)'%(this.stout.srcs[i].value/this.stout.value*100)
+        print 'heal>_'
+        for i in this.heal.srcs :
+            print '\t',i,this.heal.srcs[i],'(%.2f%%) | %d hit'%(this.heal.srcs[i].value/this.heal.value*100,this.heal.srcs[i].count),
+            if i in this.overheal.srcs :
+                print ' | overheal %s(%.2f%%)'%(this.overheal.srcs[i],100*this.overheal.srcs[i].value/(this.overheal.srcs[i].value+this.heal.srcs[i].value))
+
+
+        print 'cast>_'
+        for i in this.cast.srcs :
+            print '\t',i,this.cast.srcs[i].count
+        print 'staggerlevel>_'
+        for i in this.stlevel.srcs :
+            print '\t',i,'%.2f%%'%(this.stlevel.srcs[i].value/this.stlevel.value*100)
+        print 'brewstachetime>_'
+        for i in this.brewstachetime.srcs :
+            print '\t',i,'%.2f%%'%(this.brewstachetime.srcs[i].value/this.simctime*100)
+
+        return avoidance
 
 
 
 def main():
-    c = brm(stat=[25,25,0,30],talent=['ht'],equip=['t20','4t','ring'])
+    c = brm(stat=[25,30,0,20],talent=['ht'],equip=['4t19','ring','waist'])
     c.run(100000)
     c.showavoid()
     return

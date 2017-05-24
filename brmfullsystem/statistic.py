@@ -1,10 +1,10 @@
 
 class statisunit(object):
-    __value = 0
+    value = 0
     __unitname = 'nil'
     __src = 'null'
     __parent = 0
-    __count = 0
+    count = 0
 
     def __init__(this,p,src = 'null'):
         this.__parent = p
@@ -12,21 +12,24 @@ class statisunit(object):
         this.__src = src
 
     def __iadd__(this,other):
-        this.__value += other
-        this.__count += 1
+        this.value += other
+        this.count += 1
         this.__parent.value += other
         this.__parent.count += 1
         this.__parent.getv()[this.__unitname] += other
         return this
 
     def __str__(this):
-        return str(this.__value)
+        if this.value > 1000000 :
+            return '%.2f'%(this.value/1000000)+'m'
+        elif this.value > 10000 :
+            return '%.2f'%(this.value/10000)+'w'
+        else:
+            return str(this.value)
     def __impr__(this):
-        return str(this.__value)
+        return str(this.value)
     def getc(this):
-        return this.__count
-    def value(this):
-        return this.__value
+        return this.count
         
     def getp(this):
         return this.__parent
@@ -77,6 +80,12 @@ class statistic(object):
         return super(statistic,this).__getattribute__(name)
 
     def __str__(this):
+        if this.value > 1000000 :
+            return str(this.value/1000000)+'m'
+        elif this.value > 10000 :
+            return str(this.value/10000)+'w'
+        else:
+            return str(this.value)
         tmp = 'statis unit="%s"'%this.unitname
         return tmp
 

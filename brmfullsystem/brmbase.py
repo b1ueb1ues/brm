@@ -130,6 +130,7 @@ class brmbase(object):
         this.dtb4st.takephydmg += dmg
         this.stin.takephydmg += rate * dmg
         this.facetaken.takephydmg += dmg * (1-rate)
+        this.hp -= dmg * (1-rate)
 
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
@@ -146,6 +147,7 @@ class brmbase(object):
         this.dtb4st.takmagicdmg += dmg
         this.stin.takmagicdmg += dmg * rate
         this.facetaken.takmagicdmg += dmg * (1-rate)
+        this.hp -= dmg * (1-rate)
 
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
@@ -178,6 +180,7 @@ class brmbase(object):
     def takestdmg(this):
         if this.st <= 0 :
             return
+        this.hp -= this.sttick
         this.stout.takestdmg += this.sttick
         this.st -= this.sttick
 
@@ -190,8 +193,8 @@ class brmbase(object):
         a = this.stout.gets(src) 
         a += this.st * prate
         #print this.el.time,this.st,this.st * this.prate
-        if rate == -1 and this.phrate != 0 :
-            this.heal.pb += this.phrate * this.st 
+        if rate == -2 and this.phrate != 0 :
+            this.heal.waist += this.phrate * this.st 
             r = random.random()
             if r < this.crit :
                 this.heal.cele_waist += this.phrate * this.st * 0.65 
@@ -265,7 +268,7 @@ class brmbase(object):
     def run(this, time=9999):
         #this.refresh()
         this.init()
-        this.timeran = time
+        this.simctime = time
         this.el.run(time)
 
     def statsync(this):
@@ -291,6 +294,8 @@ class brmbase(object):
         this.haste = float (this.haste) / 100 + 1
         this.vers = float (this.vers) / 100
         this.mastery = float (this.mastery) / 100
+
+        this.ap = this.agi * (1+this.mastery) * 1.05
 
 
     def gethaste(this):

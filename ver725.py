@@ -14,13 +14,16 @@ def main():
     pool = []
 
     pool.append(brm(\
-        stat=[30,30,0,20],equip=['4t'],talent=['black','ht10'] ,melee=0,magic=1  \
+        stat=[25,30,0,20],equip=['4t','ring','waist'],talent=['black','ht15'], bsfbmastery =0,iduration=9 \
         ))
 
     pool.append(brm(\
-        stat=[30,20,0,20],equip=['4t'],talent=['black','ht10'],melee=0,magic=1   \
+        stat=[30,25,0,20],equip=['4t','ring','waist'],talent=['black','ht15'] \
         ))
 
+    pool[0].run(100000)
+    pool[0].showavoid()
+    return
     #test2haste(pool)
     #testhaste(pool)
     test2(pool)

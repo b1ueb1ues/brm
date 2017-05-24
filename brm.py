@@ -414,7 +414,7 @@ class brm(brmbase):
         if 'ed20' in this.talent :
             this.ed20 = 1
         
-        this.bsfbmastery = 1
+        this.bsfbmastery = 0
         if this.bsfbmastery != 0 :
             if 'chest' in this.equip:
                 this.fbev = brm.FBEv(this.el ,repeat = 6.0/this.haste)
