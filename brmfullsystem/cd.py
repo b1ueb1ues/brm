@@ -12,6 +12,10 @@ class cd(object):
 
 
     class CdEv(Event):
+        def __str__(this):
+            return object.__str__(this)
+        def __repr__(this):
+            return object.__repr__(this) + str(this.src)
         def process(this):
             this.src._enable=1
             if this.src._cdev == 0 :
@@ -112,6 +116,11 @@ class stack(object):
             this.src.stackprocess(this.time)
 
     class CdEv(RepeatEvent):
+        def __str__(this):
+            return object.__str__(this)
+        def __repr__(this):
+            return object.__repr__(this)
+
         def process(this):
             this.src._stack += 1
             if this.src._stack > this.src._stackmax:
@@ -167,6 +176,11 @@ class stack(object):
     def setstack(this,stack,stackmax):
         this._stack = stack
         this._stackmax = stackmax
+        return
+        if stack >= stackmax:
+            if this._cdev != 0 :
+                this._cdev.rm()
+                this._cdev = 0
 
 
     def startprocess(this,time):
@@ -180,7 +194,12 @@ class stack(object):
         if this._stack >= this._stackmax :
             this._stack -= 1
             if this._cdev != 0 :
-                return
+                this._cdev.rm()
+            #    print this._cdev.time,
+                this._cdev = 0
+                #return
+            #    this._cdev.rm()
+            #    return
             this._cdev = stack.CdEv()
             this._cdev.src = this
             this._cdev.withhaste = this.withhaste
@@ -191,6 +210,8 @@ class stack(object):
             this._cdev.repeat = this.cooldown
             this._cdev.addto(this.el)
             this.startprocess(this.el.time)
+
+            #print '---',this._cdev.time
 
             return 1
         elif this._stack >= 1 :

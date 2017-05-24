@@ -18,6 +18,7 @@ class brm(brmbase):
     fbmastery = 1
     bsmastery = 1
     mode = 'gm'
+    ver = 'ptr'
 #    facepalm = 0.4
 
     statisticlist = [
@@ -193,8 +194,8 @@ class brm(brmbase):
         if ret != 0:
             this.isb.cast()
             this.pury(rate=0.05,src='quicksip')
-            if 't20' in this.equip:
-                this.gift(src='t20')
+            if '2t20' in this.equip or '4t20' in this.equip:
+                this.gift(src='2t20')
 
             #print '-isbcast----',this.el.time
             this.brewstachebuff.cast()
@@ -343,9 +344,17 @@ class brm(brmbase):
             for i in range(stack):
                 bm.castisb()
             bm.stackbrew.setstack(bm.brewstackmax,bm.brewstackmax)
+            #this.reduce(21)
             this.cast()
             ##print '--next bob at',this.time()
 
+
+    def castpb(this):
+        this.cast.pb += 1
+        this.pury()
+        this.stackbrew.cast()
+        if '2t20' in this.equip or '4t20' in this.equip :
+            this.gift(src='2t20')
 
     class Brewstack(stack):
         _stack = 3
@@ -354,9 +363,10 @@ class brm(brmbase):
             super(brm.Brewstack,this).reduce(offset)
             if this._stack >= this._stackmax - 1 :
                 if this.last() < this.src.kscdr + 6 :
-                    this.src.pury()
-                    this.src.cast.pb += 1
-                    this.cast()
+                    this.src.castpb()
+#                    this.src.pury()
+#                    this.src.cast.pb += 1
+#                    this.cast()
 
 
         def stackprocess(this,time):
@@ -408,19 +418,6 @@ class brm(brmbase):
             tmpev.amount = 1000000
         tmpev.addto(this.el)
 
-    def odgift(this):
-        r = random.random()
-        h = 0
-        celeh = 0
-        if r < this.overflowrate :
-            h = this.ap * 7.5
-        else:
-            h = this.ap * 15
-        r = random.random()
-        if r < this.crit :
-            h += h
-        r = random.random()
-        this.getheal(h,'gift_od')
 
     def gift(this,src='origin'):
         r = random.random()
@@ -435,6 +432,8 @@ class brm(brmbase):
             h += h
         r = random.random()
         this.getheal(h,'gift_'+src)
+        if '4t20' in this.equip:
+            this.pury(rate=0.05,src='4t20')
 
 
     def getheal(this,amount,src='ext'):
@@ -530,13 +529,14 @@ class brm(brmbase):
 
        # this.bsmastery = 0
        # this.fbmastery = 0
-        if this.bsmastery != 0:
-            this.bsev = brm.BSEv(this.el,withhaste=1)
-        if this.fbmastery != 0 :
-            if 'chest' in this.equip:
-                this.fbev = brm.FBEv(this.el ,repeat = 8,withhaste=1)
-            else :
-                this.fbev = brm.FBEv(this.el ,repeat = 15)
+        if this.ver == 'ptr':
+            if this.bsmastery != 0:
+                this.bsev = brm.BSEv(this.el,withhaste=1)
+            if this.fbmastery != 0 :
+                if 'chest' in this.equip:
+                    this.fbev = brm.FBEv(this.el ,repeat = 8,withhaste=1)
+                else :
+                    this.fbev = brm.FBEv(this.el ,repeat = 15)
         #cd
         this.ks = brm.Kegcd(this,8,1)
         this.tp = brm.Palmcd(this,4,1)

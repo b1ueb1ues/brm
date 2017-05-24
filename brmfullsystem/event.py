@@ -54,7 +54,13 @@ class RepeatEvent(Event):
         if this.repeat <= 0 :
             return
         if this.withhaste != 0:
-            this.time += this.repeat / this.el._oldhaste
+            try:
+                this.time += this.repeat / this.el._oldhaste
+            except Exception,e:
+                print this, this.time, this.el, this.src.src.el
+                print this.withhaste
+                print e
+                exit()
         else:
             this.time += this.repeat
         this.el.add(this)
@@ -275,6 +281,7 @@ class Eventlist_withhaste(Eventlist):
             if _list[i] == event :
                 ret = _list.pop(i)
                 event.el = 0
+                #print '--rm',this.time,event
                 return ret
         print this.time, ': haste rm 404', event
         print this
