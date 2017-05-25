@@ -344,11 +344,11 @@ class brmbase(object):
                 this.haste *= 1.15
                 '''
             elif t == 'ed' or t == 'ed13' or t == 'ed20':
-                this.prate += 0.15
+                this.prate += 0.20
                 if t != 'ed':
                     this.talent.append('ed')
             elif t == 'ednobuff' :
-                this.prate += 0.15
+                this.prate += 0.20
             elif t == 'bc':
                 this.kscdr = 6
             elif t == 'light':

@@ -532,6 +532,8 @@ class brm(brmbase):
             this.gm()
         elif this.mode == 'star':
             this.star()
+        elif this.mode == 'gd':
+            this.gd()
 
         this.staggerev = brm.StaggerEv(this.el)
         this.staggerev.threashold = this.hpmax * 0.5
