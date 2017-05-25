@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #if __name__ == '__main__' and __package__ is None:
 if __package__ is None:
     from os import sys, path
@@ -13,15 +14,21 @@ def main():
 
     pool = []
 
+    pool.append(brm(\
+        stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='gm' \
+        ))
+    pool.append(brm(\
+        stat=[20,30,0,25],equip=['2t20','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='gm' \
+        ))
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='live',prate=0.5,mode='star' \
    #     ))
-    pool.append(brm(\
-        stat=[20,30,0,25],equip=['2t19','4t20','ring'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='gm' \
-        ))
-    pool.append(brm(\
-        stat=[20,30,0,25],equip=['2t19','4t20','ring','chest'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='gm' \
-        ))
+   # pool.append(brm(\
+   #     stat=[20,30,0,25],equip=['4t19','ring'],talent=['black','ht'],ver='ptr' ,prate=0.5,mode='gm' \
+   #     ))
+   # pool.append(brm(\
+   #     stat=[20,30,0,25],equip=['4t19','ring','chest'],talent=['black','ht'],ver='ptr' ,prate=0.5,mode='gm' \
+   #     ))
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='live',prate=0.5 \
    #     ))

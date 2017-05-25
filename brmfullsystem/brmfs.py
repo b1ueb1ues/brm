@@ -155,7 +155,7 @@ class brm(brmbase):
 
     def gm(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
-        this.takemeleeev.dmg = 5000000
+        this.takemeleeev.dmg = 6000000
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         #this.takemeleeev.dmg = 1000000
         #this.armorrate = 0
@@ -168,8 +168,8 @@ class brm(brmbase):
         pass
 
     def star(this):
-        this.takemagev = brm.TakeMagEv(this.el,repeat = 1.5)
-        this.takemagev.dmg = 5000000
+        this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
+        this.takemagev.dmg = 3000000
         pass
     ###########
     # fbbs
