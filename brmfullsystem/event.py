@@ -118,7 +118,7 @@ class Eventlist(object):
         for i in range(len(this._list)) :
             if this._list[i] == event :
                 ret = this._list.pop(i)
-                event.el = 0
+                #event.el = 0
                 return ret
         print this.time, ': rm 404', event
         print this
@@ -295,10 +295,10 @@ class Eventlist_withhaste(Eventlist):
         for i in range(len(_list)) :
             if _list[i] == event :
                 ret = _list.pop(i)
-                event.el = 0
+                #event.el = 0
                 event.removeat = this.time
                 #return ret
-                if 0 or this.time>38.598 and this.time<38.59877:
+                if 0 :
                     print '-event',event,event.src,this.time
                     print '-_list',_list
                     print '-_thislist',this._list

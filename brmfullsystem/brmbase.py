@@ -322,6 +322,7 @@ class brmbase(object):
         if this.initialized != 0 :
            print 'dirty brmbase'
            exit()
+        random.seed(1)
         this.setup()
         this.statsync()
         this.addstatistic()
@@ -333,6 +334,8 @@ class brmbase(object):
 		this.ht = 1
                 this.srate += 0.10
                 this.irate += 0.10
+                if t != 'ht':
+                    this.talent.append('ht')
                 '''
                 this.haste *= 1.1
             elif t == 'ht15':
@@ -342,6 +345,8 @@ class brmbase(object):
                 '''
             elif t == 'ed' or t == 'ed13' or t == 'ed20':
                 this.prate += 0.15
+                if t != 'ed':
+                    this.talent.append('ed')
             elif t == 'ednobuff' :
                 this.prate += 0.15
             elif t == 'bc':
@@ -375,8 +380,8 @@ class brmbase(object):
         
     def __init__(this,**argv):
         this.initargv = argv
+        #random.seed(1)
 
-        random.seed(1)
 
         this.el = Eventlist_withhaste(debug =0)
         this.el.src = this

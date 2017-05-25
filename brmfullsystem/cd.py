@@ -177,6 +177,7 @@ class Stack(object):
 
     def stack(this):
         return (this._stack,this._stackmax)
+
     def setstack(this,stack,stackmax):
         this._stack = stack
         this._stackmax = stackmax
@@ -185,6 +186,21 @@ class Stack(object):
                 this._cdev.rm()
                 this._cdev = 0
 
+    def full(this):
+        this._stack = this._stackmax
+
+        tmpev = Stack.Stackcallbackev()
+        tmpev.src = this
+        tmpev.time = this.el.time
+        tmpev.addto(this.el)
+
+        tmpev = Stack.Endcallbackev()
+        tmpev.src = this
+        tmpev.time = this.el.time
+        tmpev.addto(this.el)
+
+        this._cdev.rm()
+        this._cdev = 0
 
     def startprocess(this,time):
         pass
@@ -200,8 +216,10 @@ class Stack(object):
                 exit()
             this._stack -= 1
 
+            this.test = 1
+
             if this._cdev != 0 :
-                this.test = 0
+                this.test = 1
                 if this.test == 1:
                     print '------'
                     print this.src.el._hastelist

@@ -343,7 +343,8 @@ class brm(brmbase):
             stack,stackmax = bm.stackbrew.stack()
             for i in range(stack):
                 bm.castisb()
-            bm.stackbrew.setstack(bm.brewstackmax,bm.brewstackmax)
+            #bm.stackbrew.setstack(bm.brewstackmax,bm.brewstackmax)
+            bm.stackbrew.full()
             #this.reduce(21)
             this.cast()
             ##print '--next bob at',this.time()
