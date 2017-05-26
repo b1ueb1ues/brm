@@ -443,14 +443,15 @@ class brm(brmbase):
 
 
     def gift(this,src='origin'):
-        r = random.random()
         h = 0
         celeh = 0
+        r = random.random()
         if r < this.overflowrate :
             h = this.ap * 15
         else:
             h = this.ap * 7.5
         h += h * this.vers
+
         r = random.random()
         if r < this.crit :
             h += h
@@ -536,7 +537,7 @@ class brm(brmbase):
 
     def init(this):
         super(brm,this).init()
-        this.init = 0
+        this.initialized = 0
 
         #this.ap = this.agi * (1+this.mastery) * 1.05
 
@@ -582,7 +583,7 @@ class brm(brmbase):
 
         #this.paladinev = brm.PaladinEv(this.el)
 
-        this.init = 1
+        this.initialized = 1
 
     def __init__(this,**argv):
         super(brm,this).__init__(**argv)
@@ -606,6 +607,9 @@ class brm(brmbase):
     def getehrr(this):
         ehr = this.getehr()
         return 1 - ehr / this.totaltank.value
+
+    def show(this):
+        print this.initargv
 
     def showavoid(this):
         print 'stat\t',this.stat

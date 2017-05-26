@@ -1,10 +1,10 @@
-#!/usr/bin/python
 #if __name__ == '__main__' and __package__ is None:
 if __package__ is None:
     from os import sys, path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from brmfs import *
+import copy
 
 def main():
 
@@ -12,57 +12,17 @@ def main():
     confdefault = config(stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0)
     '''
 
-   # pool = []
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['2t20','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
-   #     ))
-   # pool.append(brm(\
-   #     stat=[20,30,10,25],equip=['2t20','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
-   #     ))
-   # test2(pool)
-   # return
-
     pool = []
-    pool.append(brm(\
-        stat=[25,25,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
-        ))
-    pool.append(brm(\
-        stat=[25,25,5,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
-        ))
-    test2(pool)
 
-    pool = []
-    pool.append(brm(\
-        stat=[25,25,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \
+    pool.append(brm( \
+        equip=['4t'],talent=['black','ed20']   \
         ))
-    pool.append(brm(\
-        stat=[25,25,5,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \
-        ))
-    test2(pool)
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='live',prate=0.5,mode='star' \
-   #     ))
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['4t19','ring'],talent=['black','ht'],ver='ptr' ,prate=0.5,mode='gm' \
-   #     ))
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['4t19','ring','chest'],talent=['black','ht'],ver='ptr' ,prate=0.5,mode='gm' \
-   #     ))
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='live',prate=0.5 \
-   #     ))
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['4t20','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44 \
-   #     ))
 
-
-   # pool[0].run(100000)
-   # pool[0].showavoid()
-   # return
     #test2haste(pool)
     #testhaste(pool)
+    teststat(pool,statindex=1)
 
-def test2haste(pool, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
+def test2haste(pool, time = 100000, start = 10, stop = 40, offset = 0.02):
     if len(pool) != 2:
         print ' pool != 2 '
         exit()
@@ -81,8 +41,8 @@ def test2haste(pool, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
         av = []
         pool[0].haste = i
         pool[1].haste = i
-        a = brm(conf = pool[0])
-        b = brm(conf = pool[1])
+        a = pool[0]
+        b = pool[1]
         a.run(time)
         b.run(time)
         ar = float(a.getehrr())
@@ -93,7 +53,7 @@ def test2haste(pool, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
             flag = 2
             d = 1.0-(1.0-br)/(1.0-ar)
 
-        hasteprint = (100*i-100)
+        hasteprint = i
         print "%.0f%%"%hasteprint,
         print '\t%.4f\t%.4f\t%.4f'%(float(ar),float(br),float(d))
 
@@ -116,40 +76,62 @@ def test2(pool, time = 100000):
         d = 1-(1-br)/(1-ar)
     print '\n>\ndiff:',d,'%d good'%flag
 
-def testn(line, time = 100000):
+def testn(line, time = 100000,basebrm=0):
 
-    col = 1
-    for l in line:
-        print '%d: '%col,
-        col += 1
-        #l.show()
+    if basebrm != 0:
+        print 'base:',
+        basebrm.show()
 
-    print '\n>'
-    for j in range(len(line)):
-        print '%d\t'%(j+1),
-    print ''
-
-    av = []
-    for c in line :
-        b = c
-        b.run(time)
-        av.append(b.getehrr())
-        #print av
-
-    for a in av:
-        print '%.4f\t'%float(a),
-    print ''
-
-def testhaste(line, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
-
-    i = start - offset
     col = 1
     for l in line:
         print '%d: '%col,
         col += 1
         l.show()
 
-    print '\nhaste\t',
+    print '\n>'
+    basebrm.run(time)
+    base = basebrm.getehrr()
+    print 'base:',base
+    for j in range(len(line)):
+            print '%d\t'%(j+1),
+    print ''
+
+    
+    av = []
+    for c in line :
+        b = c 
+        b.run(time)
+        av.append(b.getehrr())
+        #print av
+
+
+    for a in av:
+        print '%.4f\t'%float(a),
+    print ''
+    if basebrm != 0:
+        for a in av:
+            print '%.4f\t'%(1-(1-a)/(1-base)),
+        print ''
+
+def teststat(line, time = 100000, start = 10, stop = 40, offset = 2, statindex=1):
+
+    i = start - offset
+
+    col = 0
+    for l in line:
+        print '%d: '%col,
+        col += 1
+        l.show()
+
+    if statindex == 1:
+        print '\nhaste\t',
+    elif statindex == 0:
+        print '\ncrit\t',
+    elif statindex == 2:
+        print '\nvers\t',
+    elif statindex == 3:
+        print '\nmastery\t',
+
     for j in range(len(line)):
         print '%d\t'%(j+1),
     print ''
@@ -159,13 +141,13 @@ def testhaste(line, time = 100000, start = 1.1, stop = 1.4, offset = 0.02):
             break
         av = []
         for c in line :
-            c.haste = i
-            b = brm(conf=c)
+            c.stat[statindex] = i
+            b = copy.deepcopy(c)
             b.run(time)
             av.append(b.getehrr())
             #print av
 
-        print "%d%%"%(100*(i-1)),
+        print "%d%%"%(i),
         for a in av:
             print '\t%.4f'%float(a),
         print ''
