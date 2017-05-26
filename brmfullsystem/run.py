@@ -12,18 +12,39 @@ def main():
     confdefault = config(stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0)
     '''
 
-    pool = []
+   # pool = []
+   # pool.append(brm(\
+   #     stat=[20,30,0,25],equip=['2t20','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
+   #     ))
+   # pool.append(brm(\
+   #     stat=[20,30,10,25],equip=['2t20','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
+   #     ))
+   # test2(pool)
+   # return
 
+    pool = []
     pool.append(brm(\
-        stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='ptr',isbduration=8 ,prate=0.44,mode='gd' \
+        stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr',isbduration=8 ,prate=0.44,mode='gd' \
         ))
     pool.append(brm(\
-        stat=[20,30,0,25],equip=['4t20','ring','waist'],talent=['black','ht'],ver='ptr',isbduration=9.5 ,prate=0.44,mode='gd' \
-    pool.append(brm(\
-        stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='ptr' ,isbduration=8,prate=0.47,mode='gd' \
+        stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr',isbduration=9.5 ,prate=0.44,mode='gd' \
         ))
     pool.append(brm(\
-        stat=[20,30,0,25],equip=['4t20','ring','waist'],talent=['black','ht'],ver='ptr' ,isbduration=8,overflowrate=0.35,prate=0.44,mode='gd' \
+        stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr' ,isbduration=8,prate=0.47,mode='gd' \
+        ))
+    pool.append(brm(\
+        stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr' ,isbduration=8,overflowrate=0.35,prate=0.44,mode='gd' \
+        ))
+    pool.append(brm(\
+        stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr' ,isbduration=8,prate=0.44,facepalm=0.7,mode='gd' \
+        ))
+    pool.append(brm(\
+        stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr' ,isbduration=8,prate=0.44,hotblooded=0.07,mode='gd' \
+        ))
+    pool.append(brm(\
+        stat=[23,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr',isbduration=8 ,prate=0.44,mode='gd' \
+        ))
+    testn(pool)
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='live',prate=0.5,mode='star' \
    #     ))
@@ -39,7 +60,6 @@ def main():
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t20','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44 \
    #     ))
-    test2(pool)
 
 
    # pool[0].run(100000)

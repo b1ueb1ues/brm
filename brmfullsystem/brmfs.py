@@ -19,7 +19,10 @@ class brm(brmbase):
     bsmastery = 1
     mode = 'gm'
     ver = 'ptr'
-#    facepalm = 0.4
+    deathcount = 0
+    isbduration = 9
+    facepalm = 0.4
+    hotblooded = 0.04
 
     statisticlist = [
         'totaltank',
@@ -76,6 +79,9 @@ class brm(brmbase):
 
     def takephydmg(this,dmg=4000000):
         this.totaltank.takephydmg += dmg
+
+        dmg -= dmg * this.hotblooded
+        dmg -= dmg * this.vers/2
         dmg -= dmg * this.armorrate
         
         if this.ironskin == 1 :
@@ -97,7 +103,12 @@ class brm(brmbase):
             rate = this.irate * 0.7
         else :
             rate = this.srate * 0.7
+
         this.totaltank.takemagicdmg += dmg
+
+        dmg -= dmg * this.hotblooded
+        dmg -= dmg * this.vers/2
+
         this.dtb4st.takmagicdmg += dmg
         this.obtaingift(dmg)
         this.stin.takmagicdmg += dmg * rate
@@ -109,6 +120,9 @@ class brm(brmbase):
 
     def takemelee(this,dmg=2000000):
         this.totaltank.takemelee += dmg
+
+        dmg -= dmg * this.hotblooded
+        dmg -= dmg * this.vers/2
 
         if this.mastery != 0:
             r = random.random()
@@ -164,8 +178,8 @@ class brm(brmbase):
         pass
 
     def gd(this):
-        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1)
-        this.takemeleeev.dmg = 10000000
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        this.takemeleeev.dmg = 15000000
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         #this.takemeleeev.dmg = 1000000
         #this.armorrate = 0
@@ -412,7 +426,6 @@ class brm(brmbase):
             if this.src.hp < this.src.hpmax/2 :
                 this.src.paladin()
 
-    dc = 0
     def paladin(this):
         amount = 0
         class healev(Event):
@@ -421,8 +434,7 @@ class brm(brmbase):
         tmpev = healev()
         tmpev.time = this.now() + 1.5
         if this.hp < 0 :
-            this.dc += 1
-            print '----dead',this.dc
+            this.deathcount += 1
             tmpev.amount = this.hpmax/2 - this.hp
         else :
             #tmpev.amount = (this.hpmax - this.hp)/2
@@ -435,13 +447,13 @@ class brm(brmbase):
         h = 0
         celeh = 0
         if r < this.overflowrate :
-            h = this.ap * 7.5
-        else:
             h = this.ap * 15
+        else:
+            h = this.ap * 7.5
+        h += h * this.vers
         r = random.random()
         if r < this.crit :
             h += h
-        r = random.random()
         this.getheal(h,'gift_'+src)
         if '4t20' in this.equip:
             this.pury(rate=0.05,src='4t20')
@@ -558,7 +570,6 @@ class brm(brmbase):
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
         #buff
         this.brewstachebuff = brm.Brewstachebuff(this)
-        this.isbduration = 9
         this.isb = brm.ISBbuff(this,duration=this.isbduration)
         this.edbuff = brm.Edbuff(this)
         if 'ed' in this.talent:
@@ -681,6 +692,8 @@ class brm(brmbase):
         print '\nbrewstachetime>_'
         for i in this.brewstachetime.srcs :
             print '\t',i,'%.2f%%'%(this.brewstachetime.srcs[i].value/this.simctime*100)
+        if this.deathcount != 0:
+            print 'deathcount>_\n\t',this.deathcount
 
         return avoidance
 
