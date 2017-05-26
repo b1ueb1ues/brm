@@ -13,7 +13,7 @@ debug = 2
 class brm(brmbase):
 
     quicksip = 1
-    overflowrate = 0
+    overflowrate = 0.2
     giftcount = 0
     fbmastery = 1
     bsmastery = 1
@@ -40,11 +40,13 @@ class brm(brmbase):
     class StaggerEv(RepeatEvent):
         repeat = 0.5
         def process(this):
+            hpb4 = this.src.hp
             this.src.takestdmg()
             if this.src.hp < this.threashold :
                 this.src.paladin()
             if this.src.hp < this.threashold2 :
-                this.src.gift(src='od')
+                if hpb4 > this.threashold2:
+                    this.src.gift(src='od')
             #print this.src.gethaste()
             #print this.src.st
 
@@ -155,7 +157,15 @@ class brm(brmbase):
 
     def gm(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
-        this.takemeleeev.dmg = 6000000
+        this.takemeleeev.dmg = 8000000
+        #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        #this.takemeleeev.dmg = 1000000
+        #this.armorrate = 0
+        pass
+
+    def gd(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1)
+        this.takemeleeev.dmg = 10000000
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         #this.takemeleeev.dmg = 1000000
         #this.armorrate = 0
@@ -412,7 +422,7 @@ class brm(brmbase):
         tmpev.time = this.now() + 1.5
         if this.hp < 0 :
             this.dc += 1
-            #print '----dead',this.dc
+            print '----dead',this.dc
             tmpev.amount = this.hpmax/2 - this.hp
         else :
             #tmpev.amount = (this.hpmax - this.hp)/2
@@ -522,6 +532,8 @@ class brm(brmbase):
             this.gm()
         elif this.mode == 'star':
             this.star()
+        elif this.mode == 'gd':
+            this.gd()
 
         this.staggerev = brm.StaggerEv(this.el)
         this.staggerev.threashold = this.hpmax * 0.5
@@ -643,7 +655,7 @@ class brm(brmbase):
             for i in cele:
                 o = this.overheal.srcs[i.getsname()].value
                 h = i.value
-                ohpercent = o / (o + h)
+                ohpercent = o / (o + h) * 100
                 print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
         if gift != []:
             print '\tgift',giftsumstr,'(%.2f%%)'%(giftsum/this.heal.value*100)
