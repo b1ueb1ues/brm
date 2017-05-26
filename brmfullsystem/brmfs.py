@@ -169,7 +169,7 @@ class brm(brmbase):
 
     def star(this):
         this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
-        this.takemagev.dmg = 3000000
+        this.takemagev.dmg = 5000000
         pass
     ###########
     # fbbs

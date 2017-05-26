@@ -15,10 +15,10 @@ def main():
     pool = []
 
     pool.append(brm(\
-        stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='gm' \
+        stat=[20,30,0,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='star' \
         ))
     pool.append(brm(\
-        stat=[20,30,0,25],equip=['2t20','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='gm' \
+        stat=[20,30,0,25],equip=['4t20','ring','waist'],talent=['black','ht'],ver='ptr' ,prate=0.44,mode='star' \
         ))
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='live',prate=0.5,mode='star' \
