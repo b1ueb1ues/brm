@@ -437,8 +437,8 @@ class brm(brmbase):
             this.deathcount += 1
             tmpev.amount = this.hpmax/2 - this.hp
         else :
-            #tmpev.amount = (this.hpmax - this.hp)/2
-            tmpev.amount = 1000000
+            tmpev.amount = (this.hpmax - this.hp)/2
+            #tmpev.amount = 1000000
         tmpev.addto(this.el)
 
 
@@ -692,12 +692,18 @@ class brm(brmbase):
         print '\t\tbob',this.cast.bob.count
         print '\nstaggerlevel>_'
         for i in this.stlevel.srcs :
-            print '\t',i,'%.2f%%'%(this.stlevel.srcs[i].value/this.stlevel.value*100)
+            print '\t',i,'%.2f%%'%(this.stlevel.srcs[i].value/this.simctime*100)
+
+        print '\nelusive dance>_'
+        for i in this.edlevel.srcs :
+            if this.edlevel.srcs[i].value/this.simctime >= 0.01:
+                print '\t',i,'%.2f%%'%(this.edlevel.srcs[i].value/this.simctime*100)
+
         print '\nbrewstachetime>_'
         for i in this.brewstachetime.srcs :
             print '\t',i,'%.2f%%'%(this.brewstachetime.srcs[i].value/this.simctime*100)
         if this.deathcount != 0:
-            print 'deathcount>_\n\t',this.deathcount
+            print 'deathcount>_\n\t','%d(%ds)'%(this.deathcount,this.simctime/this.deathcount)
 
         return avoidance
 

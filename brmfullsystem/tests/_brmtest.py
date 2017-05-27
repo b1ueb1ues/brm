@@ -15,7 +15,7 @@ def main():
     pool = []
 
     pool.append(brm( \
-        equip=['4t'],talent=['black','ed20']   \
+        equip=['4t19'],talent=['black','ht'],stat=[25,25,0,25]   \
         ))
 
     #test2haste(pool)
@@ -113,11 +113,12 @@ def testn(line, time = 100000,basebrm=0):
             print '%.4f\t'%(1-(1-a)/(1-base)),
         print ''
 
-def teststat(line, time = 100000, start = 10, stop = 40, offset = 2, statindex=1):
+def teststatwide(line, time = 100000, start = 10, stop = 40, offset = 2, statindex=1):
 
+    stop += 5
     i = start - offset
 
-    col = 0
+    col = 1
     for l in line:
         print '%d: '%col,
         col += 1
@@ -135,21 +136,82 @@ def teststat(line, time = 100000, start = 10, stop = 40, offset = 2, statindex=1
     for j in range(len(line)):
         print '%d\t'%(j+1),
     print ''
+    allav = []
     while(1):
         i += offset
         if i > stop :
             break
         av = []
         for c in line :
-            c.stat[statindex] = i
+            b = copy.deepcopy(c)
+            b.initargv['stat'][statindex] = i
+            b.run(time)
+            av.append(b.getehrr())
+            #print av
+
+        allav.append(av)
+
+        if len(allav) >= 6:
+            print "%d%%"%(i-5*offset),
+            index = 0
+            av = allav[-6]
+            for a in av:
+                aplus = allav[-5][index]
+                da = (1-(1-a)/(1-aplus))
+                da_ave = da
+                for j in range(4):
+                    aplus = allav[-1-j][index]
+                    da = (1-(1-aplus)/(1-a))
+                    da_ave += da
+                da_ave = da_ave/5
+                print '\t%.4f | %.4f'%(float(a),da_ave),
+                index += 1
+            print ''
+def teststat(line, time = 100000, start = 10, stop = 40, offset = 2, statindex=1):
+
+    i = start - offset
+
+    col = 1
+    for l in line:
+        print '%d: '%col,
+        col += 1
+        l.show()
+
+    if statindex == 1:
+        print '\nhaste\t',
+    elif statindex == 0:
+        print '\ncrit\t',
+    elif statindex == 2:
+        print '\nvers\t',
+    elif statindex == 3:
+        print '\nmastery\t',
+
+    for j in range(len(line)):
+        print '%d\t'%(j+1),
+    print ''
+    allav = []
+    while(1):
+        i += offset
+        if i > stop :
+            break
+        av = []
+        for c in line :
+            c.initargv['stat'][statindex] = i
             b = copy.deepcopy(c)
             b.run(time)
             av.append(b.getehrr())
             #print av
 
         print "%d%%"%(i),
+        index = 0
         for a in av:
-            print '\t%.4f'%float(a),
+            if len(allav) >= 1:
+                a_old = allav[-1][index]
+            else :
+                a_old = 0
+            print '\t%.4f | %.4f'%(float(a),1-(1-a)/(1-a_old)),
+            index += 1
+        allav.append(av)
         print ''
 
 
