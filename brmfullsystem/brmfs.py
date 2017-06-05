@@ -423,7 +423,7 @@ class brm(brmbase):
     class PaladinEv(RepeatEvent):
         repeat = 8
         def process(this):
-            if this.src.hp < this.src.hpmax/2 :
+            if this.src.hp < this.src.hpmax/3*2 :
                 this.src.paladin()
 
     def paladin(this):
@@ -432,12 +432,12 @@ class brm(brmbase):
             def process(this):
                 this.src.getheal(this.amount)
         tmpev = healev()
-        tmpev.time = this.now() + 1.5
+        tmpev.time = this.now() + 0.5
         if this.hp < 0 :
             this.deathcount += 1
             tmpev.amount = this.hpmax/2 - this.hp
         else :
-            tmpev.amount = (this.hpmax - this.hp)/2
+            tmpev.amount = (this.hpmax - this.hp)/3*2
             #tmpev.amount = 1000000
         tmpev.addto(this.el)
 
@@ -621,8 +621,8 @@ class brm(brmbase):
         print ' ehr ->| %.4f%% |<- reduced'%(avoidance*100)
         print '----------------------------'
 
-        print 'melee>_'
-        print 'totaltank>_',this.totaltank
+        print 'simctime>_\n\t',this.simctime
+        print '\ntotaltank>_',this.totaltank
         for i in this.totaltank.srcs :
             print '\t',i,this.totaltank.srcs[i]
         if this.mastery != 0 and this.totaltank.takemelee.count != 0:
@@ -652,7 +652,7 @@ class brm(brmbase):
                 continue
             print '\t',i,this.heal.srcs[i],'(%.2f%%) | %d hit'%(this.heal.srcs[i].value/this.heal.value*100,this.heal.srcs[i].count),
             if i in this.overheal.srcs :
-                print ' | overheal %s(%.2f%%)'%(this.overheal.srcs[i],100*this.overheal.srcs[i].value/(this.overheal.srcs[i].value+this.heal.srcs[i].value))
+                print ' | overheal %s(%.2f%%,%dhits)'%(this.overheal.srcs[i],100*this.overheal.srcs[i].value/(this.overheal.srcs[i].value+this.heal.srcs[i].value),this.overheal.srcs[i].count)
         if celesum > 1000000:
             celesumstr = '%.2f'%(celesum/1000000) + 'm'
         elif celesum > 10000:
@@ -694,10 +694,11 @@ class brm(brmbase):
         for i in this.stlevel.srcs :
             print '\t',i,'%.2f%%'%(this.stlevel.srcs[i].value/this.simctime*100)
 
-        print '\nelusive dance>_'
-        for i in this.edlevel.srcs :
-            if this.edlevel.srcs[i].value/this.simctime >= 0.01:
-                print '\t',i,'%.2f%%'%(this.edlevel.srcs[i].value/this.simctime*100)
+        if this.ed != 0:
+            print '\nelusive dance>_'
+            for i in this.edlevel.srcs :
+                if this.edlevel.srcs[i].value/this.simctime >= 0.01:
+                    print '\t',i,'%.2f%%'%(this.edlevel.srcs[i].value/this.simctime*100)
 
         print '\nbrewstachetime>_'
         for i in this.brewstachetime.srcs :
