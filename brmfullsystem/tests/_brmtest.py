@@ -74,7 +74,7 @@ def test2(pool, time = 100000):
     if d < 0 :
         flag = 2
         d = 1-(1-br)/(1-ar)
-    print '\n>\ndiff:',d,'%d good'%flag
+    print '\n>\ndiff:',d,'%d better'%flag
 
 def testn(line, time = 100000,basebrm=0):
 
