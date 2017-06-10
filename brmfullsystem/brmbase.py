@@ -63,6 +63,8 @@ class brmbase(object):
     ht = 0
     ed = 0
     bc = 0
+    light = 0
+    black = 0
 
     #stat
     dodgebase = 0.10
@@ -355,6 +357,9 @@ class brmbase(object):
                 this.brewcd = 18
                 this.brewstack = 4
                 this.brewstackmax = 4
+                this.light = 1
+            elif t =='black':
+                this.black = 1
             
         for e in this.equip:
             if e == '2t19' :

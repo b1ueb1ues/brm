@@ -118,6 +118,7 @@ class brm(brmbase):
         this.st += rate * dmg
         this.sttick = this.st * this.stdmgrate
 
+    wristcount = 0
     def takemelee(this,dmg=2000000):
         this.totaltank.takemelee += dmg
 
@@ -129,8 +130,11 @@ class brm(brmbase):
             if r < this.getdodge():
                 this.masterystack = 0
                 if this.wrist == 1 :
-                    this.stackbrew.reduce(1)
-                    this.bob.reduce(1)
+                    if this.wristcd._enable != 0 :
+                        this.stackbrew.reduce(1)
+                        this.bob.reduce(1)
+                        this.wristcd.cast()
+                        this.wristcount += 1
                 this.dodge.takemelee += dmg
                 this.masterystack = 0
                 return
@@ -183,6 +187,17 @@ class brm(brmbase):
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         #this.takemeleeev.dmg = 1000000
         #this.armorrate = 0
+        pass
+
+    def creep(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 0.3)
+        this.takemeleeev.dmg = 2000000
+
+    def mix(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        this.takemeleeev.dmg = 8000000
+        this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
+        this.takemagev.dmg = 3000000
         pass
 
     def krosus(this):
@@ -312,6 +327,10 @@ class brm(brmbase):
             #print 'castks'
             this.src.castks()
 
+    class Wristcd(Cd):
+        cooldown = 1
+
+
     def castks(this,staveoff=0):
         if staveoff == 0:
             this.cast.ks += 1
@@ -362,6 +381,8 @@ class brm(brmbase):
     class Bobcd(Cd):
         cooldown = 90
         def endprocess(this,time):
+            if this.src.black == 0:
+                return
             this.src.cast.bob += 1
             bm = this.src
             stack,stackmax = bm.stackbrew.stack()
@@ -523,9 +544,9 @@ class brm(brmbase):
 	    if stpercent > 0.6 :
 		return this.haste * 1.15
 	    elif stpercent > 0.3 :
-		return this.haste * 1.1
+		return this.haste * 1.12
 	    elif this.st != 0 :
-		return this.haste * 1.05
+		return this.haste * 1.08
 	    else :
 		return this.haste
 	else:
@@ -547,6 +568,10 @@ class brm(brmbase):
             this.star()
         elif this.mode == 'gd':
             this.gd()
+        elif this.mode == 'mix':
+            this.mix()
+        elif this.mode == 'creep':
+            this.creep()
 
         this.staggerev = brm.StaggerEv(this.el)
         this.staggerev.threashold = this.hpmax * 0.5
@@ -566,6 +591,7 @@ class brm(brmbase):
         #cd
         this.ks = brm.Kegcd(this,8,1)
         this.tp = brm.Palmcd(this,4,1)
+        this.wristcd = brm.Wristcd(this,1,0)
         this.bob = brm.Bobcd(this)
         this.stackbrew = brm.Brewstack(this,21,1)
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
