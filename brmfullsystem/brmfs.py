@@ -593,7 +593,7 @@ class brm(brmbase):
         this.tp = brm.Palmcd(this,4,1)
         this.wristcd = brm.Wristcd(this,1,0)
         this.bob = brm.Bobcd(this)
-        this.stackbrew = brm.Brewstack(this,21,1)
+        this.stackbrew = brm.Brewstack(this,this.brewcd,1)
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
         #buff
         this.brewstachebuff = brm.Brewstachebuff(this)
