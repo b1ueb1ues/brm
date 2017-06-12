@@ -72,10 +72,21 @@ class brm(brmbase):
             this.src.takemelee(this.dmg)
 
     def obtaingift(this,dmg):
-        this.giftcount += dmg
-        if this.giftcount > this.hpmax:
-            this.gift()
-            this.giftcount = 0
+        if this.mist != 0:
+            if this.hp >= 0:
+                this.giftcount += dmg *(1 + 0.75*(1-this.hp/this.hpmax))
+            else:
+                this.giftcount += dmg * 1.75
+        else:
+            this.giftcount += dmg
+
+        while(1):
+            if this.giftcount > this.hpmax:
+                this.gift()
+                this.giftcount -= this.hpmax
+                #this.giftcount = 0
+            else:
+                break
 
     def takephydmg(this,dmg=4000000):
         this.totaltank.takephydmg += dmg
@@ -171,7 +182,8 @@ class brm(brmbase):
 
     def gm(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
-        this.takemeleeev.dmg = 8000000
+        this.takemeleeev.dmg = 1000000
+        #this.takemeleeev.dmg = 8000000
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         #this.takemeleeev.dmg = 1000000
         #this.armorrate = 0
@@ -362,6 +374,8 @@ class brm(brmbase):
     class Bobcd(Cd):
         cooldown = 90
         def endprocess(this,time):
+            if this.src.black == 0:
+                return
             this.src.cast.bob += 1
             bm = this.src
             stack,stackmax = bm.stackbrew.stack()
