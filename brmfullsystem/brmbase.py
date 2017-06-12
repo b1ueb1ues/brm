@@ -64,6 +64,7 @@ class brmbase(object):
     ed = 0
     bc = 0
     mist = 0
+    light = 0
     black = 0
 
     #stat
@@ -357,6 +358,7 @@ class brmbase(object):
                 this.brewcd = 18
                 this.brewstack = 4
                 this.brewstackmax = 4
+                this.light = 1
             elif t == 'mist':
                 this.mist = 1
             elif t == 'black':

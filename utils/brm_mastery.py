@@ -43,8 +43,8 @@ def main(mastery):
 #	print "equivalent health increaced:", 1/(1-dmg_avoid)
 
 if __name__ == '__main__':
-    i = 0.30
-    dodgebase = 0.30
+    i = 0.3
+    dodgebase = 0.70
     main(i)
     exit()
     i = 0.08 - 0.01
@@ -63,8 +63,9 @@ if __name__ == '__main__':
 #	exit()
 
     i = 0.30
-    dodgebase = 0.30
+    dodgebase = 0.20
     main(i)
+
     i = 0.27
     dodgebase = 0.08 +0.27
     main(i)
