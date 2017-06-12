@@ -34,13 +34,12 @@ def main():
 
     pool = []
     pool.append(brm(\
-        stat=[25,30,5,30],equip=['4t19','2t20','ring','waist'],talent=['light','ht'],ver='ptr', prate=0.44,mode='gm' \
+        stat=[25,50,5,30],equip=['','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' ,hotblooded=0.04,isbduration=9.5\
         ))
     pool.append(brm(\
-        stat=[25,30,5,30],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
+        stat=[25,50,5,30],equip=['','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd',hotblooded=0.05,isbduration=9 \
         ))
     test2(pool)
-    print pool[1].light
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='live',prate=0.5,mode='star' \
    #     ))

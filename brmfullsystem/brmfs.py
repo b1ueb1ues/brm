@@ -204,6 +204,10 @@ class brm(brmbase):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 0.3)
         this.takemeleeev.dmg = 2000000
 
+    def light(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        this.takemeleeev.dmg = 4000000
+
     def mix(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         this.takemeleeev.dmg = 8000000
@@ -583,6 +587,8 @@ class brm(brmbase):
             this.mix()
         elif this.mode == 'creep':
             this.creep()
+        elif this.mode == 'light':
+            this.light()
 
         this.staggerev = brm.StaggerEv(this.el)
         this.staggerev.threashold = this.hpmax * 0.5
@@ -707,8 +713,11 @@ class brm(brmbase):
             for i in cele:
                 o = this.overheal.srcs[i.getsname()].value
                 h = i.value
-                ohpercent = o / (o + h) * 100
-                print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
+                if h == 0:
+                    print '\t\t',i.getsname(),i,'|',i.count,'hits'
+                else:
+                    ohpercent = o / (o + h) * 100
+                    print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
         if gift != []:
             print '\tgift',giftsumstr,'(%.2f%%)'%(giftsum/this.heal.value*100)
             for i in gift:
