@@ -34,10 +34,10 @@ def main():
 
     pool = []
     pool.append(brm(\
-        stat=[25,30,5,30],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \
+        stat=[25,30,5,30],equip=['4t19','2t20','ring','waist'],talent=['light','ht'],ver='ptr', prate=0.44,mode='gm' \
         ))
     pool.append(brm(\
-        stat=[25,30,5,30],equip=['4t19','2t20','wrist','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \
+        stat=[25,30,5,30],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
         ))
     test2(pool)
     print pool[1].light
@@ -116,7 +116,7 @@ def test2(pool, time = 100000):
     if d < 0 :
         flag = 2
         d = 1-(1-br)/(1-ar)
-    print '\n>\ndiff:',d,'%d good'%flag
+    print '\n>\ndiff:',d,'%d better'%flag
 
 def testn(line, time = 100000):
 
