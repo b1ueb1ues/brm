@@ -186,8 +186,7 @@ class brm(brmbase):
 
     def gm(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
-        this.takemeleeev.dmg = 1000000
-        #this.takemeleeev.dmg = 8000000
+        this.takemeleeev.dmg = 8000000
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         #this.takemeleeev.dmg = 1000000
         #this.armorrate = 0
