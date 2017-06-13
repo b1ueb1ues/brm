@@ -380,7 +380,7 @@ class brmbase(object):
             if e == 'chest':
                 this.chest =1
 
-        this.brewcd /= this.haste
+        #this.brewcd /= this.haste
         this.initialized = 1
         
     def __init__(this,**argv):
