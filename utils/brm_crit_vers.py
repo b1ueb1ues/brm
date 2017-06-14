@@ -1,108 +1,70 @@
 #!/usr/bin/python27
 # -*- encoding:utf8 -*-
 
-selfh = 100.0
+selfh = 0
 dmg = 100.0
 
 outerh = 0
 dmgtaken = 0
 crit = 0
-vert = 0
+vers = 0
 
 crithrate = 0
 critselfhrate = 0
-vertselfhrate = 0
-vertavoidrate = 0
+versselfhrate = 0
+versavoidrate = 0
 critbase = 10
 
-def init():
-	global crit
-	global vert
-	global critselfhrate
-	global vertselfhrate
-	global crithrate
-	global vertavoidrate
-	crithrate = (crit/400.0 + critbase)/100.0 * 0.65 + 1
-	critselfhrate = ((crit/400.0 + critbase)/100.0 + 1) * ((crit/400.0 +critbase )/100.0*0.65 +1)
-	vertselfhrate = vert/475.0/100.0 + 1
-	vertavoidrate = vert/950.0/100.0
+def init(crit,vers):
+    global critbase
+    crithrate = (crit/400.0 + critbase)/100.0 * 0.65 + 1
+    critselfhrate = ((crit/400.0 + critbase)/100.0 + 1) * ((crit/400.0 +critbase )/100.0*0.65 +1)
+    versselfhrate = vers/475.0/100.0 + 1
+    versavoidrate = vers/950.0/100.0
+    return crithrate,critselfhrate,versselfhrate,versavoidrate
 
-def outerhneeded():
-	global outerh
-	global dmgtaken
-	global critselfhrate
-	global vertselfhrate
-	global crithrate
-	global vertavoidrate
-	global selfh
-	dmgtaken =  (dmg-dmg*vertavoidrate-selfh*vertselfhrate*critselfhrate)
-#	print 'dmgt',dmgtaken
-#	print 'dmg',dmg
-#	print 'selfh*vertselfhrate*critselfhrate',selfh*vertselfhrate*critselfhrate
-	outerh = dmgtaken/crithrate
-	return outerh
-#	print 'outerhealneeded:',outerh
-#	print 'dmgtaken:       ',dmgtaken
+def shr(crit,vers):
+    global dmg
+    crithrate, critselfhrate,versselfhrate,versavoidrate = init(crit,vers)
+    dmgtaken =  (dmg-dmg*versavoidrate)
+    shr = dmgtaken/versselfhrate/critselfhrate
+    return shr
 
-f = open("/opt/brm/figure_crt_vers_selfh.csv",'w')
-def main():
-    global f
-    global outerh
-    global dmgtaken
-    global critselfhrate
-    global vertselfhrate
-    global crithrate
-    global vertavoidrate
-    global selfh
-    global crit
-    global vert
+def ehr(crit,vers):
+    global dmg
+    global sefh
+    crithrate, critselfhrate,versselfhrate,versavoidrate = init(crit,vers)
+    dmgtaken =  (dmg-dmg*versavoidrate)
+    ehr = (dmgtaken - selfh * versselfhrate * critselfhrate)/crithrate
+    return ehr
 
-    vert = 0
+def test1():
+    total = 14000
+    vers = 0
     crit = 0
     offset = 400
     crit = 0 - offset
-    old = 0
-    f.write("crit,")
+
+   # a = shr(0,0)
+   # b = shr(400,0)
+   # c = shr(0,400)
+   # print a,b,c
+   # return
+
     while(1):
         crit += offset
-        if crit > 50 * 400:
+        if crit > total:
             break
-        init()
-        outerhneeded()
-        if old == 0:
-            old = outerh
-            continue
+        vers = total - crit
+        ret = shr(crit,vers)
+        ret2 = ehr(crit,vers)
+        print crit,ret,ret2
 
-        print 1-outerh/old
-        a = (1-outerh/old)*100
-        f.write("%.4f,"%a)
-        old = outerh
 
-    print '>>>>>>>>>>'
-    f.write('\n')
 
-    vert = 0
-    crit = 0
-    offset = 400
-    vert = 0 - offset
-    old = 0
-    f.write("vers,")
-    while(1):
-        vert += offset
-        if vert > 50 * 400:
-            break
-        init()
-        outerhneeded()
-        if old == 0:
-            old = outerh
-            continue
 
-        print outerh,
-        print 1-outerh/old
-        a = (1-outerh/old)*100
-        f.write("%.4f,"%a)
-        old = outerh
-
+def main():
+    test1()
 
 
 if __name__ == '__main__':

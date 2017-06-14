@@ -234,8 +234,18 @@ class brm(brmbase):
             this.src.cast.fb += 1
 
     class BSEv(RepeatEvent):
-        repeat = 5
+        repeat = 3
+        realrepeat = 3
         def process(this):
+            #if this.src.masterystack == 1:
+            #    pass
+            #elif this.src.masterystack == 0:
+            #    pass
+            #else :
+            #    this.repeat = 0.1
+            #    return
+            #if this.repeat != this.realrepeat:
+            #    this.repeat = this.realrepeat
             this.src.masterystack+=this.src.bsmastery
             this.src.cast.bs += 1
 
@@ -459,7 +469,7 @@ class brm(brmbase):
     class PaladinEv(RepeatEvent):
         repeat = 8
         def process(this):
-            if this.src.hp < this.src.hpmax/3*2 :
+            if this.src.hp < this.src.hpmax/2 :
                 this.src.paladin()
 
     def paladin(this):
@@ -478,6 +488,8 @@ class brm(brmbase):
         tmpev.addto(this.el)
 
 
+    gcount = 0
+    gtotal = 0
     def gift(this,src='origin'):
         h = 0
         celeh = 0
@@ -491,6 +503,11 @@ class brm(brmbase):
         r = random.random()
         if r < this.crit :
             h += h
+        
+       # print h,
+       # this.gcount += 1
+       # this.gtotal += h
+       # print this.gcount,this.gtotal/this.gcount
         this.getheal(h,'gift_'+src)
         if '4t20' in this.equip:
             this.pury(rate=0.05,src='4t20')
@@ -723,7 +740,7 @@ class brm(brmbase):
             for i in gift:
                 o = this.overheal.srcs[i.getsname()].value
                 h = i.value
-                ohpercent = o / (o + h)
+                ohpercent = o / (o + h) * 100
                 print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
 
 
