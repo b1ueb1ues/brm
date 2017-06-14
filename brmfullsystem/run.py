@@ -19,7 +19,9 @@ def main():
     pool.append(brm(\
         stat=[20,40,10,30],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='mix' \
         ))
-    test2(pool)
+    test2(pool,time=100000)
+    print pool[1].light,pool[1].brewcd,pool[1].stackbrew.cooldown
+
    # pool.append(brm(\
    #     stat=[20,30,0,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='live',prate=0.5,mode='star' \
    #     ))
