@@ -238,9 +238,7 @@ class brm(brmbase):
         repeat = 3
         realrepeat = 3
         def process(this):
-            if this.src.masterystack == 1:
-                pass
-            elif this.src.masterystack == 0:
+            if this.src.getdodge() <= 1:
                 pass
             else :
                 this.repeat = 0.1
