@@ -138,6 +138,7 @@ class brm(brmbase):
 
         if this.mastery != 0:
             r = random.random()
+            #print this.getdodge()
             if r < this.getdodge():
                 this.masterystack = 0
                 if this.wrist == 1 :
@@ -210,7 +211,7 @@ class brm(brmbase):
 
     def mix(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 8000000
+        this.takemeleeev.dmg = 4000000
         this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
         this.takemagev.dmg = 3000000
         pass
@@ -237,15 +238,15 @@ class brm(brmbase):
         repeat = 3
         realrepeat = 3
         def process(this):
-            #if this.src.masterystack == 1:
-            #    pass
-            #elif this.src.masterystack == 0:
-            #    pass
-            #else :
-            #    this.repeat = 0.1
-            #    return
-            #if this.repeat != this.realrepeat:
-            #    this.repeat = this.realrepeat
+            if this.src.masterystack == 1:
+                pass
+            elif this.src.masterystack == 0:
+                pass
+            else :
+                this.repeat = 0.1
+                return
+            if this.repeat != this.realrepeat:
+                this.repeat = this.realrepeat
             this.src.masterystack+=this.src.bsmastery
             this.src.cast.bs += 1
 
@@ -616,7 +617,7 @@ class brm(brmbase):
        # this.fbmastery = 0
         if this.ver == 'ptr':
             if this.bsmastery != 0:
-                this.bsev = brm.BSEv(this.el,withhaste=1)
+                this.bsev = brm.BSEv(this.el,withhaste=0)
             if this.fbmastery != 0 :
                 if 'chest' in this.equip:
                     this.fbev = brm.FBEv(this.el ,repeat = 8,withhaste=1)
