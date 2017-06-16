@@ -253,7 +253,11 @@ class brm(brmbase):
     # isb
     def castisb(this):
         #print '--cast isb at',this.el.time,this.brewstack.stack()
-        ret =this.stackbrew.cast()
+        if this.test == 1 :
+            ret = 1
+            pass
+        else:
+            ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
             this.pury(rate=0.05,src='quicksip')
