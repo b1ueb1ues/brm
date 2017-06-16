@@ -234,7 +234,7 @@ class brm(brmbase):
             this.src.cast.fb += 1
 
     class BSEv(RepeatEvent):
-        repeat = 5
+        repeat = 3
         def process(this):
             this.src.masterystack+=this.src.bsmastery
             this.src.cast.bs += 1
