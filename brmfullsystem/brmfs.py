@@ -138,6 +138,7 @@ class brm(brmbase):
 
         if this.mastery != 0:
             r = random.random()
+            #print this.getdodge()
             if r < this.getdodge():
                 this.masterystack = 0
                 if this.wrist == 1 :
@@ -210,7 +211,7 @@ class brm(brmbase):
 
     def mix(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 8000000
+        this.takemeleeev.dmg = 4000000
         this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
         this.takemagev.dmg = 3000000
         pass
@@ -235,7 +236,15 @@ class brm(brmbase):
 
     class BSEv(RepeatEvent):
         repeat = 3
+        realrepeat = 3
         def process(this):
+            if this.src.getdodge() <= 1:
+                pass
+            else :
+                this.repeat = 0.1
+                return
+            if this.repeat != this.realrepeat:
+                this.repeat = this.realrepeat
             this.src.masterystack+=this.src.bsmastery
             this.src.cast.bs += 1
 
@@ -244,7 +253,11 @@ class brm(brmbase):
     # isb
     def castisb(this):
         #print '--cast isb at',this.el.time,this.brewstack.stack()
-        ret =this.stackbrew.cast()
+        if this.test == 1 :
+            ret = 1
+            pass
+        else:
+            ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
             this.pury(rate=0.05,src='quicksip')
@@ -459,7 +472,7 @@ class brm(brmbase):
     class PaladinEv(RepeatEvent):
         repeat = 8
         def process(this):
-            if this.src.hp < this.src.hpmax/3*2 :
+            if this.src.hp < this.src.hpmax/2 :
                 this.src.paladin()
 
     def paladin(this):
@@ -478,6 +491,8 @@ class brm(brmbase):
         tmpev.addto(this.el)
 
 
+    gcount = 0
+    gtotal = 0
     def gift(this,src='origin'):
         h = 0
         celeh = 0
@@ -491,6 +506,11 @@ class brm(brmbase):
         r = random.random()
         if r < this.crit :
             h += h
+        
+       # print h,
+       # this.gcount += 1
+       # this.gtotal += h
+       # print this.gcount,this.gtotal/this.gcount
         this.getheal(h,'gift_'+src)
         if '4t20' in this.equip:
             this.pury(rate=0.05,src='4t20')
@@ -599,7 +619,7 @@ class brm(brmbase):
        # this.fbmastery = 0
         if this.ver == 'ptr':
             if this.bsmastery != 0:
-                this.bsev = brm.BSEv(this.el,withhaste=1)
+                this.bsev = brm.BSEv(this.el,withhaste=0)
             if this.fbmastery != 0 :
                 if 'chest' in this.equip:
                     this.fbev = brm.FBEv(this.el ,repeat = 8,withhaste=1)
@@ -723,7 +743,7 @@ class brm(brmbase):
             for i in gift:
                 o = this.overheal.srcs[i.getsname()].value
                 h = i.value
-                ohpercent = o / (o + h)
+                ohpercent = o / (o + h) * 100
                 print '\t\t',i.getsname(),i,'|',i.count,'hits','| overheal %s(%.2f%%)'%(this.overheal.srcs[i.getsname()],ohpercent)
 
 

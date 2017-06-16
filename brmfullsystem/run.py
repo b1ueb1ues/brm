@@ -12,26 +12,6 @@ def main():
     confdefault = config(stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0)
     '''
 
-   # pool = []
-   # pool.append(brm(\
-   #     stat=[20,30,0,25],equip=['2t20','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
-   #     ))
-   # pool.append(brm(\
-   #     stat=[20,30,10,25],equip=['2t20','4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gm' \
-   #     ))
-   # test2(pool)
-   # return
-
-#    pool = []
-#    pool.append(brm(\
-#        stat=[27,23,12,31],equip=['4t19','ring','waist'],talent=['black','ht'],ver='live', prate=0.5,mode='gd' \
-#        ))
-#    pool.append(brm(\
-#        stat=[28,20,10,29],equip=['4t19','ring','waist'],talent=['black','ht'],ver='live', prate=0.5,mode='gd',hotblooded=1.0-(0.93*0.94) \
-#        ))
-#    test2(pool)
-#    return
-
     pool = []
     pool.append(brm(\
         stat=[25,30,5,45],equip=['2t20','4t19','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \

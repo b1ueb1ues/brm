@@ -68,7 +68,7 @@ class brmbase(object):
     black = 0
 
     #stat
-    dodgebase = 0.10
+    dodgebase = 0.12
     crit = 0.1
     haste = 1.3
     vers = 0
