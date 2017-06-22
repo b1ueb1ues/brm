@@ -46,7 +46,7 @@ class brmbase(object):
     energy = 100
     ap = 0
     agi = 30000
-    armor = 4400
+    armor = 5000
     armorrate = 0
 
     talent = []
@@ -350,9 +350,12 @@ class brmbase(object):
                 this.prate += 0.20
                 if t != 'ed':
                     this.talent.append('ed')
+                this.ed = 1
             elif t == 'ednobuff' :
                 this.prate += 0.20
+                this.ed = 1
             elif t == 'bc':
+                this.bc = 1
                 this.kscdr = 6
             elif t == 'light':
                 this.brewcd = 18

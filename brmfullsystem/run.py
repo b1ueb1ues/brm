@@ -8,16 +8,13 @@ from brmfs import *
 
 def main():
 
-    '''
-    confdefault = config(stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0)
-    '''
 
     pool = []
     pool.append(brm(\
-        stat=[25,30,5,45],equip=['2t20','4t19','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \
+        stat=[25,30,5,25],equip=['4t19','ring','waist'],talent=['black','bc'],ver='ptr', prate=0.44,mode='god',t20rate = 0.4 \
         ))
     pool.append(brm(\
-        stat=[25,30,5,45],equip=['2t20','4t19','chest','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='gd' \
+        stat=[25,30,5,25],equip=['4t19','waist','ring'],talent=['black','ht'],ver='ptr', prate=0.44,mode='god', t20rate=0.4 \
         ))
     test2(pool,time=100000)
 

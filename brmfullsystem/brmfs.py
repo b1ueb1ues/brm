@@ -23,6 +23,8 @@ class brm(brmbase):
     isbduration = 9
     facepalm = 0.4
     hotblooded = 0.04
+    heavyhide = 0
+    t20rate = 0.4
 
     statisticlist = [
         'totaltank',
@@ -193,13 +195,13 @@ class brm(brmbase):
         #this.armorrate = 0
         pass
 
-    def gd(this):
+    def god(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         this.takemeleeev.dmg = 15000000
-        #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        #this.takemeleeev.dmg = 1000000
-        #this.armorrate = 0
-        pass
+
+    def gd(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.2)
+        this.takemeleeev.dmg = 5500000
 
     def creep(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 0.3)
@@ -230,18 +232,29 @@ class brm(brmbase):
     # fbbs
     class FBEv(RepeatEvent):
         repeat = 15
+        realrepeat = 15
         def process(this):
+            if this.src.masterystack <= 0:
+                pass
+            else :
+                this.repeat = 1
+                return
+            if this.repeat != this.realrepeat:
+                this.repeat = this.realrepeat
+
             this.src.masterystack+=this.src.fbmastery
             this.src.cast.fb += 1
+            #print this.now(),'fb'
 
     class BSEv(RepeatEvent):
         repeat = 3
         realrepeat = 3
         def process(this):
-            if this.src.getdodge() <= 1:
+
+            if this.src.masterystack <= 1:
                 pass
             else :
-                this.repeat = 0.1
+                this.repeat = 1
                 return
             if this.repeat != this.realrepeat:
                 this.repeat = this.realrepeat
@@ -251,9 +264,10 @@ class brm(brmbase):
 
     #########
     # isb
+    noisb = 0
     def castisb(this):
         #print '--cast isb at',this.el.time,this.brewstack.stack()
-        if this.test == 1 :
+        if this.noisb == 1 :
             ret = 1
             pass
         else:
@@ -262,7 +276,9 @@ class brm(brmbase):
             this.isb.cast()
             this.pury(rate=0.05,src='quicksip')
             if '2t20' in this.equip or '4t20' in this.equip:
-                this.gift(src='2t20')
+                r = random.random()
+                if r < this.t20rate:
+                    this.gift(src='2t20')
 
             #print '-isbcast----',this.el.time
             this.brewstachebuff.cast()
@@ -344,6 +360,26 @@ class brm(brmbase):
             ed.value = 0
 
 
+    ####
+    # heavyhide
+    class Heavyhide(aura):
+        starttime = 0
+        duration = 10
+        def startprocess(this,time):
+            brm = this.src
+            this.starttime = time
+            brm.armor += 3000
+            brm.armorrate = brm.getarmorrate()
+
+        def endprocess(this,time):
+            brm = this.src
+            brm.armor -= 3000
+            brm.armorrate = brm.getarmorrate()
+
+    class HeavyhideEv(RepeatEvent):
+        repeat = 50
+        def process(this):
+            this.src.heavyhidebuff.cast()
     ############
     # kegsmash
     class Staveoffev(Event):
@@ -363,6 +399,9 @@ class brm(brmbase):
         if staveoff == 0:
             this.cast.ks += 1
             this.ks.cast()
+            if this.chest != 0:
+                this.fbev.mv(time = this.el.time)
+
         if debug >= 3:
             tmp = this.stackbrew.time()
         r = random.random()
@@ -428,7 +467,9 @@ class brm(brmbase):
         this.pury()
         this.stackbrew.cast()
         if '2t20' in this.equip or '4t20' in this.equip :
-            this.gift(src='2t20')
+            r = random.random()
+            if r < this.t20rate:
+                this.gift(src='2t20')
 
     class Brewstack(Stack):
         _stack = 3
@@ -469,11 +510,11 @@ class brm(brmbase):
             #print 'cast isb(brewmax) at',this.now()
             this.src.castisb()
 
-    class PaladinEv(RepeatEvent):
-        repeat = 8
-        def process(this):
-            if this.src.hp < this.src.hpmax/2 :
-                this.src.paladin()
+ #   class PaladinEv(RepeatEvent):
+ #       repeat = 8
+ #       def process(this):
+ #           if this.src.hp < this.src.hpmax/2 :
+ #               this.src.paladin()
 
     def paladin(this):
         amount = 0
@@ -481,12 +522,12 @@ class brm(brmbase):
             def process(this):
                 this.src.getheal(this.amount)
         tmpev = healev()
-        tmpev.time = this.now() + 0.5
+        tmpev.time = this.now() + 0.1
         if this.hp < 0 :
             this.deathcount += 1
             tmpev.amount = this.hpmax/2 - this.hp
         else :
-            tmpev.amount = (this.hpmax - this.hp)/3*2
+            tmpev.amount = (this.hpmax - this.hp)/2
             #tmpev.amount = 1000000
         tmpev.addto(this.el)
 
@@ -553,6 +594,8 @@ class brm(brmbase):
             #print '-pbcast----',this.el.time
             bm = this
             bm.brewstachebuff.cast()
+            if bm.bc != 0:
+                bm.masterystack += 1
             if bm.ed != 0:
                 bm.edbuff.cast()
             if this.quicksip != 0:
@@ -601,6 +644,8 @@ class brm(brmbase):
             this.gm()
         elif this.mode == 'star':
             this.star()
+        elif this.mode == 'god':
+            this.god()
         elif this.mode == 'gd':
             this.gd()
         elif this.mode == 'mix':
@@ -622,9 +667,8 @@ class brm(brmbase):
                 this.bsev = brm.BSEv(this.el,withhaste=0)
             if this.fbmastery != 0 :
                 if 'chest' in this.equip:
-                    this.fbev = brm.FBEv(this.el ,repeat = 8,withhaste=1)
-                else :
-                    this.fbev = brm.FBEv(this.el ,repeat = 15)
+                    this.chest = 1
+                this.fbev = brm.FBEv(this.el ,repeat = 15)
         #cd
         this.ks = brm.Kegcd(this,8,1)
         this.tp = brm.Palmcd(this,4,1)
@@ -633,6 +677,9 @@ class brm(brmbase):
         this.stackbrew = brm.Brewstack(this,this.brewcd,1)
         this.stackbrew.setstack(this.brewstack,this.brewstackmax)
         #buff
+        if this.heavyhide != 0:
+            this.heavyhidebuff = brm.Heavyhide(this)
+            this.heavyhideev = brm.HeavyhideEv(this.el)
         this.brewstachebuff = brm.Brewstachebuff(this)
         this.isb = brm.ISBbuff(this,duration=this.isbduration)
         this.edbuff = brm.Edbuff(this)
