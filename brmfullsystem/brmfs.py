@@ -17,7 +17,7 @@ class brm(brmbase):
     giftcount = 0
     fbmastery = 1
     bsmastery = 1
-    mode = 'gm'
+    mode = 'normal'
     ver = 'ptr'
     deathcount = 0
     isbduration = 9
@@ -187,7 +187,7 @@ class brm(brmbase):
         this.sttick -= this.sttick * prate
 
 
-    def gm(this):
+    def mode_gm(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 2)
         this.takemeleeev.dmg = 8000000
         #this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
@@ -195,36 +195,48 @@ class brm(brmbase):
         #this.armorrate = 0
         pass
 
-    def god(this):
+    def mode_god(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         this.takemeleeev.dmg = 15000000
 
-    def gd(this):
+    def mode_gd(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.2)
         this.takemeleeev.dmg = 5500000
 
-    def creep(this):
+    def mode_test(this):
+        print 'testmode'
+        exit()
+
+    def mode_normal(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        this.takemeleeev.dmg = 6000000
+
+    def mode_n(this):
+        this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
+        this.takemeleeev.dmg = 6000000
+
+    def mode_creep(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 0.3)
         this.takemeleeev.dmg = 2000000
 
-    def light(this):
+    def mode_light(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         this.takemeleeev.dmg = 4000000
 
-    def mix(this):
+    def mode_mix(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         this.takemeleeev.dmg = 4000000
         this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
         this.takemagev.dmg = 3000000
         pass
 
-    def krosus(this):
+    def mode_krosus(this):
         this.takephyev = brm.TakePhyEv(this.el,repeat = 10)
         this.takemagev = brm.TakeMagEv(this.el,repeat = 1)
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
         pass
 
-    def star(this):
+    def mode_star(this):
         this.takemagev = brm.TakeMagEv(this.el,repeat = 2.5)
         this.takemagev.dmg = 5000000
         pass
@@ -285,7 +297,8 @@ class brm(brmbase):
             #print 'cast isb at',this.now(),'buff at',this.isb.time()
             this.cast.isb += 1
         else:
-            print '-nobrew at',this.el.time, this.stackbrew.stack()
+            #print '-nobrew at',this.el.time, this.stackbrew.stack()
+            pass
 
     class ISBbuff(aura):
         def startprocess(this,time):
@@ -640,20 +653,23 @@ class brm(brmbase):
 
         #this.ap = this.agi * (1+this.mastery) * 1.05
 
-        if this.mode == 'gm':
-            this.gm()
-        elif this.mode == 'star':
-            this.star()
-        elif this.mode == 'god':
-            this.god()
-        elif this.mode == 'gd':
-            this.gd()
-        elif this.mode == 'mix':
-            this.mix()
-        elif this.mode == 'creep':
-            this.creep()
-        elif this.mode == 'light':
-            this.light()
+        
+        m = this.__getattribute__('mode_'+this.mode)
+        m()
+      #  if this.mode == 'gm':
+      #      this.gm()
+      #  elif this.mode == 'star':
+      #      this.star()
+      #  elif this.mode == 'god':
+      #      this.god()
+      #  elif this.mode == 'gd':
+      #      this.gd()
+      #  elif this.mode == 'mix':
+      #      this.mix()
+      #  elif this.mode == 'creep':
+      #      this.creep()
+      #  elif this.mode == 'light':
+      #      this.light()
 
         this.staggerev = brm.StaggerEv(this.el)
         this.staggerev.threashold = this.hpmax * 0.5

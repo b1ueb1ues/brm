@@ -10,20 +10,21 @@ def main():
     confdefault = config(stat=[25,25,0,27],equip=['4t'],talent=['black','ht15'],iduration=8.5,palmcdr=1.3, haste=0, crit=0, vers=0, mastery=0)
     '''
 
-    basearg = {'equip':['4t19','2t20','ring','waist'] ,'stat':[25,25,5,25],'talent':['ht','black'],'prate':0.44,'mode':'star', \
+    basearg = {'equip':['4t19','2t20','ring','waist'] ,'stat':[25,25,5,25],'talent':['ed','black'],'prate':0.44,'mode':'gd', \
             'ver':'ptr'
             }
     pool = []
     pool.append(brm(**basearg))
+    stattotal = 20000
     statindex =  sys.argv[1] 
     if statindex == '0' :
-        teststatwide(pool,statindex=0,offset=1,start=10,stop=10+15000/400)
+        teststatwide(pool,statindex=0,offset=1,start=10,stop=10+stattotal/400)
     elif statindex == '1':
-        teststatwide(pool,statindex=1,offset=400.0/375,start=0,stop=15000/375)
+        teststatwide(pool,statindex=1,offset=400.0/375,start=0,stop=stattotal/375)
     elif statindex == '2':
-        teststatwide(pool,statindex=2,offset=400.0/475,start=0,stop=15000/475)
+        teststatwide(pool,statindex=2,offset=400.0/475,start=0,stop=stattotal/475)
     elif statindex == '3' :
-        teststatwide(pool,statindex=3,offset=1,start=8,stop=8+15000/400)
+        teststatwide(pool,statindex=3,offset=1,start=8,stop=8+stattotal/400)
     return
 
     teststatwide(pool,statindex=statindex,offset=1)
