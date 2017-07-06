@@ -41,8 +41,8 @@ class brmbase(object):
     initialized = 0
     initargv = {}
     
-    hp = 6000000
-    hpmax = 6000000
+    hp = 7000000
+    hpmax = 7000000
     energy = 100
     ap = 0
     agi = 30000
