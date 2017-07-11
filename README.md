@@ -22,14 +22,14 @@ available: 'ring', 'waist', 'wrist','chest' (unstable), '2t19', '4t19', '2t20', 
 
 equip=['ring','waist','wrist'] is legal, but you can't equip like that in game.
 
-(We think ['4t19','2t20','ring','waist'] is BIS when considering about survivability)
+(We think ['4t19','2t20','ring','waist'] is BIS in consider of survivability)
 
 ### prate=0.44
 you purifying brew rate(without talent)
 use this to test relic 
 
 ### isbduration=9
-use this to test relic (Chinese researchers approve that 9.5s ISB is better than 7% BOF when considering of survivability)
+use this to test relic (Chinese researchers approve that 9.5s ISB is better than 7% BOF in consider of survivability)
 
 ### facepalm = 0.4
 use this to test relic 
