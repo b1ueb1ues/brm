@@ -10,7 +10,7 @@ There is no arg parse now
 
 Edit run.py directly and run again
 
-class initial 
+Brm initial args
 ======
 ### stat=[25,25,0,25] 
 percent of crit, haste, versatility(dmg/heal), mastery
