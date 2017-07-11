@@ -20,7 +20,7 @@ available: 'ring', 'waist', 'wrist','chest' (unstable), '2t19', '4t19', '2t20', 
 
 'ring','waist','wrist','chest' means 'Jewel of the Lost Abbey', 'Gai Plin's Soothing Sash', 'Anvil-Hardened Wristwraps', 'Sal'salabim's Lost Tunic'
 
-equip=['ring','waist','wrist'] is legal, but you can't equip this in game.
+equip=['ring','waist','wrist'] is legal, but you can't equip like that in game.
 
 (We think ['4t19','2t20','ring','waist'] is BIS when consider about survival)
 
