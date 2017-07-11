@@ -1,13 +1,13 @@
 # wow brewmaster simcs by b1ueb1ues
 
-how to run
+How to run
 =====
 python brmfullsystem/run.py
 
-arguments
+Arguments
 =====
 There is no arg parse now
-edit run.py directly
+Edit run.py directly and run again
 
 class initial 
 ======
