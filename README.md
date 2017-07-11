@@ -39,7 +39,7 @@ use this to test relic
 
 
 ### mode='normal'
-####available:
+#### available:
 
 'normal' or 'n': 8m raw phydmg per 2sec (can be dodge)
 
