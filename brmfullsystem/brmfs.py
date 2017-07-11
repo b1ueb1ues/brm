@@ -23,6 +23,7 @@ class brm(brmbase):
     isbduration = 9
     facepalm = 0.4
     hotblooded = 0.04
+
     heavyhide = 0
     t20rate = 0.4
 

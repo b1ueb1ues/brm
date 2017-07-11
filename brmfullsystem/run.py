@@ -8,13 +8,20 @@ from brmfs import *
 
 def main():
 
+    '''
+    sample single run
+    b = brm(stat=[23,28,16,32],equip=['4t19','2t20','waist'],talent=['black','ht'])
+    b.run(100000) #simc seconds
+    b.showavoid() #print result
+    '''
+
 
     pool = []
     pool.append(brm(\
-        stat=[30,30,5,25],equip=['4t19','2t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='normal',t20rate = 0.4 \
+        stat=[30,30,5,25],equip=['4t19','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='normal',t20rate = 0.4 \
         ))
     pool.append(brm(\
-        stat=[30,30,5,25],equip=['2t19','4t20','ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='normal', t20rate=0.4 \
+        stat=[30,30,5,25],equip=['ring','waist'],talent=['black','ht'],ver='ptr', prate=0.44,mode='normal', t20rate=0.4 \
         ))
     test2(pool,time=100000)
 
