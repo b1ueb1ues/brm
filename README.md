@@ -29,10 +29,10 @@ you purifying brew rate(without talent)
 use this to test relic 
 
 ### isbduration=9
-use this to test relic (Chinese researchers approve that 9.5s ISB is better than 7% BOF in consider of survivability)
+use this to simc relic (Chinese researchers approve that 9.5s ISB is better than 7% BOF in consider of survivability)
 
 ### facepalm = 0.4
-use this to test relic 
+use this to simc relic 
 
 ### hotblooded = 0.04
 use this to test relic 
