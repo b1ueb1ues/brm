@@ -1,4 +1,4 @@
-# wow brewmaster simcs by b1ueb1ues
+# WOW brewmaster simulator by b1ueb1ues
 
 How to run
 =====
