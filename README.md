@@ -4,7 +4,7 @@ How to run
 =====
 python brmfullsystem/run.py
 
-Arguments
+Parameters
 =====
 There is no arg parse now
 
