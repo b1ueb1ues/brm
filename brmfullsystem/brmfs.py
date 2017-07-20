@@ -77,7 +77,10 @@ class brm(brmbase):
     def obtaingift(this,dmg):
         if this.mist != 0:
             if this.hp >= 0:
-                this.giftcount += dmg *(1 + 0.75*(1-this.hp/this.hpmax))
+                hpafter = this.hp - dmg
+                if hpafter < 0 :
+                    hpafter = 0
+                this.giftcount += dmg *(1 + 0.75*(1-hpafter/this.hpmax))
             else:
                 this.giftcount += dmg * 1.75
         else:
@@ -198,7 +201,7 @@ class brm(brmbase):
 
     def mode_god(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 15000000
+        this.takemeleeev.dmg = 30000000
 
     def mode_gd(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.2)
