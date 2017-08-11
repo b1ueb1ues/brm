@@ -117,9 +117,9 @@ class brm(brmbase):
 
     def takemagicdmg(this,dmg=400000):
         if this.ironskin == 1 :
-            rate = this.irate * 0.7
+            rate = this.irate * 0.4 * 1.4
         else :
-            rate = this.srate * 0.7
+            rate = this.srate * 0.4 * 1.4
 
         this.totaltank.takemagicdmg += dmg
 
@@ -153,6 +153,11 @@ class brm(brmbase):
                         this.bob.reduce(1)
                         this.wristcd.cast()
                         this.wristcount += 1
+                if '4t21' in this.equip:
+                    r = random.random()
+                    if r < 0.25:
+                        this.fbev.mv(time = this.el.time+1)
+
                 this.dodge.takemelee += dmg
                 this.masterystack = 0
                 return
@@ -689,6 +694,11 @@ class brm(brmbase):
                 if 'chest' in this.equip:
                     this.chest = 1
                 this.fbev = brm.FBEv(this.el ,repeat = 15)
+            if '4t21' in this.equip:
+                this.fbmastery = 2
+            if '2t21' in this.equip:
+                this.fbmastery = 2
+
         #cd
         this.ks = brm.Kegcd(this,8,1)
         this.tp = brm.Palmcd(this,4,1)
