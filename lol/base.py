@@ -153,6 +153,18 @@ class Unit(object):
     def getcritpower(this):
         return this.critpower
 
+    def getarmbreak(this):
+        return this.armbreak
+
+    def getarmbreakp(this):
+        return this.armbreakp
+
+    def getresbreak(this):
+        return this.resbreak
+
+    def getresbreakp(this):
+        return this.resbreakp
+
     def onattack(this,src):
         pass
 
@@ -195,12 +207,14 @@ class Unit(object):
         this.clock.run()
 
     
-def ave(someunit, equip, n=100):
+def ave(someunit, equip, target, n=100):
     time = 0
     tried = 0
     for i in range(n):
         c = Clock()
         a = someunit(c,equip)
+        t = target(c,a)
+        a.target = t
         a.run()
         time += a.target.diein
         tried += 1
@@ -209,9 +223,9 @@ def ave(someunit, equip, n=100):
 
 def main():
     e = [bw,jf,wj]
-    ave(Unit, e)
+    ave(Unit, e, Target)
     e = [jf,jf,wj]
-    ave(Unit, e)
+    ave(Unit, e, Target)
 
 
 if __name__ == "__main__" :
