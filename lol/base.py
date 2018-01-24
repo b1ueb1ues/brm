@@ -6,52 +6,76 @@ from equip import *
 
 
 class Target(object):
-    def __init__(this,clk,src):
-        this.hpmax = 2000
-        this.hp = this.hpmax
-        this.armbase = 90
-        this.arm = 60
-        this.res = 100
+    def __init__(this,clk):
+        this.stat = {
+                'hpmax':2000
+                ,'armbase':90
+                ,'arm':60
+                ,'res':100
+                }
         this.clock = clk
-        this.src = src
         this.diein = 0
+        this._init()
+        this.hp = this.stat['hpmax']
 
-    def getres(this):
-        return this.res
+    def _init(this):
+        pass
+
+
+    def getstat(this,stat):
+        if stat in this.stat:
+            return this.stat[stat]
 
     def getarmtotal(this):
-        return this.arm + this.armbase
+        return this.getstat('arm') + this.getstat('armbase')
 
-    def getarm(this):
-        return this.arm
 
-    def takephy(this,hit):
-        armbreakp = this.src.armbreakp
-        armbreak = this.src.armbreak
-        realarm = this.getarmtotal() - this.getarm()*armbreakp - armbreak 
+    def takephy(this,hit,src,name='_'):
+        armbreakp = src.getstat('armbreakp')
+        armbreak = src.getstat('armbreak')
+        realarm = this.getarmtotal() - this.getstat('arm')*armbreakp - armbreak 
         dmgrate = 100.0 / ( realarm + 100.0)
         dmg = hit * dmgrate
         this.hp -= dmg
+        this.clock.log("%d: phydmg:%d , hpleft:%d (%s)"%(this.clock.now,dmg,this.hp,name))
         if this.hp >= 0:
             return dmg
         else:
             return 0
 
+
+    def takemag(this,hit,src,name='_'):
+        resbreakp = src.getstat('resbreakp')
+        resbreak = src.getstat('resbreak')
+        realres = this.getstat('res') - this.getstat('res')*resbreakp - resbreak 
+        dmgrate = 100.0 / ( realres + 100.0)
+        dmg = hit * dmgrate
+        this.hp -= dmg
+        this.clock.log("%d: magdmg:%d , hpleft:%d (%s)"%(this.clock.now,dmg,this.hp,name))
+        if this.hp >= 0:
+            return dmg
+        else:
+            return 0
+
+
 class Unit(object):
     def __init__(this, clk=0, equip=0, target=0):
-        this.base_ad = 100
-        this.ad = 0
-        this.ap = 0
-        this.speedbase = 0.625
-        this.isp = 0.4
-        this.armbreak = 0
-        this.armbreakp = 0
-        this.resbreak = 0
-        this.resbreakp = 0
-        this.crit = 0
-        this.critpower = 1
+        this.stat = {
+                'base_ad':100
+                ,'ad':0
+                ,'ap':0
+                ,'speedbase': 0.625
+                ,'isp': 0.4
+                ,'armbreak': 0
+                ,'armbreakp': 0
+                ,'resbreak': 0
+                ,'resbreakp': 0
+                ,'crit': 0
+                ,'critpower': 1
+                ,'hpmax':2000
+                }
 
-        this.dmgbuff = []
+        this.dmgbuff = {}
 
         this.clock = clk
         if equip != 0:
@@ -62,8 +86,7 @@ class Unit(object):
         if target != 0:
             this.target = target
         else:
-            this.target = Target(clk,this)
-
+            this.target = Target(clk)
 
         this.equipstat = {}
 
@@ -74,8 +97,12 @@ class Unit(object):
         this.equiponattack = {}
 
         random.seed()
+        this._init()
         this.initialized = 0
-        this.hpmax = 2000
+
+
+    def _init(this):
+        pass
 
 
     def init(this):
@@ -84,7 +111,7 @@ class Unit(object):
         for k in range(len(this.equip)):
             i = this.equip[k]
             #instance
-            this.equip[k] = i()
+            this.equip[k] = i(this.clock)
             for j in i.stat :
                 if j in tmp_equipstat :
                     if '_uniq' in j:
@@ -106,24 +133,9 @@ class Unit(object):
             else:
                 this.equipstat[i] = tmp_equipstat[i]
 
-        if 'ad' in this.equipstat:
-            this.ad += this.equipstat['ad']
-        if 'ap' in this.equipstat:
-            this.ap += this.equipstat['ap']
-        if 'isp' in this.equipstat:
-            this.isp += this.equipstat['isp']
-        if 'crit' in this.equipstat:
-            this.crit += this.equipstat['crit']
-        if 'critpower' in this.equipstat:
-            this.critpower += this.equipstat['critpower']
-        if 'armbreak' in this.equipstat:
-            this.armbreak += this.equipstat['armbreak']
-        if 'armbreakp' in this.equipstat:
-            this.armbreakp += this.equipstat['armbreakp']
-        if 'resbreak' in this.equipstat:
-            this.resbreak += this.equipstat['resbreak']
-        if 'resbreakp' in this.equipstat:
-            this.resbreakp += this.equipstat['resbreakp']
+        #add static stat together
+        for i in this.equipstat:
+            this.stat[i] += this.equipstat[i]
 
         #print this.equipstat
 
@@ -134,54 +146,72 @@ class Unit(object):
         this.initialized = 1
 
 
-    def getad(this):
-        return this.ad + this.base_ad
+    def getaurastat(this,stat):
+        ret = 0
+        for i in this.aurastat :
+            if stat in this.aurastat[i]:
+                ret += this.aurastat[i][stat]
+        return ret
 
-    def getap(this):
-        return this.ap
+
+    def getstat(this,stat):
+        ret = 0
+        if stat == 'total_ad':
+            ret += this.stat['ad'] + this.stat['base_ad']
+            return ret
+
+        if stat in this.stat :
+            ret += this.stat[stat]
+
+        ret += this.getaurastat(stat)
+        return ret
+
+
+    def gettotalad(this):
+        ad = this.getstat('base_ad') + this.getstat('ad')
+        return ad
+
 
     def getiv(this):
-        speed = this.speedbase * (1.0 + this.getisp())
-        return 1.0 / speed
+        speed = this.getstat('speedbase') * (1.0 + this.getstat('isp')) 
+        if speed > 2.5:
+            speed = 2.5
+        iv =  1000 / speed
+        return iv
 
-    def getisp(this):
-        return this.isp
 
-    def getcrit(this):
-        return this.crit
-
-    def getcritpower(this):
-        return this.critpower
-
-    def getarmbreak(this):
-        return this.armbreak
-
-    def getarmbreakp(this):
-        return this.armbreakp
-
-    def getresbreak(this):
-        return this.resbreak
-
-    def getresbreakp(this):
-        return this.resbreakp
-
-    def onattack(this,src):
-        pass
-
-    def onhit(this,dst):
+    def onattack(this,src,dst):
         for i in this.equip :
-            i.onhit(dst)
+            i.onattack(src,dst)
+
+
+    def onhit(this,src,dst):
+        for i in this.equip :
+            i.onhit(src,dst)
+
+
+    def dealphy(this,hit,name='_'):
+        for i in this.dmgbuff:
+            hit *= this.dmgbuff[i]
+        return this.target.takephy(hit,this,name)
+
+
+    def dealmag(this,hit,name='_'):
+        for i in this.dmgbuff:
+            hit *= this.dmgbuff[i]
+        return this.target.takemag(hit,this,name)
 
 
     def attack(this):
-        this.onattack(this)
-        this.onhit(this.target)
+        this.onattack(this,this.target)
+        this.onhit(this,this.target)
         r = random.random()
-        hit = this.getad()
-        crit = this.getcrit() 
+        hit = this.gettotalad()
+        crit = this.getstat('crit') 
         if r < crit :
-            hit = hit * (1 + this.getcritpower())
-        return this.target.takephy(hit)
+            hit = hit * (1 + this.getstat('critpower'))
+        return this.dealphy(hit)
+
 
     class Swing(Proc):
         def tick(this):
@@ -192,6 +222,7 @@ class Unit(object):
                 #print 'kill at', this.clock.now
                 this.host.target.diein = this.clock.now
                 return
+
 
     def run(this):
         if this.initialized != 0 :
@@ -212,19 +243,31 @@ def ave(someunit, equip, target, n=100):
     tried = 0
     for i in range(n):
         c = Clock()
-        a = someunit(c,equip)
-        t = target(c,a)
-        a.target = t
+        t = target(c)
+        a = someunit(c,equip,t)
         a.run()
         time += a.target.diein
         tried += 1
-    print time/n
+    print time/n/1000
+
+def avelog(someunit, equip, target, n=100):
+    time = 0
+    tried = 0
+    for i in range(n):
+        c = Clock()
+        t = target(c)
+        a = someunit(c,equip,t)
+        a.run()
+        time += a.target.diein
+        tried += 1
+    c.printlog()
+    print time/n/1000
 
 
 def main():
-    e = [bw,jf,wj]
+    e = [bw,jf,wj,qy]
     ave(Unit, e, Target)
-    e = [jf,jf,wj]
+    e = [jf,bw,qy]
     ave(Unit, e, Target)
 
 

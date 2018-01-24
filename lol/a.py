@@ -1,37 +1,53 @@
 from base import *
 
 class Normala(Unit):
-    def __init__(this,*args,**argv):
-        super(Normala,this).__init__(*args,**argv)
-        this.isp = 18 * 0.3
+    def _init(this):
+        this.stat['isp'] = 18 * 0.03
+
+class Ts(Unit):
+    def _init(this):
+        this.stat['isp'] = 0.474
+
+    def onhit(this,src,dst):
+        this.dealmag(this.getstat('ap') * 0.3 + 60,'zyzn') 
+        super(Ts,this).onhit(src,dst)
+
 
 
 class Tan(Target):
-    def __init__(this,*args,**argv):
-        super(Tan, this).__init__(*args,**argv)
-        this.hpmax = 4000
-        this.hp = this.hpmax
-        this.armbase = 90
-        this.arm = 60+80
-        this.res = 200
+    def _init(this):
+        this.stat['hpmax'] = 4000
+        this.stat['armbase'] = 90
+        this.stat['arm'] = 60+80
+        this.stat['res'] = 200
 
 class Cui(Target):
-    def __init__(this,*args,**argv):
-        super(Cui, this).__init__(*args,**argv)
-        this.hpmax = 2000
-        this.hp = this.hpmax
-        this.armbase = 60
-        this.arm = 30
-        this.res = 50
+    def _init(this):
+        this.stat['hpmax'] = 2000
+        this.stat['armbase'] = 60
+        this.stat['arm'] = 30
+        this.stat['res'] = 50
 
 def main():
-    e = [bw,jf]
-    ave(Unit, e, Cui)
-    ave(Unit, e, Tan)
+    e = [ns,gs,bw,qy]
+    avelog(Ts,e,Tan)
+    ave(Ts,e,Cui)
 
-    e = [wj,jf]
-    ave(Unit, e, Cui)
-    ave(Unit, e, Tan)
+    e = [ns,gs,fc,mz]
+    ave(Ts,e,Tan)
+    ave(Ts,e,Cui)
+
+
+
+    return 
+    e = [bw,jf,wj,qy]
+    e = [bw,jf,wj,qy]
+    ave(Normala, e, Cui)
+    ave(Normala, e, Tan)
+
+    e = [bw,jf,wj,jf]
+    ave(Normala, e, Cui)
+    ave(Normala, e, Tan)
 
     return 
 

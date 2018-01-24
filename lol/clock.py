@@ -13,20 +13,30 @@ class Aura(Proc):
         this.enable = 0
         this.duration = 6000
         this._test = 0
+        this._init()
+    def _init():
+        pass
 
     def on(this):
         this.start = this.clock.now
         this.enable = 1
-        this.clock.add(this,this.start + this.duration)
+        if this.duration != -1:
+            this.clock.add(this,this.start + this.duration)
+        this._on()
+    def _on(this):
+        pass
 
     def off(this):
         this.enable = 0
-
+        this._off()
+    def _off(this):
+        pass
 
     def tick(this):
         this._test = this.clock.now
         this.off()
-
+    def _tick(this):
+        pass
 
 
 class Clock(object):
@@ -36,7 +46,16 @@ class Clock(object):
         this.iv = 1
         this.proctick = []
         this.proc = {}
+        this._log = []
 
+    def log(this, logstr):
+        this._log.append(logstr)
+
+    def printlog(this):
+        print '------------------'
+        print '---logstart-------'
+        for i in this._log:
+            print i
 
     def run(this):
         while this.now <= this.longest :
@@ -73,22 +92,6 @@ class Clock(object):
 
 
 def main():
-    a = {}
-    for i in a:
-        print a.pop(i)
-    a[5] = 5
-    a[3] = 3
-    a[7] = 7
-    print a.pop(6)
-    exit()
-
-    print a
-    for i in a:
-        a[8] = 8
-        print i
-        break
-    exit()
-
 
     a = Clock()
     b = Aura(a)
