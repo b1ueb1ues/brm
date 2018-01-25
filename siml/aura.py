@@ -38,7 +38,7 @@ class Aura(Proc):
         pass
 
     def tick(this):
-        if this.clock.now - this.start != this.duration:
+        if this.clock.now - this.start < this.duration:
             return
         this._test = this.clock.now
         this._tick()

@@ -108,7 +108,7 @@ class Unit(object):
             return a[1].getindex()
         aura_in_order = sorted(this.aurastat.items(),key=index)
         for i in aura_in_order :
-            ret = i[1].procstat(name,value)
+            ret = i[1].procstat(name,ret)
         return ret
 
 
@@ -253,7 +253,7 @@ def ave(someunit, equip, target, n=100):
         a.run()
         time += a.target.diein
         tried += 1
-    print time/n/1000
+    print float(time)/n/1000
 
 def avelog(someunit, equip, target, n=100):
     time = 0
@@ -266,7 +266,7 @@ def avelog(someunit, equip, target, n=100):
         time += a.target.diein
         tried += 1
     c.printlog()
-    print time/n/1000
+    print float(time)/n/1000
 
 
 def main():

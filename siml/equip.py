@@ -38,6 +38,12 @@ class jf(Equip):
     def onhit(this,src,dst):
         src.dealphy(15,'jf')
 
+class lc(Equip):
+    stat = {
+            'isp':0.45
+            ,'crit':0.3
+            }
+
 class bw(Equip):
     stat = {
             'ad':40
@@ -155,7 +161,6 @@ class gs(Equip):
         def _off(this):
             this.stat = {}
             this.rage = 0
-            print '0------------------'
             this.host.rmaura('gs')
 
 class hq(Equip):
@@ -163,3 +168,35 @@ class hq(Equip):
             'ad':40
             ,'hpmax':400
             }
+    def _init(this):
+        this.hqaura = hq.hqaura(this.clock)
+
+    class hqaura(Aura):
+        def _init(this):
+            this.stack = 0
+            this.stat = {}
+            this.duration = 6000
+            this.host = 0
+            this.index = 1
+
+        def _on(this):
+            if this.stack < 6:
+                this.stack += 1
+            this.stat['arm'] = float(this.stack)*0.04
+            this.host.addaura('hq',this)
+
+        def procstat(this,name,value):
+            ret = value
+            if name in this.stat:
+                ret = value * (1.0 - this.stat[name])
+            return ret
+
+        def _off(this):
+            this.stat = {}
+            this.rage = 0
+            this.host.rmaura('hq')
+
+    def onhit(this,src,dst):
+        this.hqaura.host = dst
+        this.hqaura.on()
+

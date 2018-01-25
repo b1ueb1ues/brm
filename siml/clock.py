@@ -39,11 +39,18 @@ class Clock(object):
             i = 0
             for i in this.proctick :
                 i.tick()
+                print i
 
             if not i : #tickproc is empty
                 i = 0
-                for i in this.proc: 
-                    this.now = i
+                def index(a):
+                    return a[0]
+                proc_in_order = sorted(this.proc.items(),key=index)
+
+                for i in proc_in_order: 
+                    this.now = i[0]
+                    break
+
                 if not i : #proc is empty
                     #print 'clock empty'
                     return 
@@ -57,6 +64,7 @@ class Clock(object):
         if time == -1 :
             this.proctick.append(p)
         else :
+            time = int(time)
             if time in this.proc :
                 this.proc[time].append(p)
             else:
