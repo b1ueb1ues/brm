@@ -5,57 +5,6 @@ from equip import *
 
 
 
-class Target(object):
-    def __init__(this,clk):
-        this.stat = {
-                'hpmax':2000
-                ,'armbase':90
-                ,'arm':60
-                ,'res':100
-                }
-        this.clock = clk
-        this.diein = 0
-        this._init()
-        this.hp = this.stat['hpmax']
-
-    def _init(this):
-        pass
-
-
-    def getstat(this,stat):
-        if stat in this.stat:
-            return this.stat[stat]
-
-    def getarmtotal(this):
-        return this.getstat('arm') + this.getstat('armbase')
-
-
-    def takephy(this,hit,src,name='_'):
-        armbreakp = src.getstat('armbreakp')
-        armbreak = src.getstat('armbreak')
-        realarm = this.getarmtotal() - this.getstat('arm')*armbreakp - armbreak 
-        dmgrate = 100.0 / ( realarm + 100.0)
-        dmg = hit * dmgrate
-        this.hp -= dmg
-        this.clock.log("%d: phydmg:%d , hpleft:%d (%s)"%(this.clock.now,dmg,this.hp,name))
-        if this.hp >= 0:
-            return dmg
-        else:
-            return 0
-
-
-    def takemag(this,hit,src,name='_'):
-        resbreakp = src.getstat('resbreakp')
-        resbreak = src.getstat('resbreak')
-        realres = this.getstat('res') - this.getstat('res')*resbreakp - resbreak 
-        dmgrate = 100.0 / ( realres + 100.0)
-        dmg = hit * dmgrate
-        this.hp -= dmg
-        this.clock.log("%d: magdmg:%d , hpleft:%d (%s)"%(this.clock.now,dmg,this.hp,name))
-        if this.hp >= 0:
-            return dmg
-        else:
-            return 0
 
 
 class Unit(object):
@@ -85,8 +34,8 @@ class Unit(object):
 
         if target != 0:
             this.target = target
-        else:
-            this.target = Target(clk)
+        #else:
+            #this.target = Target(clk)
 
         this.equipstat = {}
 
@@ -146,24 +95,30 @@ class Unit(object):
         this.initialized = 1
 
 
-    def getaurastat(this,stat):
-        ret = 0
-        for i in this.aurastat :
-            if stat in this.aurastat[i]:
-                ret += this.aurastat[i][stat]
+    def addaura(this,name,a):
+        this.aurastat[name] = a
+
+    def rmaura(this,name):
+        this.aurastat.pop(name)
+
+
+    def auraprocstat(this,name,value):
+        ret = value
+        def index(a):
+            return a[1].getindex()
+        aura_in_order = sorted(this.aurastat.items(),key=index)
+        for i in aura_in_order :
+            ret = i[1].procstat(name,value)
         return ret
 
 
     def getstat(this,stat):
         ret = 0
-        if stat == 'total_ad':
-            ret += this.stat['ad'] + this.stat['base_ad']
-            return ret
 
         if stat in this.stat :
-            ret += this.stat[stat]
+            ret = this.stat[stat]
 
-        ret += this.getaurastat(stat)
+        ret = this.auraprocstat(stat,ret)
         return ret
 
 
@@ -204,13 +159,16 @@ class Unit(object):
 
     def attack(this):
         this.onattack(this,this.target)
-        this.onhit(this,this.target)
+
         r = random.random()
         hit = this.gettotalad()
         crit = this.getstat('crit') 
         if r < crit :
             hit = hit * (1 + this.getstat('critpower'))
-        return this.dealphy(hit)
+        ret = this.dealphy(hit)
+
+        this.onhit(this,this.target)
+        return ret
 
 
     class Swing(Proc):
@@ -237,6 +195,53 @@ class Unit(object):
         this.clock.add(this.swing,0)
         this.clock.run()
 
+class Target(Unit):
+    def __init__(this,clk):
+        super(Target,this).__init__(clk)
+        this.stat = {
+                'hpmax':2000
+                ,'armbase':90
+                ,'arm':60
+                ,'res':100
+                }
+        this.diein = 0
+        this._init()
+        this.hp = this.stat['hpmax']
+
+    def _init(this):
+        pass
+
+
+    def getarmtotal(this):
+        return this.getstat('arm') + this.getstat('armbase')
+
+
+    def takephy(this,hit,src,name='_'):
+        armbreakp = src.getstat('armbreakp')
+        armbreak = src.getstat('armbreak')
+        realarm = this.getarmtotal() - this.getstat('arm')*armbreakp - armbreak 
+        dmgrate = 100.0 / ( realarm + 100.0)
+        dmg = hit * dmgrate
+        this.hp -= dmg
+        this.clock.log("%d: phydmg:%d , hpleft:%d (%s)"%(this.clock.now,dmg,this.hp,name))
+        if this.hp >= 0:
+            return dmg
+        else:
+            return 0
+
+
+    def takemag(this,hit,src,name='_'):
+        resbreakp = src.getstat('resbreakp')
+        resbreak = src.getstat('resbreak')
+        realres = this.getstat('res') - this.getstat('res')*resbreakp - resbreak 
+        dmgrate = 100.0 / ( realres + 100.0)
+        dmg = hit * dmgrate
+        this.hp -= dmg
+        this.clock.log("%d: magdmg:%d , hpleft:%d (%s)"%(this.clock.now,dmg,this.hp,name))
+        if this.hp >= 0:
+            return dmg
+        else:
+            return 0
     
 def ave(someunit, equip, target, n=100):
     time = 0
@@ -266,7 +271,7 @@ def avelog(someunit, equip, target, n=100):
 
 def main():
     e = [bw,jf,wj,qy]
-    ave(Unit, e, Target)
+    avelog(Unit, e, Target)
     e = [jf,bw,qy]
     ave(Unit, e, Target)
 

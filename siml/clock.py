@@ -2,42 +2,15 @@ class Proc(object):
     def __init__(this,clk):
         this.clock = clk
         this.iv = clk.iv
+        this._init()
+
+    def _init(this):
+        pass
 
     def tick(this):
         print 'Proc base tick'
         pass
         
-class Aura(Proc):
-    def __init__(this,clk):
-        super(Aura,this).__init__(clk)
-        this.enable = 0
-        this.duration = 6000
-        this._test = 0
-        this._init()
-    def _init():
-        pass
-
-    def on(this):
-        this.start = this.clock.now
-        this.enable = 1
-        if this.duration != -1:
-            this.clock.add(this,this.start + this.duration)
-        this._on()
-    def _on(this):
-        pass
-
-    def off(this):
-        this.enable = 0
-        this._off()
-    def _off(this):
-        pass
-
-    def tick(this):
-        this._test = this.clock.now
-        this.off()
-    def _tick(this):
-        pass
-
 
 class Clock(object):
     def __init__(this):

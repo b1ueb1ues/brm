@@ -29,13 +29,15 @@ class Cui(Target):
         this.stat['res'] = 50
 
 def main():
-    e = [ns,gs,bw,qy]
+    e = [ns,gs,mz,fc,ns2]
     avelog(Ts,e,Tan)
     ave(Ts,e,Cui)
+    print ''
 
-    e = [ns,gs,fc,mz]
+    e = [ns,gs,bw,fc,qy]
     ave(Ts,e,Tan)
     ave(Ts,e,Cui)
+    print ''
 
 
 

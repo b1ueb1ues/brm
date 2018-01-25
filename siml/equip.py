@@ -1,4 +1,5 @@
 from clock import *
+from aura import *
 class Equip(object):
     stat = {
             'ad' : 0
@@ -34,6 +35,8 @@ class jf(Equip):
             'isp':0.4
             ,'crit':0.3
             }
+    def onhit(this,src,dst):
+        src.dealphy(15,'jf')
 
 class bw(Equip):
     stat = {
@@ -61,15 +64,26 @@ class qy(Equip):
 class qy2(Equip):
     stat = {
             'ad':50
-            ,'armbreakp':0.35
     }
 
 class mz(Equip):
     stat = {
             'ap':120
             }
+    class mzaura(Aura):
+        def _init(this):
+            this.index = 256
+        def procstat(this,name,value):
+            if name == 'ap':
+                return value * 1.3
+            return value
+        def _on(this):
+            this.host.addaura('mz',this)
+
     def onequip(this,src):
-        src.stat['ap'] *= 1.3
+        this.mzaura = mz.mzaura(this.clock)
+        this.mzaura.host = src
+        this.mzaura.on()
 
 class ns(Equip):
     stat = {
@@ -96,7 +110,7 @@ class gs(Equip):
             ,'ap':50
             }
     def _init(this):
-        this.aura = gs.aura(this.clock)
+        this.gsaura = gs.gsaura(this.clock)
         this.rage = 0
         this._test = 0
 
@@ -106,9 +120,9 @@ class gs(Equip):
         
 
     def onattack(this,src,dst):
-        this.aura.src = src
-        this.aura.on()
-        if this.aura.stack >= 6:
+        this.gsaura.host = src
+        this.gsaura.on()
+        if this.gsaura.stack >= 6:
             if this.rage == 1:
                 this.rage = 0
                 this._test +=1
@@ -116,12 +130,13 @@ class gs(Equip):
             else:
                 this.rage = 1
 
-    class aura(Aura):
+    class gsaura(Aura):
         def _init(this):
             this.stack = 0
             this.stat = {}
             this.duration = 5000
-            this.src = 0
+            this.host = 0
+            this.index = 1
 
         def _on(this):
             if this.stack < 6:
@@ -129,10 +144,22 @@ class gs(Equip):
             this.stat['ad'] = this.stack*3
             this.stat['ap'] = this.stack*4
             this.stat['isp'] = this.stack*0.08
-            this.src.aurastat['gs'] = this.stat
+            this.host.addaura('gs',this)
+
+        def procstat(this,name,value):
+            ret = value
+            if name in this.stat:
+                ret = value + this.stat[name]
+            return ret
 
         def _off(this):
             this.stat = {}
             this.rage = 0
+            print '0------------------'
+            this.host.rmaura('gs')
 
-
+class hq(Equip):
+    stat = {
+            'ad':40
+            ,'hpmax':400
+            }
