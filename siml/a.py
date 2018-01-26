@@ -29,34 +29,27 @@ class Cui(Target):
         this.stat['res'] = 50
 
 def main():
-    e = [wj,jf,bw,qy,hq]
-    avelog(Normala,e,Tan)
-    ave(Normala,e,Cui)
-    print ''
-    e = [wj,jf,bw,qy,lc]
-    ave(Normala,e,Tan)
-    ave(Normala,e,Cui)
-    print ''
-    return
+    if 0 :
+        e = [wj,jf,bw,qy,hq]
+        avelog(Normala,e,Tan)
+        ave(Normala,e,Cui)
+        print ''
+        e = [wj,jf,bw,qy,lc]
+        ave(Normala,e,Tan)
+        avelog(Normala,e,Cui)
+        print ''
+        return
 
-    e = [ns,gs,bw,fc,qy]
+    e = [gs,bw,ns,qy,sx]
+    avelog(Ts,e,Tan)
+    ave(Ts,e,Cui)
+    print ''
+    e = [gs,bw,ns,qy,jf]
     ave(Ts,e,Tan)
     ave(Ts,e,Cui)
     print ''
+    return
 
-
-
-    return 
-    e = [bw,jf,wj,qy]
-    e = [bw,jf,wj,qy]
-    ave(Normala, e, Cui)
-    ave(Normala, e, Tan)
-
-    e = [bw,jf,wj,jf]
-    ave(Normala, e, Cui)
-    ave(Normala, e, Tan)
-
-    return 
 
 if __name__ == "__main__" :
     main()

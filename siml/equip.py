@@ -44,6 +44,29 @@ class lc(Equip):
             ,'crit':0.3
             }
 
+class sx(Equip):
+    def _init(this):
+        this.rb = 1
+    stat = {
+            'isp':0.40
+            ,'ad':25
+            }
+    def onhit(this,src,dst):
+        if this.rb :
+            this.rb = 0
+            dmg = src.getstat("base_ad") * 2
+            src.dealphy(dmg,'sx')
+
+class wy(Equip):
+    stat = {
+            'ap':80
+            }
+class xs(Equip):
+    stat = {
+            'hpmax':400
+            ,'base_ad':50
+            }
+
 class bw(Equip):
     stat = {
             'ad':40
