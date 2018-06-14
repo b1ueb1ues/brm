@@ -14,6 +14,8 @@ class Aura(Proc):
         this.host = 0
         this._indexmax = 256
         this.index = 0
+        this.start = 0
+        this.end = 0
     def _init():
         pass
 
@@ -24,10 +26,11 @@ class Aura(Proc):
             return this._indexmax + this.index
     def on(this):
         this.start = this.clock.now
-        this.enable = 1
+        this.end = this.start + this.duration
         if this.duration != -1:
-            this.clock.add(this,this.start + this.duration)
+            this.clock.add(this,this.end)
         this._on()
+        this.enable = 1
     def _on(this):
         pass
 

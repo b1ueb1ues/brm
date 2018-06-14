@@ -70,6 +70,41 @@ class Clock(object):
             else:
                 this.proc[time] = [p]
 
+    def rm(this,p,time=-1):
+        if time == -1 :
+            index = 0
+            for i in this.proctick:
+                if p == i:
+                    this.proctick.pop(index)
+                    break
+                index += 1
+        else :
+            time = int(time)
+            if time in this.proc :
+                index = 0
+                for i in this.proc[time]:
+                    if p == i:
+                        this.proc[time].pop(index)
+                        break
+                    index += 1
+
+                this.proc[time].append(p)
+            else:
+                print 'rm 404'
+                exit()
+    def mv(this,p,oldtime,newtime):
+        index = 0
+        for i in this.proc[oldtime]:
+            if i == p:
+                this.proc[oldtime].pop(index)
+                this.add(p,newtime)
+                return
+            index += 1
+        print 'mv 404'
+        exit()
+
+
+
 
 
 def main():

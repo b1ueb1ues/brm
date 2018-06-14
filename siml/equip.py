@@ -139,7 +139,8 @@ class gs(Equip):
             ,'ap':50
             }
     def _init(this):
-        this.gsaura = gs.gsaura(this.clock)
+        #this.gsaura = gs.gsaura(this.clock)
+        this.gsaura = 0
         this.rage = 0
         this._test = 0
 
@@ -149,8 +150,12 @@ class gs(Equip):
         
 
     def onattack(this,src,dst):
-        this.gsaura.host = src
-        this.gsaura.on()
+        if this.gsaura :
+            this.gsaura.refresh()
+        else:
+            this.gsaura = gs.gsaura(this.clock)
+            this.gsaura.host = src
+            this.gsaura.on()
         if this.gsaura.stack >= 6:
             if this.rage == 1:
                 this.rage = 0
@@ -166,6 +171,10 @@ class gs(Equip):
             this.duration = 5000
             this.host = 0
             this.index = 1
+
+        def refresh(this):
+            this.clock.rm(this,this.end)
+            this.on()
 
         def _on(this):
             if this.stack < 6:
@@ -202,11 +211,27 @@ class hq(Equip):
             this.host = 0
             this.index = 1
 
-        def _on(this):
+        def refresh(this):
+            this.clock.rm(this,this.end)
+            this.on()
+
+        def on(this):
             if this.stack < 6:
                 this.stack += 1
             this.stat['arm'] = float(this.stack)*0.04
-            this.host.addaura('hq',this)
+
+            if this.enable :
+                this.clock.mv(this,this.end,this.clock.now+this.duration)
+                this.start = this.clock.now
+                this.end = this.start + this.duration
+            else:
+                this.host.addaura('hq',this)
+                this.start = this.clock.now
+                this.end = this.start + this.duration
+                if this.duration != -1:
+                    this.clock.add(this,this.end)
+
+            this.enable = 1
 
         def procstat(this,name,value):
             ret = value

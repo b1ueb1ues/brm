@@ -1,71 +1,80 @@
 
-def bps(haste=1,t7='ht',p=1.3,t3='black'):
-	brewcd = 21
-	blackcd = 90
+def bps(haste=1,t7='ht',p=1,t3='bob'):
+	brewcd = 16
+	bobcd = 90
 	ret = 0
-	if t3 == 'light':
-		brewcd = 18
+	if t3 == 'lb':
+		brewcd = brewcd - 3
 	if t7 == 'bc' :
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 35 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 30 + 8*p)/fivekegtime
 		#print 'brewhaste',brewhaste
 		brewcd /= brewhaste
-		blackcd /= brewhaste
+		bobcd /= brewhaste
 	elif t7 == 'ht1' or t7 == 'ht' or t7 == 'ht10' :
 		haste = haste*1.1
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 25 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
 		brewcd /= brewhaste
-		blackcd /= brewhaste
+		bobcd /= brewhaste
 	elif t7 == 'ht15' :
 		haste = haste*1.15
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 25 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
 		brewcd /= brewhaste
-		blackcd /= brewhaste
+		bobcd /= brewhaste
 	elif t7 == 'ed':
 		brewcd /= haste
 		fivekegtime = 40.0/haste
-		brewhaste = (fivekegtime + 25 + 8*p)/fivekegtime
+		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
 		brewcd /= brewhaste
-		blackcd /= brewhaste
+		bobcd /= brewhaste
 	else :
 		print "t7 err"
 		return 0;
 
-	if t3 == 'black' :
-		#print 'cd',brewcd,blackcd
-		ret = 1.0/brewcd + 2.5/blackcd
+	if t3 == 'bob' :
+		#print 'cd',brewcd,bobcd
+		ret = 1.0/brewcd + 2.5/bobcd
 	else :
 		ret = 1.0/brewcd
 	return ret
 
-if __name__ == '__main__':
-    i = 1.5
-    a = bps(i,p=2.3,t3='',t7='ed')
-    print 1/a
-    exit()
+def pps(haste=1,t7='ht',p=1,t3='bob'):
+    return bps(haste,t7,p,t3) - 1.0/6
+    
 
-    b = bps(i,p=2.6,t3='black')
-    print a  * 60
-    print b * 60
-    exit()
+
+if __name__ == '__main__':
+    if 0:
+        i = 1.5
+        a = bps(i,p=2.3,t3='',t7='ed')
+        print 1/a
+        exit()
+
+        b = bps(i,p=2.6,t3='bob')
+        print a  * 60
+        print b * 60
+        exit()
 
     i=1-0.01
     while(1):
         if i >= 1.5:
                 break
         i+=0.01
-        a = bps(i,'ht',p=1.3,t3='black')
-        print i,a
+        a = bps(i,'ed',p=1,t3='bob')
+        b = bps(i,'ht',p=1,t3='bob')
+        c = bps(i,'ht15',p=1,t3='bob')
+        print '%.2f'%i,'%.2f, %.2f, %.2f'%(1.0/a ,1.0/b  ,1/c)
         #b = 1/(a-0.125)
         #c = 1/(a-1.0/9)
-        #print i,a,b,c
+        #print i,a,b,clb
+    exit()
 
-    a = bps(i,'ht1',p=1.3,t3='black')
+    a = bps(i,'ht1',p=1.3,t3='bob')
     pps = a - 1.0/8
     print pps
     print 1/pps, a
@@ -78,7 +87,7 @@ if __name__ == '__main__':
     #	d = bps(i*1.15,'ht',p=2.3,t3='null')
     #	print d,
     #
-    #	b = bps(i,'bc',p=2.3,t3='black')
+    #	b = bps(i,'bc',p=2.3,t3='bob')
     #	print b
     #
     #
