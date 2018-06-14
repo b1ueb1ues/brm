@@ -2562,7 +2562,7 @@ def _test():
     doctest.testmod()
 
 
-def main(argv=None):
+def main(argv=None,path=None):
     if argv is None:
         argv = sys.argv
     if not logging.root.handlers:
@@ -2598,7 +2598,7 @@ def main(argv=None):
     parser.add_option("--compare", action="store_true",
                       help="run against Markdown.pl as well (for testing)")
     parser.set_defaults(log_level=logging.INFO, compare=False,
-                        encoding="utf-8", safe_mode=None, use_file_vars=False)
+                        encoding="utf-8", safe_mode=None, use_file_vars=False )
     opts, paths = parser.parse_args()
     log.setLevel(opts.log_level)
 
@@ -2644,6 +2644,9 @@ def main(argv=None):
     from os.path import join, dirname, abspath, exists
     markdown_pl = join(dirname(dirname(abspath(__file__))), "test",
                        "Markdown.pl")
+    if path:
+        paths = [path]
+
     if not paths:
         paths = ['-']
     for path in paths:
@@ -2672,6 +2675,7 @@ def main(argv=None):
             extras=extras, link_patterns=link_patterns,
             use_file_vars=opts.use_file_vars,
             cli=True)
+        return html
         if py3:
             sys.stdout.write(html)
         else:
