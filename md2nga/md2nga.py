@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+# -*- encoding:utf8 -*-
 import sys
-from markdown2 import Markdown
-from markdown2 import main as mmain
+import markdown2
+Markdown = markdown2.Markdown
+mmain = markdown2.main
+py3 = markdown2.py3
 
 
 #md = Markdown()
@@ -9,7 +13,6 @@ from markdown2 import main as mmain
 
 def processall(a):
     alt = 1 # make p=quote quote=collapse
-    print '-------'
     replace = {
         '<p>'   : ''        , '</p>'   : ''         ,
        #'<p>'   : '[quote]' , '</p>'   : '[/quote]' ,
@@ -58,7 +61,13 @@ def processall(a):
 
     for i in replace:
         a = a.replace(i,replace[i])
-    print a
+
+    if py3:
+        sys.stdout.write(a)
+    else:
+        sys.stdout.write(a.encode(
+            sys.stdout.encoding or "utf-8", 'xmlcharrefreplace'))
+    #print a
 
 
 def processline(l):
