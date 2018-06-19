@@ -8,7 +8,7 @@ from markdown2 import main as mmain
 
 
 def processall(a):
-    alt = 1
+    alt = 1 # make p=quote quote=collapse
     print '-------'
     replace = {
         '<p>'   : ''        , '</p>'   : ''         ,
@@ -21,25 +21,31 @@ def processall(a):
         '<h4>' : '[b][size=110%]'    , '</h4>' : '[/size][/b]'     , # ####
         '<h5>' : '[b][size=100%]'    , '</h5>' : '[/size][/b]'     , # #####
         '<h6>' : '[b][size=100%]'    , '</h6>' : '[/size][/b]'     , # ######
-       # # ## ### #### ##### ######
-        '<ul>'         : '[list]'         , '</ul>'         : '[/list]'     , # list
-        '<ol>'         : '[list]'         , '</ol>'         : '[/list]'     , # list
+       # ## ### #### ##### ######
+        '<ul>'         : '[list]'         , '</ul>'         : '[/list]'     , # - list
+        '<ol>'         : '[list]'         , '</ol>'         : '[/list]'     , # 1. order list
         '<li>'         : '[*]'            , '</li>'         : ''            ,
        #-------------
-        '<table>'      : '[table]'        , '</table>'      : '[/table]'    , # table
-        '<thead>'      : ''               , '</thead>'      : ''            ,
-        '<th>'         : '[th]'           , '</th>'         : '[/th]'       ,
+        '<table>'      : '[table]'        , '</table>'      : '[/table]'    , # | table | table |
+        '<thead>'      : ''               , '</thead>'      : ''            , # | :---- | ----: |
+        '<th>'         : '[th]'           , '</th>'         : '[/th]'       , # | body  |  body |
         '<tbody>'      : ''               , '</tbody>'      : ''            ,
         '<tr>'         : '[tr]'           , '</tr>'         : '[/tr]'       ,
         '<td>'         : '[td]'           , '</td>'         : '[/td]'       ,
        #-------------
-        '<strong>'     : '[b][size=110%]' , '</strong>'     : '[/size][/b]' , # **
-        '<em>'         : '[color=red]'    , '</em>'         : '[/color]'    , # *
-        '<blockquote>' : '[quote]'        , '</blockquote>' : '[/quote]'    , # >
-       #'<blockquote>' : '[collapse]'     , '</blockquote>' : '[/collapse]' , # >
-        '<code>'       : '[code]'         , '</code>'       : '[/code]'     , # `
-        '<strike>'     : '[del]'          , '</strike>'     : '[/del]'      , # ~~
-        '<hr />'       : '======'         , '<hr>'          : ''            , # ---
+        '<strong>'     : '[b][size=110%]' , '</strong>'     : '[/size][/b]' , # **bold**
+        '<em>'         : '[color=red]'    , '</em>'         : '[/color]'    , # *red*
+        '<blockquote>' : '[quote]'        , '</blockquote>' : '[/quote]'    , # > quote
+       #'<blockquote>' : '[collapse]'     , '</blockquote>' : '[/collapse]' , # > collapse
+        '<strike>'     : '[del]'          , '</strike>'     : '[/del]'      , # ~~del~~
+        '<hr />'       : '======'         , # -------------------------------------------
+        '<code>'       : '[code]'         , '</code>'       : '[/code]'     , # `code`  
+        # ```
+        # code
+        # ```
+        #
+        #   code
+        #
 
         '__END__' : '__END__'
         }
