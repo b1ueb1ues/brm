@@ -354,6 +354,7 @@ class Markdown(object):
         if "fenced-code-blocks" in self.extras and not self.safe_mode:
             text = self._do_fenced_code_blocks(text)
 
+
         if self.safe_mode:
             text = self._hash_html_spans(text)
 
@@ -2562,7 +2563,7 @@ def _test():
     doctest.testmod()
 
 
-def main(argv=None,path=None):
+def main(argv=None,path=None,extras=None):
     if argv is None:
         argv = sys.argv
     if not logging.root.handlers:
@@ -2604,6 +2605,9 @@ def main(argv=None,path=None):
 
     if opts.self_test:
         return _test()
+
+    if not opts.extras:
+        opts.extras = extras
 
     if opts.extras:
         extras = {}
