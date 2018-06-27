@@ -67,6 +67,8 @@ def processall(a):
     else:
         sys.stdout.write(a.encode(
             sys.stdout.encoding or "utf-8", 'xmlcharrefreplace'))
+
+    return a
     #print a
 
 
@@ -88,7 +90,10 @@ def main():
     else:
         path = 'b.md'
     a = mmain(path=path,extras=ext)
-    processall(a)
+    a = processall(a)
+    f = open(path+".txt",'w')
+    f.write(a)
+    f.close()
 
 if __name__ == "__main__":
     main()
