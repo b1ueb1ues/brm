@@ -2,6 +2,8 @@ class Processor(object):
     def __init__(this, cb=0, timing=0, interval=0):
         this.handler = -1
         this.timeline = Timeline()
+        if not cb:
+            cb = this._process
         this.set(timing, interval, cb)
 
 
@@ -10,15 +12,21 @@ class Processor(object):
         this.interval = int(interval * 1000)
 
         if not timing :
-            if not interval :
-                this.interval = 1
-            if this.interval > 1:
+            #if not interval :
+            #    this.interval = 1
+            if not this.interval > 1:
                 this.timing = this.timeline._now
 
         if cb:
-            this.register(cb)
-        else:
-            this.register(this._process)
+            this._process = cb
+            if not this.timing and not this.interval:
+                this.process = this._direct
+            else:
+                this.process = this._check
+       # if cb:
+       #     this._register(cb)
+       # else:
+       #     this._register(this._process)
 
 
     def now(this):
@@ -37,17 +45,6 @@ class Processor(object):
         this.timeline.rm(this)
         return this
     
-    def move(this, tl):
-        tl.mv(this)
-
-
-    def register(this, cb):
-        this._process = cb
-        if not this.timing and this.interval==1:
-            this.process = this._direct
-        else:
-            this.process = this._check
-
 
     def _check(this, timing):
         if this.interval : # repeat
@@ -90,20 +87,42 @@ class Processor(object):
             this.process = this._check
         else:
             this.process = this._process
+   # def settl(this, tl):
+   #     tl.mv(this)
+
+
+   # def _register(this, cb):
+   #     this._process = cb
+   #     if not this.timing and this.interval==1:
+   #         this.process = this._direct
+   #     else:
+   #         this.process = this._check
+
 #}}}
+
 #} class Processor
 
 
 class Timeline(object):
     'timeline for every 0.001s'
+    s_nextid = [0]
     def __init__(this):
         this._now = 0
-        this.nextid = 0
         this.processors = {}
-        #this.disabled = {}
         this.p2add = []
         this.h2rm = []
         pass
+
+    def getnextid(this):
+        return this.s_nextid[0]
+
+    def newid(this):
+        this.s_nextid[0] += 1
+        return this.s_nextid[0] - 1
+
+    def setnextid(this, n):
+        this.s_nextid[0] = n
+        
 
     def run(this, time=10, interval = 0.001):
         _interval = int(interval * 1000)
@@ -121,8 +140,7 @@ class Timeline(object):
     def createp(this, cb, timing=0, interval=0):
         p = Processor(cb,timing,interval)
         p.timeline = this
-        handler = this.nextid
-        this.nextid += 1
+        handler = this.newid()
         p.handler = handler 
         return p
 
@@ -133,15 +151,14 @@ class Timeline(object):
 
     def add(this, p):
         this.p2add.append(p)
-        return handler
+        #return handler
 
     def rm(this, p):
         this.h2rm.append(p.handler)
 
-    def mv(this, p):
+    def register(this, p):
         p.timeline = this
-        handler = this.nextid
-        this.nextid += 1
+        handler = this.newid()
         p.handler = handler 
 
     def _async_add(this):
@@ -163,35 +180,26 @@ class Timeline(object):
             p = this.processors[i]
             p.process(timing)
 
-class test(object):
-    def __init__(this):
-        this.p = Processor()
-        this.p.register(this.foo)
-    def foo(this, proc):
-        print '++ class tick processor @', proc.now(), proc.timing, proc.interval
-
 
 def main():
-    def b(p):
-        print '-- modified interval processor @', p.now(), p.timing, p.interval
-        if p.now() >= 0.05:
-            p.disable()
-    def c(p):
-        print '-- modified once processor @', p.now(), p.timing, p.interval
-        p.pp.enable()
+    def a(this, p):
+        print 'a', p.now()
+    def b(this, p):
+        print 'b', p.now()
+    def c(this, p):
+        print 'c', p.now()
 
-    t = Timeline()
+    t1 = Timeline()
+    p1 = t1.createp(a, 0.01, 0.01)
 
-    ob = test()
+    t2 = Timeline()
+    p2 = t2.createp(b, 0.03, 0.01)
+    p3 = t2.createp(c)
 
-    pp = t.createp(b, 0.01,0.01)
-    po = t.createp(c, 0.07,0)
-    po.pp = pp
-
-    t.add(ob.p)
-    #t.add(pp)
-    #t.add(po)
-    t.run(0.1)
+    print p1.handler
+    print p2.handler
+    print p3.handler
+    
 
 if __name__ == "__main__" :
     main()

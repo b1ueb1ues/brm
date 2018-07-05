@@ -16,6 +16,9 @@ class Stat(object):
 
 
 class Aura(object):
+    duration = 0
+    last = 0
+
     pass
 
 
