@@ -36,6 +36,9 @@ class Processor(object):
     def disable(this):
         this.timeline.rm(this)
         return this
+    
+    def move(this, tl):
+        tl.mv(this)
 
 
     def register(this, cb):
@@ -112,28 +115,34 @@ class Timeline(object):
                 break
             this._now = i
             #this.now += 1
-            this.process(i)
+            this._process(i)
 
 
     def createp(this, cb, timing=0, interval=0):
         p = Processor(cb,timing,interval)
         p.timeline = this
+        handler = this.nextid
+        this.nextid += 1
+        p.handler = handler 
         return p
+
 
     def now(this):
         return this._now / 1000.0
 
 
     def add(this, p):
-        handler = this.nextid
-        this.nextid += 1
-        p.handler = handler 
-        p.timeline = this
         this.p2add.append(p)
         return handler
 
     def rm(this, p):
         this.h2rm.append(p.handler)
+
+    def mv(this, p):
+        p.timeline = this
+        handler = this.nextid
+        this.nextid += 1
+        p.handler = handler 
 
     def _async_add(this):
         for i in this.p2add:
@@ -147,7 +156,7 @@ class Timeline(object):
         this.h2rm = []
 
 
-    def process(this, timing):
+    def _process(this, timing):
         this._async_rm()
         this._async_add()
         for i in this.processors:

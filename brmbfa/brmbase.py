@@ -22,10 +22,16 @@ class Aura(object):
 class Brmbase(object):
     def __init__(this):
         this.tl = Timeline()
+
+        this.realtime = this.timer(this.p_realtime)
+
         this.gcd = this.timer(this.p_gcd, (0, 0), 0)
         this.gcd.idle = 1
+
         this.ks = this.timer(this.p_ks, (0, 6.5), 0)
         this.ks.cd = 0
+
+
     
     def timer(this, cb, ti=(0, 0), enable=1):
         timing = ti[0]
@@ -54,6 +60,13 @@ class Brmbase(object):
             return 1
         else:
             return 0
+
+    def p_realtime(this, p):
+        this.act_realtime()
+
+    def act_realtime(this):
+        pass
+
 
     def p_ks(this, p):
         p.cd = 0
