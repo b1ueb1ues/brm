@@ -5,6 +5,13 @@ class Event(object):
     @classmethod
     def setup(cls,timeline):
         cls.ctx.timeline = timeline
+        return cls.ctx
+    @classmethod
+    def reset(cls,timeline=None):
+        cls.ctx = Event.Context()
+        if timeline:
+            cls.ctx.timeline = timeline
+        return cls.ctx
 
     def __init__(this, proc=None):
         if proc:
@@ -12,6 +19,7 @@ class Event(object):
         else:
             this.process = this._process
 
+        this.ctx = Event.ctx
         this.timing = 0
         this.online = 0
     
@@ -114,26 +122,36 @@ class Timeline(object):
 
 
 def main():
-    Event.ctx.timeline = t = Timeline()
 
     def a1(e):
         print 'a1', e.timing
+        e.timing += 2
     def a2(e):
         print 'a2', e.timing
 
+    t = Timeline()
+
+    Event.setup(t)
     e1 = Event()
     e1.timing = 2
     e1.process = a1
     e1.on()
 
+    Event.reset()
+    t2 = Timeline()
+    Event.setup(t2)
     e2 = RepeatEvent()
     e2.timing = 1.5
     e2.process = a2
     e2.on()
 
+    e3 = Event()
+    e3.timing = 2
+    e3.process = a1
+    e3.on()
 
-    print t
-    t.run()
+    t.run(10)
+    t2.run(30)
 
 
 if __name__ == '__main__' :
