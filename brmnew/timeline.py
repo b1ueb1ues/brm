@@ -3,9 +3,7 @@ class Event(object):
         timeline = 0
     ctx = Context()
 
-    def __init__(this, timeline=None, proc=None):
-        if timeline:
-            this.ctx.timeline = timeline
+    def __init__(this, proc=None):
         if proc:
             this.process = proc
         else:
@@ -42,13 +40,14 @@ class Event(object):
         return 1
 
 class RepeatEvent(Event):
-    def __init__(this):
-        this.repeat = 10
+    def __init__(this,proc=None,interval=10):
+        super(RepeatEvent,this).__init__(proc)
+        this.interval = interval
 
     def callback(this):
         this.process(this)
         if this.timing == this.now():
-            this.timing += this.repeat
+            this.timing += this.interval
 
 
 
@@ -68,9 +67,9 @@ class Timeline(object):
         return this._now
 
     def add(this, event, timing = None):
-        event.ctx.timeline = this
-        if timing != None:
-            event.timing = timing
+        #event.ctx.timeline = this
+        #if timing != None:
+            #event.timing = timing
         this._events.append(event)
 
     def rm(this, event):
@@ -112,7 +111,7 @@ class Timeline(object):
 
 
 def main():
-    t = Timeline()
+    Event.ctx.timeline = t = Timeline()
 
     def a1(e):
         print 'a1', e.timing
@@ -122,14 +121,13 @@ def main():
     e1 = Event()
     e1.timing = 2
     e1.process = a1
+    e1.on()
 
     e2 = RepeatEvent()
     e2.timing = 1.5
     e2.process = a2
+    e2.on()
 
-
-    t.add(e1)
-    t.add(e2)
 
     print t
     t.run()
