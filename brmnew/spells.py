@@ -1,15 +1,17 @@
+import timeline
+Timeline = timeline.Timeline
+Event = timeline.Event
 from timeline import Timeline
 import time
 
-class Skill(object):
-    def __init__(this, tl, src=0, dst=0):
-        this.tl = tl
+class Spell(object):
+    def __init__(this, src=0, dst=0):
         this.cd = 8
         this.stackmax = 3
         this.stack = this.stackmax
 
         this.charge = 0
-        this.tick = this.tl.newevent(this.p_tick)
+        this.tick = Event(this.p_tick)
 
         this.charging = 0
 
@@ -22,7 +24,7 @@ class Skill(object):
             this.stack -= 1
             if not this.charging :
                 this.charging = 1
-                this.tick.enable(this.tl.now()+this.cd)
+                this.tick.enable(this.tick.now()+this.cd)
             return 0
         else:
             return this.cd - this.charge
@@ -38,7 +40,8 @@ class Skill(object):
 
 def main():
     tl = Timeline()
-    s = Skill(tl)
+    Event.setup(tl)
+    s = Spell(tl)
     s.cast()
     print s.tick.ctx.timeline
     

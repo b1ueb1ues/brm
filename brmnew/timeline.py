@@ -2,6 +2,9 @@ class Event(object):
     class Context(object):
         timeline = 0
     ctx = Context()
+    @classmethod
+    def setup(cls,timeline):
+        cls.ctx.timeline = timeline
 
     def __init__(this, proc=None):
         if proc:
