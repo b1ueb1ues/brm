@@ -3,21 +3,37 @@ class Event(object):
         timeline = 0
     ctx = Context()
 
-    def __init__(this):
-        this.ctx.timeline = 0
+    def __init__(this, timeline=None, proc=None):
+        if timeline:
+            this.ctx.timeline = timeline
+        if proc:
+            this.process = proc
+        else:
+            this.process = this._process
+
         this.timing = 0
-        this.process = this._process
+        this.online = 0
     
     def now(this):
-        return this.ctx.timeline.now
+        return this.ctx.timeline.now()
 
     def disable(this):
-        this.ctx.timeline.rm(this)
+        if this.online:
+            this.online = 0
+            this.ctx.timeline.rm(this)
+    off = disable
+
+    def enable(this, timing = None):
+        if this.online == 0:
+            this.online = 1
+            this.ctx.timeline.add(this, timing)
+    on = enable
 
     def callback(this):
         this.process(this)
         if this.timing == this.now():
-            this.ctx.timeline.rm(this)
+            if this.online:
+                this.ctx.timeline.rm(this)
 
     @staticmethod
     def _process(timing):
@@ -43,10 +59,13 @@ class Timeline(object):
 
     def __init__(this):
         this._events = []
-        this.now = 0
+        this._now = 0
 
     def __str__(this):
         return str(this._events)
+
+    def now(this):
+        return this._now
 
     def add(this, event, timing = None):
         event.ctx.timeline = this
@@ -58,6 +77,9 @@ class Timeline(object):
         i = this._events.index(event)
         return this._events.pop(i)
 
+    def newevent(this, proc) :
+        return Event(this, proc)
+        
     
     def process_head(this):
         eventcount = len(this._events)
@@ -73,13 +95,16 @@ class Timeline(object):
                 if timing < headtiming:
                     headtiming = timing
                     headindex = i
-        this.now = headtiming
-        this._events[headindex].callback()
+        if headtiming >= this._now:
+            this._now = headtiming
+            this._events[headindex].callback()
+        else:
+            this._events.pop(headindex)
         return 0
     
     def run(this, last = 100):
         while 1:
-            if this.now > last:
+            if this._now > last:
                 return
             r = this.process_head()
             if r == -1:
