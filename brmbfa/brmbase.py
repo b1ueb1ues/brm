@@ -78,11 +78,15 @@ class Brmbase(object):
 
     def run(this):
         this.gcd.enable()
-        this.tl.run(50,0.1)
+        this.tl.run(100000)
 
 def main():
+    import time
+    time1 = time.time()
     brm = Brmbase()
     brm.run()
+    time2 = time.time()
+    print time2-time1
 
 
 if __name__ == "__main__":
