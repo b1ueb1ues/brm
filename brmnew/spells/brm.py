@@ -22,13 +22,15 @@ class Brew(Spell):
     pass
 
 
-class a():
-    ks = Kegsmash(this)
-    brew = Brew(this)
+class A():
+    def __init__(this):
+        this.ks = Kegsmash(this)
+        this.brew = Brew(this)
 
 
 def main():
-    a = 
+    a = A()
+    a.ks.cast()
 
 if __name__ == "__main__" :
     main()

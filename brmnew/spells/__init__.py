@@ -39,21 +39,23 @@ class Spell(object):
 
 
     def cast(this):
+        print this, this.stack,this.stackmax
         if this.stack >= 1:
             this.stack -= 1
             if this.cdstart == None:
-                this.effect()
                 this.cdstart = now()
                 this.cdtick.enable(now() + this.cd/this._haste)
+                this.effect()
             return 0
         else:
+            print this.cd, now(), this.cdstart
             return this.cd - (now() - this.cdstart)
 
     def reduce(this,time):
         n = now()
-        this.timing -= time
-        if this.timing < n:
-            this.timing = n
+        this.cdtick.timing -= time
+        if this.cdtick.timing < n:
+            this.cdtick.timing = n
 
 
     def effect(this):
