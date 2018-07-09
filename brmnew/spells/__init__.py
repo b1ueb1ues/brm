@@ -16,6 +16,9 @@ class Spell(object):
 
     def __init__(this, src=0, dst=0):
         this.ctx = Context()
+        this.src = src
+        this.dst = dst
+        this._haste = 1
 
         this.cdstart = None
 
@@ -31,8 +34,9 @@ class Spell(object):
         pass
 
 
-    def haste(this):
+    def sethaste(this):
         return 0
+
 
     def cast(this):
         if this.stack >= 1:
@@ -40,10 +44,17 @@ class Spell(object):
             if this.cdstart == None:
                 this.effect()
                 this.cdstart = now()
-                this.cdtick.enable(now() + this.cd)
+                this.cdtick.enable(now() + this.cd/this._haste)
             return 0
         else:
             return this.cd - (now() - this.cdstart)
+
+    def reduce(this,time):
+        n = now()
+        this.timing -= time
+        if this.timing < n:
+            this.timing = n
+
 
     def effect(this):
         pass
