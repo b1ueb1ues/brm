@@ -61,15 +61,18 @@ class Event(object):
         this.timing = timing
 
         this.online = 0
+
     
     def now(this):
         return this.ctx.now
+
 
     def disable(this):
         if this.online:
             this.online = 0
             this.ctx.timeline.rm(this)
     off = disable
+
 
     def enable(this, timing = None):
         if timing:
@@ -79,17 +82,20 @@ class Event(object):
             this.ctx.timeline.add(this)
     on = enable
 
+
     def callback(this):
         this.process(this)
         if this.timing <= this.now():
             if this.online:
                 this.ctx.timeline.rm(this)
 
+
     @staticmethod
     def _process(timing):
         # sample plain _process
         print '-- plain event @', timing
         return 1
+
 
 class RepeatEvent(Event):
     def __init__(this,proc=None,interval=10):

@@ -7,10 +7,13 @@ import time
 
 class Spell(object):
     config = {
-        "cd":8,
-        "stackmax":3,
-        "hashaste":0,
-        "_END":0
+        "cd"       : 8  ,
+        "stackmax" : 3  ,
+        "hashaste" : 0  ,
+        "cost"     : {} ,
+        "channel"  : 0  ,
+        "cast"     : 0  ,
+        "_END"     : 0
     }
     effects = []
 
