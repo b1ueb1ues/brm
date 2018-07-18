@@ -1,7 +1,7 @@
 
 def bps(haste=1,t7='ht',p=1,t3='bob'):
-	brewcd = 16
-	bobcd = 90
+	brewcd = 14
+	bobcd = 120
 	ret = 0
 	if t3 == 'lb':
 		brewcd = brewcd - 3
@@ -60,15 +60,18 @@ if __name__ == '__main__':
         print b * 60
         exit()
 
+    print 'haste bob lb htbob htlb'
     i=1-0.01
     while(1):
         if i >= 1.5:
                 break
         i+=0.01
-        a = bps(i,'ed',p=1,t3='bob')
-        b = bps(i,'ht',p=1,t3='bob')
-        c = bps(i,'ht15',p=1,t3='bob')
-        print '%.2f'%i,'%.2f, %.2f, %.2f'%(1.0/a ,1.0/b  ,1/c)
+        a = bps(i , t7='ed'   , t3='bob')
+        b = bps(i , t7='ed'   , t3='lb')
+        c = bps(i , t7='ed'   , t3='lb', p=0)
+        #c = bps(i , t7='ht15' , t3='bob')
+        #d = bps(i , t7='ht15' , t3='lb')
+        print '%.2f'%i,'%.2f, %.2f, %.2f'%(1.0/a, 1.0/b, 1.0/c)
         #b = 1/(a-0.125)
         #c = 1/(a-1.0/9)
         #print i,a,b,clb
