@@ -6,6 +6,8 @@ Markdown = markdown2.Markdown
 mmain = markdown2.main
 py3 = markdown2.py3
 
+#sys.setdefaultencoding('utf-8')
+
 
 #md = Markdown()
 #print md.convert("## test\#")
@@ -88,11 +90,11 @@ def main():
         if sys.argv[1] :
             path = sys.argv[1]
     else:
-        path = 'b.md'
+        path = 'mwts.md'
     a = mmain(path=path,extras=ext)
     a = processall(a)
     f = open(path+".txt",'w')
-    f.write(a)
+    f.write(a.encode('utf-8'))
     f.close()
 
 if __name__ == "__main__":
