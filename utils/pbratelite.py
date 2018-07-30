@@ -1,3 +1,6 @@
+from brm_bps import *
+
+
 def prate(iv):
     stagger = 0
     #iv = 10
@@ -10,29 +13,41 @@ def prate(iv):
         if i % iv >= 0 and i % iv < 1:
             puried += stagger * 0.5
             stagger -= stagger * 0.5
-    print puried / staggerin
+    return puried / staggerin
 
+def main():
+    a = bps(1.3 , t7='ed', t3='bob')
+    b = bps(1.3 , t7='ed', t3='bob', p=0)
 
-i = 20
-while 1:
-    i -= 0.5
-    if i <= 3:
-        break
-    print i,
-    prate(i)
-    print '-------'
-    p = prate(4.19)
-    p = prate(4.86)
+    pps_a = a - 1.0/7
+    pps_b = b - 1.0/7
+    pr_a = prate(1/pps_a)
+    pr_b = prate(1/pps_b)
 
+    pps_c = a
+    pps_d = b
+    pr_c = prate(1/pps_c)
+    pr_d = prate(1/pps_d)
 
-    print '-------'
-    bps = 1/4.19
-    bps -= 1.0/7
-    print 1/bps
-    prate(1/bps)
+    dm_a = 0.8 * pr_a
+    dm_b = 0.8 * pr_b
 
-    print '-------'
-    bps = 1/4.86
-    bps -= 1.0/7
-    print 1/bps
-    prate(1/bps)
+    dm_c = 0.5 * pr_c
+    dm_d = 0.5 * pr_d
+    
+    i = 0.3
+    print '%.2f'%i, ' brew_cd: %.2f, %.2f '%(1.0/a, 1.0/b)
+    print '%.2f'%i, ' pb_interval: %.2f, %.2f '%(1.0/pps_a, 1.0/pps_b)
+    print '%.2f'%i, ' pb_interval_noisb: %.2f, %.2f '%(1.0/pps_c, 1.0/pps_d)
+    print '| prate_keepisb: %.2f, %.2f \n'\
+          '| prate_noisb: %.2f, %.2f \n'\
+          '| dm_keepisb: %.2f, %.2f \n'\
+          '| dm_noisb: %.2f, %.2f \n'\
+              %(
+                pr_a, pr_b, pr_c, pr_d,
+                dm_a,dm_b,dm_c,dm_d
+                )
+
+if __name__ == "__main__":
+    main()
+

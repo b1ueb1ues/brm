@@ -1,10 +1,13 @@
 
-def bps(haste=1,t7='ht',p=1,t3='bob'):
-	brewcd = 14
+def bps(haste=1,t7=None ,p=1,t3='bob'):
+	brewcd = 15 
 	bobcd = 120
 	ret = 0
 	if t3 == 'lb':
 		brewcd = brewcd - 3
+        elif t3 == 'bob':
+            p = p * 1.25
+
 	if t7 == 'bc' :
 		brewcd /= haste
 		fivekegtime = 40.0/haste
@@ -26,10 +29,11 @@ def bps(haste=1,t7='ht',p=1,t3='bob'):
 		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
 		brewcd /= brewhaste
 		bobcd /= brewhaste
-	elif t7 == 'ed':
+	elif t7 == 'ed' or t7 == None:
 		brewcd /= haste
 		fivekegtime = 40.0/haste
 		brewhaste = (fivekegtime + 20 + 8*p)/fivekegtime
+                #  12/(1+jisu) / [1 + 28/40*(1+jisu)]
 		brewcd /= brewhaste
 		bobcd /= brewhaste
 	else :
@@ -37,8 +41,15 @@ def bps(haste=1,t7='ht',p=1,t3='bob'):
 		return 0;
 
 	if t3 == 'bob' :
-		#print 'cd',brewcd,bobcd
-		ret = 1.0/brewcd + 2.5/bobcd
+            rotation_brew_count = int(bobcd / brewcd)
+            ret1 = float(rotation_brew_count + 3)/bobcd
+            ret2 = float(rotation_brew_count + 4)/(rotation_brew_count * brewcd)
+            if ret1 >= ret2:
+                #print 'strick bob',ret1,ret2
+                ret = ret1
+            else:
+                #print 'strick isb',ret1,ret2
+                ret = ret2
 	else :
 		ret = 1.0/brewcd
 	return ret
@@ -63,15 +74,20 @@ if __name__ == '__main__':
     print 'haste bob lb htbob htlb'
     i=1-0.01
     while(1):
-        if i >= 1.5:
+        if i >= 1.9:
                 break
         i+=0.01
+       # a = bps(i , t7='ed'   , t3='bob')
+       # print '%.2f, %.2f'%(i, a)
+       # continue
+
         a = bps(i , t7='ed'   , t3='bob')
         b = bps(i , t7='ed'   , t3='lb')
-        c = bps(i , t7='ed'   , t3='lb', p=0)
+        c = bps(i , t7='ed'   , t3='bob', p=0)
+        d = bps(i , t7='ed'   , t3='lb', p=0)
         #c = bps(i , t7='ht15' , t3='bob')
         #d = bps(i , t7='ht15' , t3='lb')
-        print '%.2f'%i,'%.2f, %.2f, %.2f'%(1.0/a, 1.0/b, 1.0/c)
+        print '%.2f'%i, '%.2f, %.2f | %.2f, %.2f'%(1.0/a, 1.0/b, 1.0/c, 1.0/d)
         #b = 1/(a-0.125)
         #c = 1/(a-1.0/9)
         #print i,a,b,clb
