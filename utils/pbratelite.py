@@ -16,6 +16,46 @@ def prate(iv):
     return puried / staggerin
 
 def main():
+    f = open('hp_haste.csv','wb')
+    hpold = 1
+    iv = 0.01
+    stop = 1.6
+    i = 1 - iv
+    while i < stop-iv :
+        i += iv
+        f.write('%.2f, '%i)
+    f.write('\n')
+    i = 1 - iv
+    while i < stop-iv :
+        i += iv
+        a = bps(i, t3='lb')
+        pr = prate(1.0/a) * 0.5 
+        hp = 1.0/(1.0-pr)
+        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
+                        %(i, 1.0/a, pr, hp, hp-hpold)
+        f.write('%f, '%hp)
+        hpold = hp
+
+    f.write('\n')
+    hpold = 1
+    i = 1 - iv
+    while i < stop-iv :
+        i += iv
+        a = bps(i, t3='lb') - 1.0/7
+        pr = prate(1.0/a) * 0.8
+        hp = 1.0/(1.0-pr)
+        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
+                        %(i, 1.0/a, pr, hp, hp-hpold)
+        f.write('%f, '%hp)
+        hpold = hp
+
+    f.close()
+
+
+    
+
+
+def test_no_palm():
     a = bps(1.3 , t7='ed', t3='bob')
     b = bps(1.3 , t7='ed', t3='bob', p=0)
 

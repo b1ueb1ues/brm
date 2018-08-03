@@ -7,6 +7,7 @@ def bps(haste=1,t7=None ,p=1,t3='bob'):
 		brewcd = brewcd - 3
         elif t3 == 'bob':
             p = p * 1.25
+            pass
 
 	if t7 == 'bc' :
 		brewcd /= haste
@@ -43,7 +44,7 @@ def bps(haste=1,t7=None ,p=1,t3='bob'):
 	if t3 == 'bob' :
             rotation_brew_count = int(bobcd / brewcd)
             ret1 = float(rotation_brew_count + 3)/bobcd
-            ret2 = float(rotation_brew_count + 4)/(rotation_brew_count * brewcd)
+            ret2 = float(rotation_brew_count + 3)/(rotation_brew_count * brewcd)
             if ret1 >= ret2:
                 #print 'strick bob',ret1,ret2
                 ret = ret1
@@ -74,7 +75,7 @@ if __name__ == '__main__':
     print 'haste bob lb htbob htlb'
     i=1-0.01
     while(1):
-        if i >= 1.9:
+        if i >= 2.1:
                 break
         i+=0.01
        # a = bps(i , t7='ed'   , t3='bob')
