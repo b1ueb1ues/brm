@@ -4,7 +4,7 @@ def foo(x,k):
     k = float(k)
     return x/(x+k)
 
-def ehp(x):
+def dr2ehp(x):
     return 1.0/(1.0-x)
 
 def srate(a):
@@ -32,66 +32,75 @@ def main():
     print ''
     f.write('\n')
 
-
-
-
-    print 'brm dm noarmor, ',
-    f.write('brm dm noarmor, ')
+    print 'brm stagger, ',
+    f.write('铁骨欠债, ')
     for i in range(tick):
         a = i * iv + statbase
         a = a*3.5
-        print '%.2f, '%(ehp(srate(a)*0.35)),
-        f.write('%.2f, '%(ehp(srate(a)*0.35)))
+        print '%.2f, '%(dr2ehp(srate(a))/0.7),
+        f.write('%.2f, '%(dr2ehp(srate(a))/0.7))
+    print ''
+    f.write('\n')
+
+
+
+
+    print 'brm dm',
+    f.write('保持铁骨(平均收益,30急速后), ')
+    for i in range(tick):
+        a = i * iv + statbase
+        a = a*3.5
+        print '%.2f, '%(dr2ehp(srate(a)*0.35)/0.7),
+        f.write('%.2f, '%(dr2ehp(srate(a)*0.35)/0.7))
+    print ''
+    f.write('\n')
+
+    print 'brm dm noisb',
+    f.write('活tm的(平均收益), ')
+    for i in range(tick):
+        a = i * iv + statbase
+        print '%.2f, '%(dr2ehp(srate(a)*0.5)/0.7),
+        f.write('%.2f, '%(dr2ehp(srate(a)*0.5)/0.7))
     print ''
     f.write('\n')
 
     print 'brm dm 1i1p, ',
-    f.write('brm dm 1i1p, ')
+    f.write('1铁1活, ')
     for i in range(tick):
         a = i * iv + statbase
         a = a*3.5
-        print '%.2f, '%(ehp(srate(a)*0.5)/0.7),
-        f.write('%.2f, '%(ehp(srate(a)*0.5)/0.7))
+        print '%.2f, '%(dr2ehp(srate(a)*0.5)/0.7),
+        f.write('%.2f, '%(dr2ehp(srate(a)*0.5)/0.7))
     print ''
     f.write('\n')
 
     print 'brm dm 1i2p, ',
-    f.write('brm dm 1i2p, ')
+    f.write('1铁2活, ')
     for i in range(tick):
         a = i * iv + statbase
         a = a*3.5
-        print '%.2f, '%(ehp(srate(a)*0.75)/0.7),
-        f.write('%.2f, '%(ehp(srate(a)*0.75)/0.7))
+        print '%.2f, '%(dr2ehp(srate(a)*0.75)/0.7),
+        f.write('%.2f, '%(dr2ehp(srate(a)*0.75)/0.7))
     print ''
     f.write('\n')
 
 
     print 'dk,', 
-    f.write('dk, ')
+    f.write('骨盾, ')
     for i in range(tick):
         s = i * iv + statbase
-        print '%.2f, '%(ehp(dkrate(s))),
-        f.write('%.2f, '%(ehp(dkrate(s))))
+        print '%.2f, '%(dr2ehp(dkrate(s))),
+        f.write('%.2f, '%(dr2ehp(dkrate(s))))
     print ''
     f.write('\n')
 
 
     print 'pala,', 
-    f.write('pala, ')
+    f.write('炖鸡, ')
     for i in range(tick):
         s = i * iv + statbase
-        print '%.2f, '%(ehp(palarate(s))),
-        f.write('%.2f, '%(ehp(palarate(s))))
-    print ''
-    f.write('\n')
-
-    print 'brm stagger, ',
-    f.write('brm stagger, ')
-    for i in range(tick):
-        a = i * iv + statbase
-        a = a*3.5
-        print '%.2f, '%(ehp(srate(a))),
-        f.write('%.2f, '%(ehp(srate(a))))
+        print '%.2f, '%(dr2ehp(palarate(s))),
+        f.write('%.2f, '%(dr2ehp(palarate(s))))
     print ''
     f.write('\n')
 

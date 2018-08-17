@@ -1,216 +1,204 @@
-# Too slow
-class Processor(object):
-    class Context(object):
-        def __init__(this, timeline):
-            this.now = 0
-            this.timeline = timeline
-    def __init__(this, cb=0, timing=0, interval=0):
-        this.handler = -1
-        this.context = Processor.Context(Timeline())
-        this.lock = 0
-        if not cb:
-            cb = this._process
-        this.set(timing, interval, cb)
+def now():
+    return Context.activeContext[0].now
+
+class Context(object):
+    activeContext = [0]
+    timeline = 0
+
+    @classmethod
+    def setup(cls):
+        cls.activeContext[0] = object.__new__(cls)
 
 
-    def set(this, timing=0, interval=0, cb=0):
-        this.timing = int(timing * 1000)
-        this.interval = int(interval * 1000)
-
-        if not timing :
-            #if not interval :
-            #    this.interval = 1
-            if not this.interval > 1:
-                this.timing = this.context.timeline._now
-
-        if cb:
-            this._process = cb
-            if not this.timing and not this.interval:
-                this.process = this._direct
-            else:
-                this.process = this._check
-       # if cb:
-       #     this._register(cb)
-       # else:
-       #     this._register(this._process)
+    @classmethod
+    def reset(cls):
+        cls.activeContext[0] = 0
+        return Context()
 
 
+    def __new__(cls):
+        if not cls.activeContext[0] :
+            cls.activeContext[0] = object.__new__(cls)
+        return cls.activeContext[0]
+
+    def __init__(this):
+        if not this.timeline:
+            this.timeline = 1
+            this.timeline = Timeline()
+        this.now = 0
+
+
+    def run(this,*args, **argv):
+        this.timeline.run(*args, **argv)
+
+
+class Event(object):
+    #class Context(object):
+    #    timeline = 0
+    #ctx = Context()
+    #@classmethod
+    #def setup(cls,timeline):
+    #    cls.ctx.timeline = timeline
+    #    return cls.ctx
+    #@classmethod
+    #def reset(cls,timeline=None):
+    #    cls.ctx = Event.Context()
+    #    if timeline:
+    #        cls.ctx.timeline = timeline
+    #    return cls.ctx
+
+    def __init__(this, proc=None, timing=0, ctx=None):
+        if proc:
+            this.process = proc
+        else:
+            this.process = this._process
+
+        if not ctx:
+            this.ctx = Context()
+        else:
+            this.ctx = ctx
+
+        this.timing = timing
+
+        this.online = 0
+
+    
     def now(this):
-        if this.context.timeline:
-            return this.context.timeline.now()
-
-
-    def enable(this):
-        this.lock = 1
-        if this.interval > 1:
-            this.timing = this.context.timeline._now
-        this.context.timeline.add(this)
-        return this
-    on = enable
+        return this.ctx.now
 
 
     def disable(this):
-        if not this.lock :
-            return 0
-        this.lock = 0
-        this.context.timeline.rm(this)
-        return this
+        if this.online:
+            this.online = 0
+            this.ctx.timeline.rm(this)
     off = disable
-    
-
-    def _check(this, timing):
-        if this.interval : # repeat
-            if (timing - this.timing) % this.interval == 0:
-                this._process(this)
-        else : # proc once
-            if (timing - this.timing) == 0:
-                this._process(this)
-                this.disable()
 
 
-    def _direct(this, timing):
-        this._process(this)
+    def enable(this, timing = None):
+        if timing:
+            this.timing = timing
+        if this.online == 0:
+            this.online = 1
+            this.ctx.timeline.add(this)
+    on = enable
+
+
+    def callback(this):
+        this.process(this)
+        if this.timing <= this.now():
+            if this.online:
+                this.ctx.timeline.rm(this)
 
 
     @staticmethod
     def _process(timing):
         # sample plain _process
-        if not this.timing :
-            print '-- plain tick processor @', timing
-        elif this.interval :
-            print '-- plain interval processor per %d @ %d'%(this.interval, timing)
-        else :
-            print '-- plain once processor @', timing
+        print '-- plain event @', timing
+        return 1
 
 
-    def process(): # virtual
-        "this is the main process for outer to call"
-        "but it is actually no need to def hear"
-        "just for reference"
+class RepeatEvent(Event):
+    def __init__(this,proc=None,interval=10):
+        super(RepeatEvent,this).__init__(proc)
+        this.interval = interval
 
-#{{{
-    def _disable(this):
-        def nop(timing):
-            return
-        this.process = nop
+    def callback(this):
+        this.process(this)
+        if this.timing == this.now():
+            this.timing += this.interval
 
-    def _enable(this):
-        if this.timing :
-            this.process = this._check
-        else:
-            this.process = this._process
-   # def settl(this, tl):
-   #     tl.mv(this)
-
-
-   # def _register(this, cb):
-   #     this._process = cb
-   #     if not this.timing and this.interval==1:
-   #         this.process = this._direct
-   #     else:
-   #         this.process = this._check
-
-#}}}
-
-#} class Processor
 
 
 class Timeline(object):
-    'timeline for every 0.001s'
-    s_nextid = [0]
-    def __init__(this):
-        this._now = 0
-        this.processors = {}
-        this.p2add = []
-        this.h2rm = []
-        pass
 
-    def getnextid(this):
-        return this.s_nextid[0]
-
-    def newid(this):
-        this.s_nextid[0] += 1
-        return this.s_nextid[0] - 1
-
-    def setnextid(this, n):
-        this.s_nextid[0] = n
-        
-
-    def run(this, time=10, interval = 0.001):
-        _interval = int(interval * 1000)
-        _time = int(time * 1000)
-        i = 0 - _interval
-        while 1:
-            i += _interval
-            if i >= _time:
-                break
-            this._now = i
-            #this.now += 1
-            this._process(i)
+    def __init__(this, ctx=None):
+        this._events = []
+        if not ctx:
+            this.ctx = Context()
+        else:
+            this.ctx = ctx
 
 
-    def createp(this, cb, timing=0, interval=0):
-        p = Processor(cb,timing,interval)
-        this.register(p)
-        return p
+    def __str__(this):
+        return "Timeline Events: %s"%(str(this._events))
 
 
     def now(this):
-        return this._now / 1000.0
+        return this.ctx.now
 
 
-    def add(this, p):
-        this.p2add.append(p)
-        #return handler
-
-    def rm(this, p):
-        this.h2rm.append(p.handler)
-
-    def register(this, p):
-        p.context.timeline = this
-        p.handler = this.newid()
-        return p.handler
-
-    def _async_add(this):
-        for i in this.p2add:
-            this.processors[i.handler] = i
-        this.p2add = []
+    def add(this, event):
+        this._events.append(event)
 
 
-    def _async_rm(this):
-        for i in this.h2rm:
-            this.processors.pop(i)
-        this.h2rm = []
+    def rm(this, event):
+        i = this._events.index(event)
+        return this._events.pop(i)
 
 
-    def _process(this, timing):
-        this._async_rm()
-        this._async_add()
-        for i in this.processors:
-            p = this.processors[i]
-            p.process(timing)
+    def process_head(this):
+        eventcount = len(this._events)
+        if eventcount == 0:
+            return -1
+
+        headtiming = this._events[0].timing
+        headindex = 0
+
+        if eventcount >= 2:
+            for i in range(1,eventcount):
+                timing = this._events[i].timing
+                if timing < headtiming:
+                    headtiming = timing
+                    headindex = i
+        if headtiming >= this.now():
+            this.ctx.now = headtiming
+            this._events[headindex].callback()
+        else:
+            print "timeline time err"
+            exit()
+            this._events.pop(headindex)
+        return 0
+    
+
+    def run(this, last = 100):
+        while 1:
+            if this.now() > last:
+                return
+            r = this.process_head()
+            if r == -1:
+                return
 
 
 def main():
-    def a(p):
-        print 'a', p.now()
-    def b(p):
-        print 'b', p.now()
-    def c(p):
-        print 'c', p.now()
 
-    t1 = Timeline()
-    p1 = t1.createp(a, 0.01, 0.01)
+    def a1(e):
+        print 'a1', e.timing
+        e.timing += 2
+    def a2(e):
+        print 'a2', e.timing
 
-    t2 = Timeline()
-    p2 = t2.createp(b, 0.03, 0.01)
-    p3 = t2.createp(c)
+    ctx = Context()
 
-    print p1.handler
-    print p2.handler
-    print p3.handler
-    t1.run(2,0.01)
-    
+    e1 = Event()
+    e1.timing = 2
+    e1.process = a1
+    e1.on()
 
-if __name__ == "__main__" :
+    ctx2 = Context.reset()
+    #Event.setup(t2)
+    e2 = RepeatEvent()
+    e2.timing = 1.5
+    e2.process = a2
+    e2.on()
+
+    e3 = Event()
+    e3.timing = 2
+    e3.process = a1
+    e3.on()
+
+    ctx.timeline.run(10)
+    ctx2.timeline.run(30)
+
+
+if __name__ == '__main__' :
     main()

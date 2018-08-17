@@ -44,8 +44,8 @@ def main():
         a = bps(i, t3='lb') - 1.0/7
         pr = prate(1.0/a) * 0.8
         hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
+        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
+                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
         f.write('%f, '%hp)
         hpold = hp
 

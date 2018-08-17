@@ -3,8 +3,9 @@ from __init__ import Spell
 class Kegsmash(Spell):
     config = {
         "cd":8,
-        "stackmax":1,
-        "hashaste":1,
+        "stack_max":1,
+        "has_haste":1,
+        "cost":{'energy':40},
         "_END":0
     }
     def effect(this):
@@ -15,11 +16,16 @@ class Kegsmash(Spell):
 class Brew(Spell):
     config = {
         "cd":12,
-        "stackmax":3,
-        "hashaste":1,
+        "stack_max":3,
+        "has_haste":1,
         "_END":0
     }
-    pass
+
+class TP(Spell):
+    config = {
+        'cost':{'energy':25},
+        "_END":0
+    }
 
 
 class A():

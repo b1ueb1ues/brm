@@ -8,8 +8,8 @@ import time
 class Spell(object):
     config = {
         "cd"       : 8  ,
-        "stackmax" : 3  ,
-        "hashaste" : 0  ,
+        "stack_max" : 3  ,
+        "has_haste" : 0  ,
         "cost"     : {} ,
         "channel"  : 0  ,
         "cast"     : 0  ,
@@ -37,12 +37,12 @@ class Spell(object):
         pass
 
 
-    def sethaste(this):
+    def set_haste(this):
         return 0
 
 
     def cast(this):
-        print this, this.stack,this.stackmax
+        print this, this.stack,this.stack_max
         if this.stack >= 1:
             this.stack -= 1
             if this.cdstart == None:
@@ -68,7 +68,7 @@ class Spell(object):
         this.stack += 1
         this.cdstart = now()
         print 'cdtick', p.now()
-        if this.stack >= this.stackmax:
+        if this.stack >= this.stack_max:
             this.cdtick.disable()
             this.cdstart = None
         else:
