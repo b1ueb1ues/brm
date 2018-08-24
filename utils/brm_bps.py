@@ -1,5 +1,5 @@
 
-def bps(haste=1,t7=None ,p=1,t3='bob'):
+def bps(haste=1,t7=None ,p=1,t3='lb'):
 	brewcd = 15 
 	bobcd = 120
 	ret = 0
@@ -55,8 +55,8 @@ def bps(haste=1,t7=None ,p=1,t3='bob'):
 		ret = 1.0/brewcd
 	return ret
 
-def pps(haste=1,t7='ht',p=1,t3='bob'):
-    return bps(haste,t7,p,t3) - 1.0/6
+def pps(haste=1, t7=None, p=1, t3='lb'):
+    return bps(haste,t7,p,t3) - 1.0/7
     
 
 

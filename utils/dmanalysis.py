@@ -42,7 +42,24 @@ def main():
     print ''
     f.write('\n')
 
+    print 'pala,', 
+    f.write('炖鸡, ')
+    for i in range(tick):
+        s = i * iv + statbase
+        print '%.2f, '%(dr2ehp(palarate(s))),
+        f.write('%.2f, '%(dr2ehp(palarate(s))))
+    print ''
+    f.write('\n')
 
+    print 'brm dm 1i2p, ',
+    f.write('1铁2活, ')
+    for i in range(tick):
+        a = i * iv + statbase
+        a = a*3.5
+        print '%.2f, '%(dr2ehp(srate(a)*0.75)/0.7),
+        f.write('%.2f, '%(dr2ehp(srate(a)*0.75)/0.7))
+    print ''
+    f.write('\n')
 
 
     print 'brm dm',
@@ -74,15 +91,6 @@ def main():
     print ''
     f.write('\n')
 
-    print 'brm dm 1i2p, ',
-    f.write('1铁2活, ')
-    for i in range(tick):
-        a = i * iv + statbase
-        a = a*3.5
-        print '%.2f, '%(dr2ehp(srate(a)*0.75)/0.7),
-        f.write('%.2f, '%(dr2ehp(srate(a)*0.75)/0.7))
-    print ''
-    f.write('\n')
 
 
     print 'dk,', 
@@ -95,14 +103,6 @@ def main():
     f.write('\n')
 
 
-    print 'pala,', 
-    f.write('炖鸡, ')
-    for i in range(tick):
-        s = i * iv + statbase
-        print '%.2f, '%(dr2ehp(palarate(s))),
-        f.write('%.2f, '%(dr2ehp(palarate(s))))
-    print ''
-    f.write('\n')
 
 
     f.close()
