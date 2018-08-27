@@ -1,58 +1,149 @@
 from brm_bps import *
 
+sim_time = 10000
+isb_boost = 3.5
+isb_duration = 7.0
+armor_base = 6300.0
+stagger_per_agi = 1.4
+
+
+def foo(x,k):
+    return x/(x+k)
 
 def srate(a):
     a = float(a)
-    return a/(a+6300.0/1.4)
+    return foo(a, armor_base/stagger_per_agi)
 
-def prate(iv):
-    stagger = 0
-    #iv = 10
-    puried = 0
+def pdm(iv, a):
+    sr = srate(a)
+    dt = 0
     staggerin = 0
-    for i in range(600):
-        staggerin += 100
-        stagger += 100
+    puried = 0
+
+    stagger = 0
+    for i in range(sim_time):
+        dt += 100.0
+        staggerin += 100.0 * sr
+        stagger += 100.0 * sr
         stagger -= stagger * 0.1
         if i % iv >= 0 and i % iv < 1:
             puried += stagger * 0.5
             stagger -= stagger * 0.5
-    return puried / staggerin
+    return puried / dt
 
-def iprate(iv, a):
-    if iv <= 3.5:
-        print('err')
-        exit()
-    iv = iv * 2
-    noisb_stin = a/(a+6300.0/1.4) * 100
-    isb_stin = a/(a+6300.0/1.4/3.5) * 100
-    isb_on = 7
-    stagger = 0
-    puried = 0
-    staggerin = 0
-    dt = 0
-    for i in range(600):
-        dt += 100
-        isb_on -= 1
-        if isb_on >= 0 :
-            staggerin += isb_stin
-            stagger += isb_stin
-            if isb_on == 0:
-                puried += stagger * 0.5
-                stagger -= stagger * 0.5
-        else:
-            staggerin += noisb_stin
-            stagger += noisb_stin
+def ipdm(iv, a):
+    if iv >= isb_duration:
+        return 0
+    iv = 1.0 / (1.0/iv - 1.0/isb_duration)
+    a = a * isb_boost
+    return pdm(iv, a)
 
-        stagger -= stagger * 0.1
-        if i % iv >= 0 and i % iv < 1:
-                isb_on = 7
-    return puried/dt
+def i1p1dm(iv, a):
+    if iv <= isb_duration/2 :
+        return 0
+    else:
+        # 1:1
+        iv = iv * 2
+        noisb_stin = a/(a+armor_base/stagger_per_agi) * 100
+        isb_stin = a/(a+armor_base/stagger_per_agi/isb_boost) * 100
+        isb_on = isb_duration
+        stagger = 0
+        puried = 0
+        staggerin = 0
+        dt = 0
+        for i in range(sim_time):
+            dt += 100
+            isb_on -= 1
+            if isb_on >= 0 :
+                staggerin += isb_stin
+                stagger += isb_stin
+                if isb_on == 0:
+                    puried += stagger * 0.5
+                    stagger -= stagger * 0.5
+            else:
+                staggerin += noisb_stin
+                stagger += noisb_stin
+
+            stagger -= stagger * 0.1
+            if i % iv >= 0 and i % iv < 1:
+                    isb_on = isb_duration
+        return puried/dt
+
+
+def fline(f, title, start, stop, iv, callback):
+    f.write( '%s'%(title) )
+    print '%s'%(title),
+    i = start - iv
+    while i < stop - iv:
+        i += iv
+        r = callback(i)
+        f.write(',')
+        f.write(str(r))
+        print ',',
+        print str(r),
+    print '\n',
+    f.write('\n')
 
 def main():
-    f = open('hp_haste.csv','wb')
+    start = 1
+    stop = 1.50
     iv = 0.01
-    stop = 1.35
+    f = open('pdm.csv','wb')
+
+    fline(f, '', start, stop, iv, lambda x:'')
+    fline(f, 'haste', start, stop, iv, lambda x:x)
+
+    agi = 13500
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-pdm(i, agi*1.4)))
+    fline(f, 'no_isb %dagi ht '%agi, start, stop, iv, foo)
+
+    agi = 9000
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-pdm(i, agi*1.4)))
+    fline(f, 'no_isb %dagi ht '%agi, start, stop, iv, foo)
+
+    agi = 6000
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-pdm(i, agi*1.4)))
+    fline(f, 'no_isb %dagi ht '%agi, start, stop, iv, foo)
+
+    agi = 4000
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-pdm(i, agi*1.4)))
+    fline(f, 'no_isb %dagi ht '%agi, start, stop, iv, foo)
+
+    agi = 13500
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-ipdm(i, agi*1.4)))
+    fline(f, 'keep_isb %dagi ht'%agi, start, stop, iv, foo)
+
+    agi = 9000
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-ipdm(i, agi*1.4)))
+    fline(f, 'keep_isb %dagi ht'%agi, start, stop, iv, foo)
+
+    agi = 6000
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-ipdm(i, agi*1.4)))
+    fline(f, 'keep_isb %dagi ht'%agi, start, stop, iv, foo)
+
+    agi = 4000
+    def foo(x):
+        i = 1.0/bps(x)
+        return '%.4f'%(1.0/(1.0-ipdm(i, agi*1.4)))
+    fline(f, 'keep_isb %dagi ht'%agi, start, stop, iv, foo)
+
+
+
+    return
 
     f.write('haste:, ')
     i = 1 - iv
@@ -180,7 +271,7 @@ def main():
     i = 1 - iv
     while i < stop-iv :
         i += iv
-        a = bps(i, t3='lb') - 1.0/7
+        a = bps(i, t3='lb') - 1.0/isb_duration
         pr = prate(1.0/a) * srate(6000*1.4*3.5)
         hp = 1.0/(1.0-pr)
         print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
