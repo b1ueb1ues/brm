@@ -23,7 +23,6 @@ class Context(object):
 
     def __init__(this):
         if not this.timeline:
-            this.timeline = 1
             this.timeline = Timeline()
         this.now = 0
 
