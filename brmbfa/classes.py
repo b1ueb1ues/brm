@@ -22,7 +22,7 @@ class Stats(object):
         effect = this.add
         c = 0.1
         h = 0.0
-        m = 0.12
+        m = 0.8
         v = 0.0
         _c = 0.1
         _h = 0.0
