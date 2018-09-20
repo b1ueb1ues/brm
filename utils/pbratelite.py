@@ -1,6 +1,6 @@
 from brm_bps import *
 
-sim_time = 10000
+sim_time = 600
 isb_boost = 3.5
 isb_duration = 7.0
 armor_base = 6300.0
@@ -29,6 +29,7 @@ def pdm(iv, a):
         if i % iv >= 0 and i % iv < 1:
             puried += stagger * 0.5
             stagger -= stagger * 0.5
+    print puried / staggerin
     return puried / dt
 
 def ipdm(iv, a):
@@ -85,6 +86,10 @@ def fline(f, title, start, stop, iv, callback):
     f.write('\n')
 
 def main():
+    print pdm(1,50000000000000000)
+    exit()
+
+
     start = 1
     stop = 1.50
     iv = 0.01
@@ -142,241 +147,6 @@ def main():
     fline(f, 'keep_isb %dagi ht'%agi, start, stop, iv, foo)
 
 
-
-    return
-
-    f.write('haste:, ')
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        f.write('%.2f, '%i)
-    f.write('\n')
-
-    f.write('8000a ht 1:1:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = iprate(1.0/a, 8000*1.4)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-
-    f.write('6000a ht 1:1:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = iprate(1.0/a, 6000*1.4)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-
-    f.write('6000a ht no isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = prate(1.0/a) * srate(6000*1.4)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('6000a no isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = prate(1.0/a) * srate(6000)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('5000a ht no isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = prate(1.0/a) * srate(5000*1.4)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('5000a no isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = prate(1.0/a) * srate(5000)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('4000a ht no isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = prate(1.0/a) * srate(4000*1.4)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('4000a no isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb')
-        pr = prate(1.0/a) * srate(4000)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f)'\
-                        %(i, 1.0/a, pr, hp, hp-hpold)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('6000a ht keep isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb') - 1.0/isb_duration
-        pr = prate(1.0/a) * srate(6000*1.4*3.5)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
-                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('6000a keep isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb') - 1.0/7
-        pr = prate(1.0/a) * srate(6000*3.5)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
-                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('5000a ht keep isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb') - 1.0/7
-        pr = prate(1.0/a) * srate(5000*1.4*3.5)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
-                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-
-    f.write('5000a keep isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb') - 1.0/7
-        pr = prate(1.0/a) * srate(5000*3.5)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
-                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('4000a ht keep isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb') - 1.0/7
-        pr = prate(1.0/a) * srate(4000*1.4*3.5)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
-                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-    f.write('4000a keep isb:, ')
-    hpold = 1
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = bps(i, t3='lb') - 1.0/7
-        pr = prate(1.0/a) * srate(4000*3.5)
-        hp = 1.0/(1.0-pr)
-        print '%.2f: pbcd: %.2f, pbrate: %.2f, hp:%.2f(d=%.4f) p/s:%.2f'\
-                        %(i, 1.0/a, pr, hp, hp-hpold, pr/0.8)
-        f.write('%f, '%hp)
-        hpold = hp
-    f.write('\n')
-
-
-
-
-
-    f.write('\n')
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        f.write('%.2f, '%i)
-    f.write('\n')
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = 1.0/bps(i, t3='lb')
-        f.write('%f, '%(a))
-    f.write('\n')
-
-    i = 1 - iv
-    while i < stop-iv :
-        i += iv
-        a = 1.0/(bps(i, t3='lb') - 1.0/7)
-        f.write('%f, '%a)
-    f.write('\n')
-
-    f.close()
-    
 
 
 def test_no_palm():
