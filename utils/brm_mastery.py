@@ -3,7 +3,7 @@
 
 dodgebase = 0.08 # base dodge+rate
 o_dmg_avoid = 0
-#f = open("/opt/brm/figure_mastery.csv",'w')
+f = open("/d/brm/utils/figure_mastery.csv",'w')
 def main(mastery):
     global f
     #mastery = 0.10 # mastery
@@ -43,12 +43,8 @@ def main(mastery):
 #	print "equivalent health increaced:", 1/(1-dmg_avoid)
 
 if __name__ == '__main__':
-    i = 0.3
-    dodgebase = 0.70
-    main(i)
-    exit()
     i = 0.08 - 0.01
-    dodgebase = 0.20
+    dodgebase = 0.10
     while(1):
         i+=0.01
         print "-----\n mastery = ",i
