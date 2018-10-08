@@ -1,7 +1,7 @@
 #!/usr/bin/python27
 # -*- encoding:utf8 -*-
 
-dodgebase = 0.08 # base dodge+rate
+dodgebase = 0.15 # base dodge+rate
 o_dmg_avoid = 0
 f = open("figure_mastery.csv",'w')
 f1 = open("figure_all.csv",'w')
@@ -45,7 +45,6 @@ def main(mastery):
 #	print "equivalent health increaced:", 1/(1-dmg_avoid)
 
 if __name__ == '__main__':
-    dodgebase = 0.10
     mmax = 0.5
 
     iv = 100.0
@@ -60,12 +59,12 @@ if __name__ == '__main__':
     f.write('\nmastery,')
     f1.write('\nmastery,')
 
-    iv = 100.0
+    iv = 50.0
     i = 0.0 - iv
     while(1):
         i+=iv
         m = 0.08 + i/7200.0
-        print "-----\n mastery = ",i
+        print "-----\n mastery = ",m
         main(m)
         if m >= mmax:
             break;
