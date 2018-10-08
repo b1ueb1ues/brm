@@ -3,7 +3,8 @@
 
 dodgebase = 0.08 # base dodge+rate
 o_dmg_avoid = 0
-f = open("/d/brm/utils/figure_mastery.csv",'w')
+f = open("figure_mastery.csv",'w')
+f1 = open("figure_all.csv",'w')
 def main(mastery):
     global f
     #mastery = 0.10 # mastery
@@ -38,21 +39,41 @@ def main(mastery):
     print "attack dmg avoid than before :", 1-(1-dmg_avoid)/(1-o_dmg_avoid)
     a = 1-(1-dmg_avoid)/(1-o_dmg_avoid)
     if o_dmg_avoid != 0 :
-        f.write("%.4f,"%(a*100))
+        f.write("%.4f,"%(a))
+        f1.write("%.4f,"%(a))
     o_dmg_avoid = dmg_avoid 
 #	print "equivalent health increaced:", 1/(1-dmg_avoid)
 
 if __name__ == '__main__':
-    i = 0.08 - 0.01
     dodgebase = 0.10
+    mmax = 0.5
+
+    iv = 100.0
+    i = 0.0 - iv
     while(1):
-        i+=0.01
+        i+=iv
+        m = 0.08 + i/7200.0
+        f.write("%d,"%(i))
+        f1.write("%d,"%(i))
+        if m >= mmax :
+            break
+    f.write('\nmastery,')
+    f1.write('\nmastery,')
+
+    iv = 100.0
+    i = 0.0 - iv
+    while(1):
+        i+=iv
+        m = 0.08 + i/7200.0
         print "-----\n mastery = ",i
-        main(i)
-        if i >= 0.5:
+        main(m)
+        if m >= mmax:
             break;
+    f.write("\n")
+    f1.write("\n")
 	
     exit()
+
 #	i = 0
 #	dodgebase = 0.10
 #	main(0.31)
