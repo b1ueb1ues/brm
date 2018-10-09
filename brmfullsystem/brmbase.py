@@ -11,7 +11,7 @@ def main():
 #    b = brmbase(talent=['black','light','ht','bc','ed'],equip=['ring','waist','wrist'], stat=[25,25,0,20],\
 #            iduration = 8, tpcdr = 1.4, haste = 30, dodgebase = 0.08, mastery = 0, crit = 0, vers = 0 )
 
-    b = brmbase(stat=[30,20,0,16],equip=['ring','waist','4t'],iduration=9)
+    b = brmbase(stat=[30,20,0,16],equip=[],iduration=7)
     b.haste=32
     b.init()
     print b.__dict__
@@ -80,7 +80,7 @@ class brmbase(object):
     kscdr = 4
     tpcdr = 1
     facepalm = 0.4
-    brewcd = 21
+    brewcd = 15
     brewstack = 3
     brewstackmax = 3
 
@@ -358,7 +358,7 @@ class brmbase(object):
                 this.bc = 1
                 this.kscdr = 6
             elif t == 'light':
-                this.brewcd = 18
+                this.brewcd = 15-3
                 this.brewstack = 4
                 this.brewstackmax = 4
                 this.light = 1

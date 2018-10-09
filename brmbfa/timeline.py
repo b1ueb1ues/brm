@@ -1,75 +1,33 @@
-def now():
-    return Context.activeContext[0].now
-
-class Context(object):
-    activeContext = [0]
-    timeline = 0
-
-    @classmethod
-    def setup(cls):
-        cls.activeContext[0] = object.__new__(cls)
-
-
-    @classmethod
-    def reset(cls):
-        cls.activeContext[0] = 0
-        return Context()
-
-
-    def __new__(cls):
-        if not cls.activeContext[0] :
-            cls.activeContext[0] = object.__new__(cls)
-        return cls.activeContext[0]
-
-    def __init__(this):
-        if not this.timeline:
-            this.timeline = Timeline()
-        this.now = 0
-
-
-    def run(this,*args, **argv):
-        this.timeline.run(*args, **argv)
-
 
 class Event(object):
-    #class Context(object):
-    #    timeline = 0
-    #ctx = Context()
-    #@classmethod
-    #def setup(cls,timeline):
-    #    cls.ctx.timeline = timeline
-    #    return cls.ctx
-    #@classmethod
-    #def reset(cls,timeline=None):
-    #    cls.ctx = Event.Context()
-    #    if timeline:
-    #        cls.ctx.timeline = timeline
-    #    return cls.ctx
 
-    def __init__(this, proc=None, timing=0, ctx=None):
+    def __init__(this, name, proc=None, timing=None, timeline=None):
+        this.name = name
+
         if proc:
             this.process = proc
         else:
             this.process = this._process
 
-        if not ctx:
-            this.ctx = Context()
+        if timeline:
+            this.timeline = timeline
         else:
-            this.ctx = ctx
+            this.timeline = Timeline()
 
-        this.timing = timing
+        if timing :
+            this.timing = timing
+        else:
+            this.timing = now()
 
+        this._trigger = []
         this.online = 0
-
-    
-    def now(this):
-        return this.ctx.now
-
+        this.on()
 
     def disable(this):
         if this.online:
             this.online = 0
-            this.ctx.timeline.rm(this)
+            this.timeline.rm(this)
+    #alias
     off = disable
 
 
@@ -78,17 +36,22 @@ class Event(object):
             this.timing = timing
         if this.online == 0:
             this.online = 1
-            this.ctx.timeline.add(this)
+            this.timeline.add(this)
+    #alias
     on = enable
 
 
     def callback(this):
         this.process(this)
-        if this.timing <= this.now():
+        for i in this._trigger:
+            i()
+        if this.timing <= now():
             if this.online:
-                this.ctx.timeline.rm(this)
+                this.timeline.rm(this)
 
 
+    def process(this):
+        pass
     @staticmethod
     def _process(timing):
         # sample plain _process
@@ -97,73 +60,130 @@ class Event(object):
 
 
 class RepeatEvent(Event):
-    def __init__(this,proc=None,interval=10):
-        super(RepeatEvent,this).__init__(proc)
+    def __init__(this, name, proc=None, interval=10):
+        super(RepeatEvent,this).__init__(name, proc)
         this.interval = interval
 
     def callback(this):
         this.process(this)
-        if this.timing == this.now():
+        if this.timing == now():
             this.timing += this.interval
 
 
 
-class Timeline(object):
 
-    def __init__(this, ctx=None):
-        this._events = []
-        if not ctx:
-            this.ctx = Context()
-        else:
-            this.ctx = ctx
+__g_now = 0
+
+def now():
+    global __g_now
+    return __g_now
+def set_time(time):
+    global __g_now
+    __g_now = time
+    return 1
+
+__g_event_listener_mismatch = {} # {"name":[]}
+__g_trigger_onload = {}
+
+def add_event_listener(eventname,listener):
+    global __g_eventlistener 
+    global __g_trigger_onload
+
+    if eventname in __g_trigger_onload:
+        __g_trigger_onload[eventname].append(listener)
+    elif eventname in __g_eventlistener_mismatch :
+        __g_eventlistener_mismatch[eventname].append(listener)
+    else:
+        __g_eventlistener_mismatch[eventname] = listener
+
+def add_event_trigger(eventname, trigger):
+    global __g_eventlistener 
+    global __g_trigger_onload
+
+    __g_trigger_onload[eventname] = trigger
+
+
+
+class Timeline(object):
+    _active = [0]
+    _now = 0
+    _listenerlist = []
+    _eventlist = []
+
+    @classmethod
+    def setup(cls):
+        cls.activeContext[0] = object.__new__(cls)
+
+
+    @classmethod
+    def reset(cls):
+        cls._active = [0]
+        return Timeline()
+
+    def __init__(this):
+        if this._active[0]:
+            return
+        this._listenerlist = []
+        this._eventlist = []
+
+    def __new__(cls):
+        if not cls._active[0] :
+            cls._active[0] = object.__new__(cls)
+        return cls._active[0]
 
 
     def __str__(this):
-        return "Timeline Events: %s"%(str(this._events))
-
-
-    def now(this):
-        return this.ctx.now
+        return "Timeline Eventlist: %s"%(str(this._eventlist))
 
 
     def add(this, event):
-        this._events.append(event)
+        this._eventlist.append(event)
+
+
+    def addlistener(this, listener):
+        this._listenerlist.append(listener)
 
 
     def rm(this, event):
-        i = this._events.index(event)
-        return this._events.pop(i)
+        i = this._eventlist.index(event)
+        return this._eventlist.pop(i)
 
 
     def process_head(this):
-        eventcount = len(this._events)
+        global __g_now
+        eventcount = len(this._eventlist)
         if eventcount == 0:
             return -1
 
-        headtiming = this._events[0].timing
-        headindex = 0
-
-        if eventcount >= 2:
+        if eventcount == 1:
+            headtiming = this._eventlist[0].timing  
+            headindex = 0                          
+        else: #if eventcount >= 2: 
+            headtiming = this._eventlist[0].timing  
+            headindex = 0                          
             for i in range(1,eventcount):
-                timing = this._events[i].timing
+                timing = this._eventlist[i].timing
                 if timing < headtiming:
                     headtiming = timing
                     headindex = i
-        if headtiming >= this.now():
-            this.ctx.now = headtiming
-            this._events[headindex].callback()
+
+        if headtiming >= now():
+            set_time(headtiming)
+            headevent = this._eventlist[headindex]
+            headevent.callback()
+            for i in this._listenerlist:
+                i(headevent)
         else:
             print "timeline time err"
             exit()
-            this._events.pop(headindex)
         return 0
     
-
-    def run(this, last = 100):
+    @classmethod
+    def run(cls, last = 100):
         while 1:
-            if this.now() > last:
+            if now() > last:
                 return
-            r = this.process_head()
+            r = cls.process_head(cls._active[0])
             if r == -1:
                 return
 
@@ -171,32 +191,31 @@ class Timeline(object):
 def main():
 
     def a1(e):
-        print 'a1', e.timing
+        print e.name, e.timing
         e.timing += 2
     def a2(e):
-        print 'a2', e.timing
+        print e.name, e.timing
+    def a3(e):
+        print e.name, e.timing
 
-    ctx = Context()
+    class Test():
+        def __init__(this):
+            this.e = Event("test",this.processb,5).on()
+            print Timeline()
 
-    e1 = Event()
-    e1.timing = 2
+        def processb(this, e):
+            print e.name, e.timing
+
+    e1 = Event("e1",a1,2)
+    e2 = RepeatEvent("e2",a2,1.5)
+    e3 = Event("e3",a3,3)
+    Test()
     e1.process = a1
-    e1.on()
-
-    ctx2 = Context.reset()
-    #Event.setup(t2)
-    e2 = RepeatEvent()
-    e2.timing = 1.5
     e2.process = a2
-    e2.on()
+    e3.process = a3
 
-    e3 = Event()
-    e3.timing = 2
-    e3.process = a1
-    e3.on()
+    Timeline().run()
 
-    ctx.timeline.run(10)
-    ctx2.timeline.run(30)
 
 
 if __name__ == '__main__' :

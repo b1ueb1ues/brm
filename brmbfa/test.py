@@ -1,9 +1,7 @@
-
-class test(object):
-    v = 1
-
-t = test()
-t2 = test()
-a = {t2:"2", t:"1", 0:"0",65535:"65535"}
+a = {}
+a["test"] = [1]
+if "test2" in a:
+    print 'no'
+if "test" in a:
+    print 'yes'
 print a
-

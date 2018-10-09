@@ -12,20 +12,20 @@ debug = 2
 
 class brm(brmbase):
 
-    quicksip = 1
-    overflowrate = 0.2
+    quicksip = 0
+    overflowrate = 0
     giftcount = 0
-    fbmastery = 1
+    fbmastery = 0
     bsmastery = 1
     mode = 'normal'
     ver = 'ptr'
     deathcount = 0
-    isbduration = 9
-    facepalm = 0.4
-    hotblooded = 0.04
+    isbduration = 7
+    facepalm = 0
+    hotblooded = 0.05
 
     heavyhide = 0
-    t20rate = 0.4
+    t20rate = 0
 
     statisticlist = [
         'totaltank',
@@ -218,11 +218,11 @@ class brm(brmbase):
 
     def mode_normal(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 6000000
+        this.takemeleeev.dmg = 300000
 
     def mode_n(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 1.5)
-        this.takemeleeev.dmg = 6000000
+        this.takemeleeev.dmg = 300000
 
     def mode_creep(this):
         this.takemeleeev = brm.TakeMeleeEv(this.el,repeat = 0.3)
@@ -290,12 +290,13 @@ class brm(brmbase):
         #print '--cast isb at',this.el.time,this.brewstack.stack()
         if this.noisb == 1 :
             ret = 1
+            return
             pass
         else:
             ret =this.stackbrew.cast()
         if ret != 0:
             this.isb.cast()
-            this.pury(rate=0.05,src='quicksip')
+            #this.pury(rate=0.05,src='quicksip')
             if '2t20' in this.equip or '4t20' in this.equip:
                 r = random.random()
                 if r < this.t20rate:

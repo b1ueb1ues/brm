@@ -13,6 +13,7 @@ class Kegsmash(Spell):
 
     def effect(this):
         brm = this.src
+        # !
         brm.brew.reduce(4)
 
 
@@ -44,8 +45,7 @@ class A():
 
 
 def main():
-    a = A()
-    a.ks.cast()
+    A().ks.cast()
 
 if __name__ == "__main__" :
     main()
