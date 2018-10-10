@@ -1,7 +1,10 @@
-a = {}
-a["test"] = [1]
-if "test2" in a:
-    print 'no'
-if "test" in a:
-    print 'yes'
-print a
+from timeline import *
+
+
+class Spell(object):
+    def __init__(this):
+        print this.__class__
+
+    pass
+
+Spell()

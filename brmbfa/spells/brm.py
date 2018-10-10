@@ -9,7 +9,7 @@ class Kegsmash(Spell):
         "_END":0
     }
     def __init__(this, brew):
-        brew.reduce(4)
+        pass
 
     def effect(this):
         brm = this.src

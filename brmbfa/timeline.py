@@ -1,4 +1,36 @@
 
+
+
+__g_now = 0
+
+def now():
+    global __g_now
+    return __g_now
+def set_time(time):
+    global __g_now
+    __g_now = time
+    return 1
+
+
+__g_event_listeners = {}
+
+def add_event_listener(eventname,listener): #listener should be a function
+    global __g_event_listeners
+
+    if eventname in __g_event_listeners:
+        __g_event_listeners[eventname].append(listener)
+    else:
+        __g_event_listeners[eventname] = [listener]
+
+def get_event_trigger(eventname, trigger = []): 
+    global __g_event_listeners
+    if eventname in __g_event_listeners:
+        return __g_event_listeners[eventname]
+    else:
+        __g_event_listeners[eventname] = []
+        return __g_event_listeners[eventname]
+
+
 class Event(object):
 
     def __init__(this, name, proc=None, timing=None, timeline=None):
@@ -19,7 +51,11 @@ class Event(object):
         else:
             this.timing = now()
 
-        this._trigger = []
+        if name :
+            this._trigger = get_event_trigger(name)
+        else:
+            this._trigger = []
+
         this.online = 0
         this.on()
 
@@ -43,64 +79,36 @@ class Event(object):
 
     def callback(this):
         this.process(this)
-        for i in this._trigger:
-            i()
+        this.trigger()
         if this.timing <= now():
             if this.online:
                 this.timeline.rm(this)
 
+    def trigger(this,triggername=None):
+        if triggername:
+            trigger = get_event_trigger(triggername)
+        else:
+            trigger = this._trigger
+        for i in trigger:
+            i()
 
-    def process(this):
-        pass
+
     @staticmethod
-    def _process(timing):
+    def _process(e):
         # sample plain _process
-        print '-- plain event @', timing
+        print '-- plain event ',e.name ,'@', e.timing
         return 1
 
 
-class RepeatEvent(Event):
-    def __init__(this, name, proc=None, interval=10):
-        super(RepeatEvent,this).__init__(name, proc)
+class Repeat_event(Event):
+    def __init__(this, name, proc=None, interval=10, timing=None):
+        super(Repeat_event,this).__init__(name, proc, timing)
         this.interval = interval
 
     def callback(this):
         this.process(this)
         if this.timing == now():
             this.timing += this.interval
-
-
-
-
-__g_now = 0
-
-def now():
-    global __g_now
-    return __g_now
-def set_time(time):
-    global __g_now
-    __g_now = time
-    return 1
-
-__g_event_listener_mismatch = {} # {"name":[]}
-__g_trigger_onload = {}
-
-def add_event_listener(eventname,listener):
-    global __g_eventlistener 
-    global __g_trigger_onload
-
-    if eventname in __g_trigger_onload:
-        __g_trigger_onload[eventname].append(listener)
-    elif eventname in __g_eventlistener_mismatch :
-        __g_eventlistener_mismatch[eventname].append(listener)
-    else:
-        __g_eventlistener_mismatch[eventname] = listener
-
-def add_event_trigger(eventname, trigger):
-    global __g_eventlistener 
-    global __g_trigger_onload
-
-    __g_trigger_onload[eventname] = trigger
 
 
 
@@ -180,6 +188,7 @@ class Timeline(object):
     
     @classmethod
     def run(cls, last = 100):
+        last += now()
         while 1:
             if now() > last:
                 return
@@ -191,30 +200,30 @@ class Timeline(object):
 def main():
 
     def a1(e):
-        print e.name, e.timing
-        e.timing += 2
+        print '-1',e.name, e.timing
+        e.trigger('e3')
     def a2(e):
-        print e.name, e.timing
-    def a3(e):
-        print e.name, e.timing
+        print '-2',e.name, e.timing
 
-    class Test():
-        def __init__(this):
-            this.e = Event("test",this.processb,5).on()
-            print Timeline()
+    def lis():
+        print "listener1"
+    def lis2():
+        print "listener2"
+    def lis3():
+        print "listener3"
 
-        def processb(this, e):
-            print e.name, e.timing
+    e1 = Event("e1",a1,1)
 
-    e1 = Event("e1",a1,2)
-    e2 = RepeatEvent("e2",a2,1.5)
-    e3 = Event("e3",a3,3)
-    Test()
-    e1.process = a1
-    e2.process = a2
-    e3.process = a3
+    add_event_listener("e3",lis3)
+
+
+    add_event_listener("e2",lis)
+    add_event_listener("e2",lis2)
+
+    e2 = Event("e2",a2,2)
 
     Timeline().run()
+
 
 
 
