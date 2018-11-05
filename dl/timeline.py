@@ -64,9 +64,12 @@ class Event(object):
         if this.online:
             this.online = 0
             this.timeline.rm(this)
+        return this
     #alias
     off = disable
 
+    def status(this):
+        return this.online
 
     def enable(this, timing = None):
         if timing:
@@ -74,6 +77,7 @@ class Event(object):
         if this.online == 0:
             this.online = 1
             this.timeline.add(this)
+        return this
     #alias
     on = enable
 

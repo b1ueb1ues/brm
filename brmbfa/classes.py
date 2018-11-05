@@ -43,14 +43,13 @@ class Stats(object):
 
 class Classes(object):
     def __init__(this):
-        this.ctx = Context()
-        this.tl = this.ctx.timeline
+        #this.tl = Timeline
 
         this.stats = Stats()
         this.spells = Spells()
         this.auras = Auras()
 
-        this.gcd = RepeatEvent(proc=this.p_gcd, interval=1)
+        this.gcd = Repeat_event(proc=this.p_gcd, interval=1)
         this.gcd.idle = 0
 
         this.foo = this.Foo()
@@ -59,7 +58,8 @@ class Classes(object):
     class Foo(object):
         cding = 0
         def __init__(this):
-            this.foocd = Event(this.p_foocd)
+            this.foocd = Event("foocd",this.p_foocd)
+            this.foocd.off()
 
         def cast(this):
             print '-- foo!', now()
