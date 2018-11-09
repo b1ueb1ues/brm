@@ -89,13 +89,20 @@ class Event(object):
             if this.online:
                 this.timeline.rm(this)
 
-    def trigger(this,triggername=None):
+    def listener(this, cb,  eventname = None):
+        if eventname:
+            add_event_listener(eventname, cb)
+        else:
+            add_event_listener(this.name, cb)
+
+
+    def trigger(this, triggername = None):
         if triggername:
             trigger = get_event_trigger(triggername)
         else:
             trigger = this._trigger
         for i in trigger:
-            i()
+            i(this)
 
 
     @staticmethod
