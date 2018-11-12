@@ -2,6 +2,7 @@
 
 
 __g_now = 0
+#__g_active_timeline = 0
 
 def now():
     global __g_now
@@ -29,6 +30,10 @@ def get_event_trigger(eventname, trigger = []):
     else:
         __g_event_listeners[eventname] = []
         return __g_event_listeners[eventname]
+
+def clean_event_listener(): 
+    global __g_event_listeners
+    __g_event_listeners = {}
 
 
 
@@ -138,6 +143,8 @@ class Timeline(object):
     @classmethod
     def reset(cls):
         cls._active = [0]
+        set_time(0)
+        clean_event_listener()
         return Timeline()
 
     def __init__(this):

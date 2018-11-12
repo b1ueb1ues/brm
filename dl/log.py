@@ -12,3 +12,10 @@ def logcat():
         elif type(i[3]) == int:
             print "%-8.3f: %-8s\t, %-16s\t, %-8d\t, %s"%(i[0],i[1],i[2],i[3],i[4])
 
+def logget():
+    return g_log
+
+def logreset():
+    global g_log
+    g_log = []
+
