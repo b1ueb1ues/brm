@@ -1,85 +1,7 @@
-from timeline import *
-from log import *
+from core.timeline import *
+from core.log import *
 
 
-conf = {}
-conf.update( {
-        "x_type"      : "ranged" ,
-
-        "x1_dmg"      : 0.98     ,
-        "x1_sp"       : 130      ,
-        "x1_startup"  : 18/60.0  ,
-
-        "x2_dmg"      : 1.06     ,
-        "x2_sp"       : 200      ,
-        "x2_startup"  : 33/60.0  ,
-
-        "x3_dmg"      : 1.08     ,
-        "x3_sp"       : 240      ,
-        "x3_startup"  : 31/60.0  ,
-
-        "x4_dmg"      : 1.56     ,
-        "x4_sp"       : 430      ,
-        "x4_startup"  : 53/60.0  ,
-
-        "x5_dmg"      : 2.06     ,
-        "x5_sp"       : 600      ,
-        "x5_startup"  : 64/60.0  ,
-        "x5_recovery" : 68/60.0  ,
-
-        "fs_dmg"      : 1.8      ,
-        "fs_sp"       : 400      ,
-        "fs_startup"  : 42/60.0  ,
-        "fs_recovery" : 81/60.0  ,
-
-        "dodge_recovery": 43/60.0,
-
-        "missile_iv"  : [0.7/2, 0.7, 0.7, 0.7, 0.7, 0.7], # fs, c1, c2...
-        }
-        )
-
-
-
-conf.update(  {
-        "s1_dmg"  : 1.61*6   ,
-        "s1_sp"   : 2648     ,
-        "s1_time" : 167/60.0 ,
-
-        "s2_dmg"  : 2.44*4   ,
-        "s2_sp"   : 5838     ,
-        "s2_time" : 114/60.0 ,
-
-        "s3_dmg"  : 0        ,
-        "s3_sp"   : 0        ,
-        "s3_time" : 0        ,
-
-        } )
-
-conf.update(  {
-    "think_latency" : {'x_cancel':0.05, 'sp':0.05 , 'default':0.05}
-        }
-        )
-al = {
-        'sp': [],
-        'x5': [],
-        'x4': [],
-        'x3': [],
-        'x2': [],
-        'x1': [],
-        'x0': [],
-        }
-
-al.update({
-        #'sp': ["s1","s2"],
-        'x5': ["s1", "s2"],
-        'x4': ["s1", "s2"],
-        'x3': ["s1", "s2"],
-        'x2': ["s1", "s2"],
-        'x1': ["s1", "s2"],
-        'x0': ["s1", "s2"],
-        })
-
-conf['al'] = al
 
 class Skill(object):
     charged = 0
@@ -116,9 +38,13 @@ class Skill(object):
 class Adv(object):
     x_status = (0,1)
     log = []
+    conf = {}
 
     def __init__(this,conf):
-        this.conf = conf
+        tmpconf = {}
+        tmpconf.update(this.conf)
+        tmpconf.update(conf)
+        this.conf = tmpconf
         this.s1 = Skill("s1",this.conf["s1_sp"])
         this.s2 = Skill("s2",this.conf["s2_sp"])
         this.s3 = Skill("s3",this.conf["s3_sp"])
@@ -143,7 +69,7 @@ class Adv(object):
     def ac(this, e):
         this.x()
 
-    def run(this, d = 10):
+    def run(this, d = 300):
         this.init()
         Timeline().run(d)
 
@@ -232,9 +158,6 @@ class Adv(object):
             time = this.conf["x%d_startup"%(seq+1)]
         this.idle.timing += time
 
-
-
-    
     def melee_x(this):
         seq = this.x_status
         dmg = this.conf["x%d_dmg"%seq]
@@ -292,15 +215,62 @@ def sum_dmg():
     print dmg_sum
 
 
-a = Adv(conf)
-a.run(300)
-logcat(['dmg','x','cast'])
-sum_dmg()
+if __name__ == "__main__":
 
+    conf = {}
+    conf.update( {
+        "x_type"      : "ranged" ,
 
-logreset()
-conf['al'] = {
-        'sp': ["s1","s2"],
+        "x1_dmg"      : 0.98     ,
+        "x1_sp"       : 130      ,
+        "x1_startup"  : 18/60.0  ,
+
+        "x2_dmg"      : 1.06     ,
+        "x2_sp"       : 200      ,
+        "x2_startup"  : 33/60.0  ,
+
+        "x3_dmg"      : 1.08     ,
+        "x3_sp"       : 240      ,
+        "x3_startup"  : 31/60.0  ,
+
+        "x4_dmg"      : 1.56     ,
+        "x4_sp"       : 430      ,
+        "x4_startup"  : 53/60.0  ,
+
+        "x5_dmg"      : 2.06     ,
+        "x5_sp"       : 600      ,
+        "x5_startup"  : 64/60.0  ,
+        "x5_recovery" : 68/60.0  ,
+
+        "fs_dmg"      : 1.8      ,
+        "fs_sp"       : 400      ,
+        "fs_startup"  : 42/60.0  ,
+        "fs_recovery" : 81/60.0  ,
+
+        "dodge_recovery": 43/60.0,
+
+        "missile_iv"  : [0.7/2, 0.7, 0.7, 0.7, 0.7, 0.7], # fs, c1, c2...
+        } )
+
+    conf.update( {
+        "s1_dmg"  : 1.61*6   ,
+        "s1_sp"   : 2648     ,
+        "s1_time" : 167/60.0 ,
+
+        "s2_dmg"  : 2.44*4   ,
+        "s2_sp"   : 5838     ,
+        "s2_time" : 114/60.0 ,
+
+        "s3_dmg"  : 0        ,
+        "s3_sp"   : 0        ,
+        "s3_time" : 0        ,
+        } )
+
+    conf.update( {
+        "think_latency" : {'x_cancel':0.05, 'sp':0.05 , 'default':0.05}
+        } )
+    al = {
+        'sp': [],
         'x5': [],
         'x4': [],
         'x3': [],
@@ -309,9 +279,38 @@ conf['al'] = {
         'x0': [],
         }
 
-a = Adv(conf)
-a.run(300)
-sum_dmg()
-        
+    al.update( {
+            #'sp': ["s1","s2"],
+            'x5': ["s1", "s2"],
+            'x4': ["s1", "s2"],
+            'x3': ["s1", "s2"],
+            'x2': ["s1", "s2"],
+            'x1': ["s1", "s2"],
+            'x0': ["s1", "s2"],
+        } )
+
+    conf['al'] = al
+
+    a = Adv(conf)
+    a.run(300)
+    logcat(['dmg','x','cast'])
+    sum_dmg()
+
+
+    logreset()
+    conf['al'] = {
+            'sp': ["s1","s2"],
+            'x5': [],
+            'x4': [],
+            'x3': [],
+            'x2': [],
+            'x1': [],
+            'x0': [],
+            }
+
+    a = Adv(conf)
+    a.run(300)
+    sum_dmg()
+            
 
 
