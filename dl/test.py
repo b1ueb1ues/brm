@@ -62,6 +62,6 @@ conf['al'] = {
     'x0': [],
     }
 
-Maribelle(conf).run()
+Maribelle(conf).run(300)
 sum_dmg()
 
