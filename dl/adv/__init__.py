@@ -36,7 +36,7 @@ class Skill(object):
         Event(this.name).trigger()
 
 class Adv(object):
-    x_status = (0,1)
+    x_status = (0,0)
     log = []
     conf = {}
 
@@ -57,7 +57,7 @@ class Adv(object):
     def init(this):
         Timeline().reset()
         this.idle = Event("idle", this.ac).on()
-        this.x_status = (0,1)
+        this.x_status = (0,0)
         Event("s1").listener(this.s)
         Event("s2").listener(this.s)
         Event("s3").listener(this.s)
@@ -101,10 +101,12 @@ class Adv(object):
             if this.x_status == (1, 2) and this.conf['al']['x1']:
                 for i in this.conf['al']['x1']:
                     getattr(this,i).cast()
-
-        if e.pin == 's':
-            for i in this.conf['al']['x0'] :
-                getattr(this, i).cast()
+            if this.x_status == (0, 1) and this.conf['al']['x1']:
+                for i in this.conf['al']['x0'] :
+                    getattr(this, i).cast()
+        #if e.pin == 's':
+            #for i in this.conf['al']['x0'] :
+                #getattr(this, i).cast()
 
     def charge(this, name, sp):
         sp = sp * this.sp_mod()
@@ -129,7 +131,7 @@ class Adv(object):
 
 
     def range_x(this):
-        if this.x_status == (5, 0):
+        if this.x_status[1] == 0 :
             this.x_status = (0, 1)
             time = this.conf["x1_startup"]
             this.idle.timing += time
@@ -169,9 +171,15 @@ class Adv(object):
 
     def dmg_make(this, name, count):
         count = count * this.dmg_mod()
-        spgain = this.conf[name[:2]+"_sp"]
-        log("dmg", name, count, "%d/%d, %d/%d, %d/%d (+%d)"%(\
-            this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp, spgain) )
+        
+        if name[0] == "x":
+            spgain = this.conf[name[:2]+"_sp"]
+            log("dmg", name, count, "%d/%d, %d/%d, %d/%d (+%d)"%(\
+                this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp, spgain) )
+        else:
+            spgain = this.conf[name[:2]+"_sp"]
+            log("dmg", name, count, "%d/%d, %d/%d, %d/%d (-%d)"%(\
+                this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp, spgain) )
 
 
     def s(this, e):
@@ -187,9 +195,8 @@ class Adv(object):
         this.idle.timing = now() + this.conf[e.name+"_time"]
         this.dmg_make(e.name , this.conf[e.name+"_dmg"])
 
-
-        this.x_status = (0, 1)
-        this.think_pin("s")
+        this.x_status = (0, 0)
+        #this.think_pin("s")
 
     def s1_proc(this, e):
         pass

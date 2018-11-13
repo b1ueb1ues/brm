@@ -1,6 +1,5 @@
 import adv
 import wep.wand
-import al
 
 
 class Maribelle(adv.Adv):
