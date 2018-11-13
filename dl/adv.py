@@ -4,53 +4,59 @@ from log import *
 
 conf = {}
 conf.update( {
-        "x_type"     : "ranged" ,
+        "x_type"      : "ranged" ,
 
-        "missile_iv" : [0.5,0.5,0.5,1.0,1.5]  ,
+        "x1_dmg"      : 0.98     ,
+        "x1_sp"       : 130      ,
+        "x1_startup"  : 18/60.0  ,
 
-        "x1_dmg"     : 0.98     ,
-        "x1_sp"      : 130      ,
-        "x1_time"    : 15/60.0  ,
+        "x2_dmg"      : 1.06     ,
+        "x2_sp"       : 200      ,
+        "x2_startup"  : 33/60.0  ,
 
-        "x2_dmg"     : 1.06     ,
-        "x2_sp"      : 200      ,
-        "x2_time"    : 25/60.0  ,
+        "x3_dmg"      : 1.08     ,
+        "x3_sp"       : 240      ,
+        "x3_startup"  : 31/60.0  ,
 
-        "x3_dmg"     : 1.08     ,
-        "x3_sp"      : 240      ,
-        "x3_time"    : 30/60.0  ,
+        "x4_dmg"      : 1.56     ,
+        "x4_sp"       : 430      ,
+        "x4_startup"  : 53/60.0  ,
 
-        "x4_dmg"     : 1.56     ,
-        "x4_sp"      : 430      ,
-        "x4_time"    : 52/60.0  ,
+        "x5_dmg"      : 2.06     ,
+        "x5_sp"       : 600      ,
+        "x5_startup"  : 64/60.0  ,
+        "x5_recovery" : 68/60.0  ,
 
-        "x5_dmg"     : 2.06     ,
-        "x5_sp"      : 600      ,
-        "x5_time"    : 65/60.0  ,
+        "fs_dmg"      : 1.8      ,
+        "fs_sp"       : 400      ,
+        "fs_startup"  : 42/60.0  ,
+        "fs_recovery" : 81/60.0  ,
+
+        "dodge_recovery": 43/60.0,
+
+        "missile_iv"  : [0.7/2, 0.7, 0.7, 0.7, 0.7, 0.7], # fs, c1, c2...
         }
         )
 
 
 
+conf.update(  {
+        "s1_dmg"  : 1.61*6   ,
+        "s1_sp"   : 2648     ,
+        "s1_time" : 167/60.0 ,
+
+        "s2_dmg"  : 2.44*4   ,
+        "s2_sp"   : 5838     ,
+        "s2_time" : 114/60.0 ,
+
+        "s3_dmg"  : 0        ,
+        "s3_sp"   : 0        ,
+        "s3_time" : 0        ,
+
+        } )
 
 conf.update(  {
-        "s1_dmg"  : 1.61*6,
-        "s1_sp"   : 2648  ,
-        "s1_time" : 3     ,
-
-        "s2_dmg"  : 2.44*4,
-        "s2_sp"   : 5838  ,
-        "s2_time" : 3     ,
-
-        "s3_dmg"  : 0     ,
-        "s3_sp"   : 10000 ,
-        "s3_time" : 0     ,
-
-        }
-        )
-
-conf.update(  {
-    "think_latency" : {'x_cancel':0.2, 'sp':0.05 , 'default':0.05}
+    "think_latency" : {'x_cancel':0.05, 'sp':0.05 , 'default':0.05}
         }
         )
 al = {
@@ -65,12 +71,12 @@ al = {
 
 al.update({
         #'sp': ["s1","s2"],
-        'x5': ["s1","s2"],
-        'x4': ["s1","s2"],
-        'x3': ["s1","s2"],
-        'x2': ["s1","s2"],
-        'x1': ["s1","s2"],
-        'x0': ["s1","s2"],
+        'x5': ["s1", "s2"],
+        'x4': ["s1", "s2"],
+        'x3': ["s1", "s2"],
+        'x2': ["s1", "s2"],
+        'x1': ["s1", "s2"],
+        'x0': ["s1", "s2"],
         })
 
 conf['al'] = al
@@ -108,7 +114,7 @@ class Skill(object):
         Event(this.name).trigger()
 
 class Adv(object):
-    x_status = 1 
+    x_status = (0,1)
     log = []
 
     def __init__(this,conf):
@@ -125,6 +131,7 @@ class Adv(object):
     def init(this):
         Timeline().reset()
         this.idle = Event("idle", this.ac).on()
+        this.x_status = (0,1)
         Event("s1").listener(this.s)
         Event("s2").listener(this.s)
         Event("s3").listener(this.s)
@@ -153,19 +160,19 @@ class Adv(object):
                 getattr(this,i).cast()
 
         if e.pin == 'x_cancel':
-            if this.x_status == 5 and this.conf['al']['x5']:
+            if this.x_status == (5, 0) and this.conf['al']['x5']:
                 for i in this.conf['al']['x5']:
                     getattr(this,i).cast()
-            if this.x_status == 4 and this.conf['al']['x4']:
+            if this.x_status == (4, 5) and this.conf['al']['x4']:
                 for i in this.conf['al']['x4']:
                     getattr(this,i).cast()
-            if this.x_status == 3 and this.conf['al']['x3']:
+            if this.x_status == (3, 4) and this.conf['al']['x3']:
                 for i in this.conf['al']['x3']:
                     getattr(this,i).cast()
-            if this.x_status == 2 and this.conf['al']['x2']:
+            if this.x_status == (2, 3) and this.conf['al']['x2']:
                 for i in this.conf['al']['x2']:
                     getattr(this,i).cast()
-            if this.x_status == 1 and this.conf['al']['x1']:
+            if this.x_status == (1, 2) and this.conf['al']['x1']:
                 for i in this.conf['al']['x1']:
                     getattr(this,i).cast()
 
@@ -196,24 +203,36 @@ class Adv(object):
 
 
     def range_x(this):
-        seq = this.x_status
+        if this.x_status == (5, 0):
+            this.x_status = (0, 1)
+            time = this.conf["x1_startup"]
+            this.idle.timing += time
+            return
+
+        seq = this.x_status[1]
         dmg = this.conf["x%d_dmg"%seq] 
         sp = this.conf["x%d_sp"%seq] 
-        time = this.conf["x%d_time"%seq]
-        this.idle.timing += time
-
-        e = Event("x%d_missile"%seq, this.missile, now()+this.conf['missile_iv'][seq-1])
+        e = Event("x%d_missile"%seq, this.missile, \
+                now() + this.conf['missile_iv'][seq] )
         e.amount = dmg
         e.samount = sp
         e.on()
 
-        log("x", "x%d"%seq, 0)
+        if seq == 5:
+            log("x", "x%d"%seq, 0,"-------------------------------------c5")
+        else:
+            log("x", "x%d"%seq, 0)
         this.think_pin("x_cancel")
 
-        if this.x_status == 5:
-            this.x_status = 1
+        if seq == 5:
+            this.x_status = (5, 0)
+            time = this.conf["x5_recovery"]
         else:
-            this.x_status += 1
+            this.x_status = (seq, seq+1)
+            time = this.conf["x%d_startup"%(seq+1)]
+        this.idle.timing += time
+
+
 
     
     def melee_x(this):
@@ -225,14 +244,11 @@ class Adv(object):
         this.dmg_make("x%d"%seq, dmg)
         this.charge("x%d"%seq, sp)
 
-        if this.x_status == 5:
-            this.x_status = 1
-        else:
-            this.x_status += 1
-
     def dmg_make(this, name, count):
         count = count * this.dmg_mod()
-        log("dmg", name, count)
+        spgain = this.conf[name[:2]+"_sp"]
+        log("dmg", name, count, "%d/%d, %d/%d, %d/%d (+%d)"%(\
+            this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp, spgain) )
 
 
     def s(this, e):
@@ -241,14 +257,15 @@ class Adv(object):
         #if e.name == "s1":
             #this.s1_proc(e)
 
-        log("cast", e.name, 0,"%d/%d, %d/%d, %d/%d"%(\
-            this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp) )
+        seq = this.x_status[0]
+        log("cast", e.name, 0,"<cast> %d/%d, %d/%d, %d/%d (%s after c%s)"%(\
+            this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp, e.name, seq ) )
 
         this.idle.timing = now() + this.conf[e.name+"_time"]
         this.dmg_make(e.name , this.conf[e.name+"_dmg"])
 
 
-        this.x_status = 1
+        this.x_status = (0, 1)
         this.think_pin("s")
 
     def s1_proc(this, e):
@@ -277,7 +294,7 @@ def sum_dmg():
 
 a = Adv(conf)
 a.run(300)
-logcat()
+logcat(['dmg','x','cast'])
 sum_dmg()
 
 
