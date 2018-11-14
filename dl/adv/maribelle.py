@@ -19,6 +19,9 @@ class Maribelle(adv.Adv):
         } )
     conf.update(wep.wand.conf)
 
+    def sp_mod(this):
+        return 1.05
+
 
     def s1_proc(this, e):
         pass

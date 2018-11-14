@@ -31,6 +31,7 @@ class Skill(object):
         else:
             this.charged = 0
             this.ac()
+            return 1
 
     def ac(this):
         Event(this.name).trigger()
@@ -81,32 +82,38 @@ class Adv(object):
         e = Event('think', this.think).on(now() + latency).pin = pin
 
     def think(this, e):
-        if e.pin == 'sp':
+        if e.pin == 'sp' and 'sp' in this.conf['al']:
             for i in this.conf['al']['sp']:
-                getattr(this,i).cast()
+                if getattr(this,i).cast():
+                    break
 
         if e.pin == 'x_cancel':
-            if this.x_status == (5, 0) and this.conf['al']['x5']:
+            if 'x5' in this.conf['al'] and this.x_status == (5, 0):
                 for i in this.conf['al']['x5']:
-                    getattr(this,i).cast()
-            if this.x_status == (4, 5) and this.conf['al']['x4']:
+                    if getattr(this,i).cast():
+                        break
+            elif 'x4' in this.conf['al'] and this.x_status == (4, 5):
                 for i in this.conf['al']['x4']:
-                    getattr(this,i).cast()
-            if this.x_status == (3, 4) and this.conf['al']['x3']:
+                    if getattr(this,i).cast():
+                        break
+            elif 'x3' in this.conf['al'] and this.x_status == (3, 4):
                 for i in this.conf['al']['x3']:
-                    getattr(this,i).cast()
-            if this.x_status == (2, 3) and this.conf['al']['x2']:
+                    if getattr(this,i).cast():
+                        break
+            elif 'x2' in this.conf['al'] and this.x_status == (2, 3):
                 for i in this.conf['al']['x2']:
-                    getattr(this,i).cast()
-            if this.x_status == (1, 2) and this.conf['al']['x1']:
+                    if getattr(this,i).cast():
+                        break
+            elif 'x1' in this.conf['al'] and this.x_status == (1, 2):
                 for i in this.conf['al']['x1']:
-                    getattr(this,i).cast()
-            if this.x_status == (0, 1) and this.conf['al']['x1']:
-                for i in this.conf['al']['x0'] :
-                    getattr(this, i).cast()
-        #if e.pin == 's':
-            #for i in this.conf['al']['x0'] :
-                #getattr(this, i).cast()
+                    if getattr(this,i).cast():
+                        break
+            #elif this.x_status == (0, 1) and this.conf['al']['x1']:
+                #for i in this.conf['al']['x0'] :
+                    #getattr(this, i).cast()
+        if e.pin == 's' and 's' in this.conf['al']:
+            for i in this.conf['al']['s'] :
+                getattr(this, i).cast()
 
     def charge(this, name, sp):
         sp = sp * this.sp_mod()
@@ -132,9 +139,11 @@ class Adv(object):
 
     def range_x(this):
         if this.x_status[1] == 0 :
-            this.x_status = (0, 1)
             time = this.conf["x1_startup"]
             this.idle.timing += time
+            if this.x_status[0] == 0:
+                this.think_pin('s')
+            this.x_status = (0, 1)
             return
 
         seq = this.x_status[1]

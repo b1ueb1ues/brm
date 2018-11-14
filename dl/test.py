@@ -17,17 +17,17 @@ al = {
     'x3': [],
     'x2': [],
     'x1': [],
-    'x0': [],
+    's': [],
     }
 
 al.update( {
     #'sp': ["s1","s2"],
     'x5': ["s1", "s2"],
-    'x4': [],
+    'x4': ["s1", "s2"],
     'x3': ["s1", "s2"],
     'x2': ["s1", "s2"],
     'x1': ["s1", "s2"],
-    'x0': ["s1", "s2"],
+    's': ["s1", "s2"],
     } )
 
 conf['al'] = al
@@ -47,7 +47,7 @@ def sum_dmg():
 
 
 Maribelle(conf).run()
-logcat(['x','dmg','cast'])
+#logcat(['x','dmg','cast'])
 sum_dmg()
 
 logreset()
@@ -59,8 +59,20 @@ conf['al'] = {
     'x3': [],
     'x2': [],
     'x1': [],
-    'x0': [],
+    's': [],
     }
+
+al = {}
+al.update( {
+    #'sp': ["s1","s2"],
+    'x5': ["s1", "s2"],
+    #'x4': ["s1", "s2"],
+    'x3': ["s1", "s2"],
+    'x2': ["s1", "s2"],
+    'x1': ["s1", "s2"],
+    's': ["s1", "s2"],
+    } )
+conf['al'] = al
 
 Maribelle(conf).run(300)
 sum_dmg()
