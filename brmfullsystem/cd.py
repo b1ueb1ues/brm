@@ -19,7 +19,8 @@ class Cd(object):
         def process(this):
             this.src._enable=1
             if this.src._cdev == 0 :
-                print '====',this.now(),this.src,this.src.casttime
+                pass
+                #print '====',this.now(),this.src,this.src.casttime
 
             tmpev = Cd.callbackev()
             tmpev.src = this.src

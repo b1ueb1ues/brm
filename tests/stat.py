@@ -9,19 +9,19 @@ def main():
     pool = []
 
     pool.append(config( \
-        equip=['4t'] ,stat=[25,20,0,25] \
+        equip=[] ,stat=[25,20,0,25] \
         ))
     pool.append(config( \
-        equip=['4t'] ,stat=[30,20,0,25] \
+        equip=[] ,stat=[30,20,0,25] \
         ))
     pool.append(config( \
-        equip=['4t'] ,stat=[25,25,0,25] \
+        equip=[] ,stat=[25,25,0,25] \
         ))
     pool.append(config( \
-        equip=['4t'] ,stat=[25,20,5,25] \
+        equip=[] ,stat=[25,20,5,25] \
         ))
     pool.append(config( \
-        equip=['4t'] ,stat=[25,20,0,30] \
+        equip=[] ,stat=[25,20,0,30] \
         ))
 
 

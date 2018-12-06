@@ -303,7 +303,7 @@ class brm(brmbase):
                     this.gift(src='2t20')
 
             #print '-isbcast----',this.el.time
-            this.brewstachebuff.cast()
+            #this.brewstachebuff.cast()
             #print 'cast isb at',this.now(),'buff at',this.isb.time()
             this.cast.isb += 1
         else:
@@ -326,23 +326,23 @@ class brm(brmbase):
             else:
                 this.delay(this.duration)
                 
-    class Brewstachebuff(aura):
-        starttime = 0
-        duration = 4.5
-        def startprocess(this,time):
-            this.value = 0.1
-            this.starttime = time
-        def endprocess(this,time):
-            bs = this
-            brm = bs.src
-            bs.value = 0
-            brm.brewstachetime.time += (time - bs.starttime)
-        def refreshprocess(this,time):
-            super(brm.Brewstachebuff,this).refreshprocess(time)
-            bs = this
-            bm = this.src
-            bm.brewstachetime.time += (time - bs.starttime)
-            bs.starttime = time
+    #class Brewstachebuff(aura):
+    #    starttime = 0
+    #    duration = 4.5
+    #    def startprocess(this,time):
+    #        this.value = 0.1
+    #        this.starttime = time
+    #    def endprocess(this,time):
+    #        bs = this
+    #        brm = bs.src
+    #        bs.value = 0
+    #        brm.brewstachetime.time += (time - bs.starttime)
+    #    def refreshprocess(this,time):
+    #        super(brm.Brewstachebuff,this).refreshprocess(time)
+    #        bs = this
+    #        bm = this.src
+    #        bm.brewstachetime.time += (time - bs.starttime)
+    #        bs.starttime = time
 
     class Edbuff(aura):
         starttime = 0
@@ -616,7 +616,7 @@ class brm(brmbase):
         if rate == -2 :
             #print '-pbcast----',this.el.time
             bm = this
-            bm.brewstachebuff.cast()
+            #bm.brewstachebuff.cast()
             if bm.bc != 0:
                 bm.masterystack += 1
             if bm.ed != 0:
@@ -654,7 +654,7 @@ class brm(brmbase):
 	    return this.haste
 
     def getdodge(this):
-        return this.dodgebase + this.masterystack * this.mastery + this.brewstachebuff.value + this.edbuff.value
+        return this.dodgebase + this.masterystack * this.mastery + this.edbuff.value
 
 
     def init(this):
@@ -711,7 +711,7 @@ class brm(brmbase):
         if this.heavyhide != 0:
             this.heavyhidebuff = brm.Heavyhide(this)
             this.heavyhideev = brm.HeavyhideEv(this.el)
-        this.brewstachebuff = brm.Brewstachebuff(this)
+        #this.brewstachebuff = brm.Brewstachebuff(this)
         this.isb = brm.ISBbuff(this,duration=this.isbduration)
         this.edbuff = brm.Edbuff(this)
         if 'ed' in this.talent:

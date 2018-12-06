@@ -38,10 +38,11 @@ class Skill(object):
 
 class Adv(object):
     x_status = (0,0)
-    log = []
     conf = {}
 
     def __init__(this,conf):
+        this.log = []
+        loginit(this.log)
         tmpconf = {}
         tmpconf.update(this.conf)
         tmpconf.update(conf)
@@ -55,14 +56,8 @@ class Adv(object):
         elif this.conf['x_type']== "melee":
             this.x = this.melee_x
 
-    def init(this):
-        Timeline().reset()
-        this.idle = Event("idle", this.ac).on()
-        this.x_status = (0,0)
-        Event("s1").listener(this.s)
-        Event("s2").listener(this.s)
-        Event("s3").listener(this.s)
-
+    def init(this): #virtual
+        pass
 
     def x(this): #virtual
         pass
@@ -71,6 +66,14 @@ class Adv(object):
         this.x()
 
     def run(this, d = 300):
+
+        Timeline().reset()
+        this.idle = Event("idle", this.ac).on()
+        this.x_status = (0,0)
+        Event("s1").listener(this.s)
+        Event("s2").listener(this.s)
+        Event("s3").listener(this.s)
+
         this.init()
         Timeline().run(d)
 
@@ -116,7 +119,7 @@ class Adv(object):
                 getattr(this, i).cast()
 
     def charge(this, name, sp):
-        sp = sp * this.sp_mod()
+        sp = sp * this.sp_mod(name)
         this.s1.charge(sp)
         this.s2.charge(sp)
         this.s3.charge(sp)
@@ -124,12 +127,40 @@ class Adv(object):
         log("sp", name, sp,"%d/%d, %d/%d, %d/%d"%(\
             this.s1.charged, this.s1.sp, this.s2.charged, this.s2.sp, this.s3.charged, this.s3.sp) )
 
-    def dmg_mod(this):
-        armor = 10
-        mod = 5.0/3/armor
-        return mod
+    def dmg_formula(this, name, att):
+        att = att * this.att_mod()
+        arm = 10.0 * this.arm_mod()
+        return 5.0/3 * this.dmg_mod(name) * att/arm
 
-    def sp_mod(this):
+    def dmg_mod_s(this, name):
+        return 1
+
+    def dmg_mod_fs(this, name):
+        return 1
+
+    def dmg_mod_x(this, name):
+        return 1
+
+    def dmg_mod_fs(this):
+        return 1
+
+    def dmg_mod(this, name):
+        if name[0] == 's':
+            return this.dmg_mod_s(name)
+        elif name[0:2] == 'fs':
+            return this.dmg_mod_fs(name)
+        elif name[0] == 'x':
+            return this.dmg_mod_x(name)
+        else:
+            return 1
+
+    def att_mod(this):
+        return 1
+
+    def arm_mod(this):
+        return 1
+
+    def sp_mod(this, name):
         return 1
 
     def missile(this,e):
@@ -171,15 +202,15 @@ class Adv(object):
 
     def melee_x(this):
         seq = this.x_status
-        dmg = this.conf["x%d_dmg"%seq]
+        att = this.conf["x%d_dmg"%seq]
         sp = this.conf["x%d_sp"%seq] 
         log("x", "x%d"%seq, 0)
 
-        this.dmg_make("x%d"%seq, dmg)
+        this.dmg_make("x%d"%seq, att)
         this.charge("x%d"%seq, sp)
 
-    def dmg_make(this, name, count):
-        count = count * this.dmg_mod()
+    def dmg_make(this, name, att):
+        count = this.dmg_formula(name, att)
         
         if name[0] == "x":
             spgain = this.conf[name[:2]+"_sp"]

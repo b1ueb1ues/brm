@@ -15,7 +15,7 @@ def main():
     pool = []
 
     pool.append(brm( \
-        equip=['4t19'],talent=['black','ht'],stat=[25,25,0,25]   \
+        equip=[],talent=['light','ht'],stat=[25,25,0,25]   \
         ))
 
     #test2haste(pool)
@@ -124,10 +124,10 @@ def teststatwide(line, time = 100000, start = 10, stop = 40, offset = 2, statind
         col += 1
         l.show()
 
-    if statindex == 1:
-        print '\nhaste\t',
-    elif statindex == 0:
+    if statindex == 0:
         print '\ncrit\t',
+    elif statindex == 1:
+        print '\nhaste\t',
     elif statindex == 2:
         print '\nvers\t',
     elif statindex == 3:
